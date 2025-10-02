@@ -3,23 +3,24 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id           String        @id @default(cuid())
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
   email        String        @unique
   password     String
   role         Role
-  clinicId     String?
+  clinicId     String?       @db.ObjectId
   clinic       Clinic?       @relation(fields: [clinicId], references: [id])
-  appointments Appointment[] @relation("SpecialistAppointments")
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Clinic {
-  id       String @id @default(cuid())
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   name     String
   phone    String
   email    String
@@ -36,29 +37,35 @@ model Clinic {
 }
 
 model Staff {
-  id         String    @id @default(cuid())
-  name       String
-  user_id    String
-  phone      String
-  email      String?
-  gender     String
-  address    String?
-  disciplineId String
-  role       StaffRole
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  user_id      String
+  phone        String
+  email        String?
+  gender       String
+  address      String?
+  disciplineId String  @db.ObjectId
+  role         String
 
-  clinicId String
+  clinicId   String     @db.ObjectId
   discipline Discipline @relation(fields: [disciplineId], references: [id])
-  clinic   Clinic @relation(fields: [clinicId], references: [id])
+  clinic     Clinic     @relation(fields: [clinicId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Discipline {
-  id        String   @id @default(cuid())
-  name      String
-  staff     Staff[]
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  staff Staff[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Patient {
-  id                    String        @id @default(cuid())
+  id                    String        @id @default(auto()) @map("_id") @db.ObjectId
   firstName             String
   lastName              String?
   phone                 String
@@ -69,9 +76,6 @@ model Patient {
   patient_document_id   String?
   country               String?
   guardian_name         String?
-  guardian_phone        String?
-  guardian_email        String?
-  guardian_address      String?
   guardian_relationship String?
   guardian_document_id  String?
   medical_history       String?
@@ -84,21 +88,19 @@ model Patient {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  clinicId     String
+  clinicId     String        @db.ObjectId
   clinic       Clinic        @relation(fields: [clinicId], references: [id])
   appointments Appointment[]
 }
 
-
-
 model Appointment {
-  id              String            @id @default(cuid())
-  patientId       String
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  patientId       String            @db.ObjectId
   patient_name    String
   contact_number  String
   service         String
   specialist_name String
-  specialistId    String
+  specialistId    String            @db.ObjectId
   date            DateTime
   time            String
   status          AppointmentStatus
@@ -109,13 +111,11 @@ model Appointment {
   updatedAt DateTime @updatedAt
 
   patient    Patient @relation(fields: [patientId], references: [id])
-  specialist User    @relation("SpecialistAppointments", fields: [specialistId], references: [id])
+  specialist User    @relation(fields: [specialistId], references: [id])
 }
 
-
-
 model Bonds {
-  id           String     @id @default(cuid())
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   discipline   String
   service      String
@@ -129,7 +129,7 @@ model Bonds {
 }
 
 model Products {
-  id           String      @id @default(cuid())
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   product_type ProductType
   price        Float
@@ -140,9 +140,8 @@ model Products {
   updatedAt DateTime @updatedAt
 }
 
-
 model BillingAndInvoice {
-  id             String        @id @default(cuid())
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
   invoice_id     String
   name           String
   amount         Float
@@ -154,11 +153,13 @@ model BillingAndInvoice {
 
   payment_date DateTime      @default(now())
   status       BillingStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-
 model Reminders {
-  id                   String              @id @default(cuid())
+  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
   reminder_id          String
   reminder_type        ReminderType
   reminder_time        Int
@@ -172,9 +173,8 @@ model Reminders {
   updatedAt DateTime @updatedAt
 }
 
-
 model Voucher {
-  id             String        @id @default(cuid())
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   associate_name String
   amount         Float
@@ -185,29 +185,49 @@ model Voucher {
   updatedAt DateTime @updatedAt
 }
 
-
 model membershipPackage {
-  id            String         @id @default(cuid())
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
   name          String
   maxDoctors    Int
   maxPatients   Int
   price         Float
   durationDays  Int
   subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Subscription {
-  id        String   @id @default(cuid())
-  clinicId  String
-  packageId String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  clinicId  String   @db.ObjectId
+  packageId String   @db.ObjectId
   startDate DateTime
   endDate   DateTime
 
-  clinic  Clinic  @relation(fields: [clinicId], references: [id])
+  clinic  Clinic            @relation(fields: [clinicId], references: [id])
   package membershipPackage @relation(fields: [packageId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum BillingStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BondStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum VoucherStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PatientStatus {
   ACTIVE
   INACTIVE
 }
@@ -222,28 +242,13 @@ enum CommunicationMethod {
   EMAIL
   SMS
   WHATSAPP
-  OTHER
 }
-
-
-
-enum BondStatus {
-  ACTIVE
-  INACTIVE
-}
-
 
 enum ProductType {
   BOND
   SERVICE
   VOUCHER
   OTHER
-}
-
-
-enum VoucherStatus {
-  ACTIVE
-  INACTIVE
 }
 
 enum PaymentMethod {
@@ -254,31 +259,24 @@ enum PaymentMethod {
   OTHER
 }
 
-
 enum PaymentStatus {
   PAID
   PENDING
   FAILED
 }
 
-
-enum StaffRole {
-  CLEANER
-  CONSULTATION
-  EMERGENCY
-  OTHERS
-}
+// enum StaffRole {
+//   CLEANER
+//   CONSULTATION
+//   EMERGENCY
+//   OTHERS
+// }
 
 enum Role {
-  SUPERADMIN
-  CLINICADMIN
+  SUPER_ADMIN
+  CLINIC_ADMIN
   RECEPTIONIST
   SPECIALIST
-}
-
-enum PatientStatus {
-  ACTIVE
-  INACTIVE
 }
 
 enum AppointmentStatus {
