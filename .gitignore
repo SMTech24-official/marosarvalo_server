@@ -1,0 +1,13 @@
+node_modules
+dist
+.vercel
+.qodo
+.env
+uploads
+/prisma/prisma
+
+/prisma/prisma
+
+/prisma/prisma
+
+/generated/prisma

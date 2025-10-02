@@ -1,0 +1,288 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  password     String
+  role         Role
+  clinicId     String?
+  clinic       Clinic?       @relation(fields: [clinicId], references: [id])
+  appointments Appointment[] @relation("SpecialistAppointments")
+}
+
+model Clinic {
+  id       String @id @default(cuid())
+  name     String
+  phone    String
+  email    String
+  address1 String
+  address2 String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users         User[]
+  staff         Staff[]
+  patients      Patient[]
+  subscriptions Subscription[]
+}
+
+model Staff {
+  id         String    @id @default(cuid())
+  name       String
+  user_id    String
+  phone      String
+  email      String?
+  gender     String
+  address    String?
+  disciplineId String
+  role       StaffRole
+
+  clinicId String
+  discipline Discipline @relation(fields: [disciplineId], references: [id])
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
+}
+
+model Discipline {
+  id        String   @id @default(cuid())
+  name      String
+  staff     Staff[]
+}
+
+model Patient {
+  id                    String        @id @default(cuid())
+  firstName             String
+  lastName              String?
+  phone                 String
+  age                   Int
+  gender                String
+  email                 String?
+  address               String?
+  patient_document_id   String?
+  country               String?
+  guardian_name         String?
+  guardian_phone        String?
+  guardian_email        String?
+  guardian_address      String?
+  guardian_relationship String?
+  guardian_document_id  String?
+  medical_history       String?
+  allergies             String?
+  medications           String?
+  medical_conditions    String?
+  other_documents       String?
+  patient_status        PatientStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clinicId     String
+  clinic       Clinic        @relation(fields: [clinicId], references: [id])
+  appointments Appointment[]
+}
+
+
+
+model Appointment {
+  id              String            @id @default(cuid())
+  patientId       String
+  patient_name    String
+  contact_number  String
+  service         String
+  specialist_name String
+  specialistId    String
+  date            DateTime
+  time            String
+  status          AppointmentStatus
+  notes           String?
+  documents       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient    Patient @relation(fields: [patientId], references: [id])
+  specialist User    @relation("SpecialistAppointments", fields: [specialistId], references: [id])
+}
+
+
+
+model Bonds {
+  id           String     @id @default(cuid())
+  name         String
+  discipline   String
+  service      String
+  session      String
+  price        Float
+  status       BondStatus @default(ACTIVE)
+  durationDays Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Products {
+  id           String      @id @default(cuid())
+  name         String
+  product_type ProductType
+  price        Float
+  quantity     Int
+  total        Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model BillingAndInvoice {
+  id             String        @id @default(cuid())
+  invoice_id     String
+  name           String
+  amount         Float
+  tax            Float
+  discount       Float
+  total          Float
+  payment_method PaymentMethod
+  payment_status PaymentStatus
+
+  payment_date DateTime      @default(now())
+  status       BillingStatus @default(ACTIVE)
+}
+
+
+model Reminders {
+  id                   String              @id @default(cuid())
+  reminder_id          String
+  reminder_type        ReminderType
+  reminder_time        Int
+  reminder_message     String
+  communication_method CommunicationMethod
+
+  subject String
+  body    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Voucher {
+  id             String        @id @default(cuid())
+  name           String
+  associate_name String
+  amount         Float
+  expire_date    DateTime
+  status         VoucherStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model membershipPackage {
+  id            String         @id @default(cuid())
+  name          String
+  maxDoctors    Int
+  maxPatients   Int
+  price         Float
+  durationDays  Int
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  clinicId  String
+  packageId String
+  startDate DateTime
+  endDate   DateTime
+
+  clinic  Clinic  @relation(fields: [clinicId], references: [id])
+  package membershipPackage @relation(fields: [packageId], references: [id])
+}
+
+enum BillingStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ReminderType {
+  APPOINTMENT
+  BILLING
+  OTHER
+}
+
+enum CommunicationMethod {
+  EMAIL
+  SMS
+  WHATSAPP
+  OTHER
+}
+
+
+
+enum BondStatus {
+  ACTIVE
+  INACTIVE
+}
+
+
+enum ProductType {
+  BOND
+  SERVICE
+  VOUCHER
+  OTHER
+}
+
+
+enum VoucherStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  VOUCHER
+  BOND
+  OTHER
+}
+
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  FAILED
+}
+
+
+enum StaffRole {
+  CLEANER
+  CONSULTATION
+  EMERGENCY
+  OTHERS
+}
+
+enum Role {
+  SUPERADMIN
+  CLINICADMIN
+  RECEPTIONIST
+  SPECIALIST
+}
+
+enum PatientStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
