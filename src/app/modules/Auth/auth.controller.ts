@@ -7,7 +7,7 @@ import {
 	emailVerifiedFailedTemplate,
 	emailVerifiedSuccessTemplate,
 } from "./auth.template";
-import { jwtHelpers } from "../../../helpars/jwtHelpers";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import config from "../../../config";
 import prisma from "../../../shared/prisma";
 

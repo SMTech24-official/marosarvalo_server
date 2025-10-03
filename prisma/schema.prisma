@@ -8,10 +8,13 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  email    String @unique
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name     String
+  email    String   @unique
   password String
-  role     Role
+  phone    String
+  role     UserRole
 
   // Relation to Clinic (optional)
   clinicId String? @db.ObjectId
@@ -140,7 +143,7 @@ model Appointment {
   specialistId String @db.ObjectId
   specialist   User   @relation(fields: [specialistId], references: [id])
 
-  date            DateTime
+  date          DateTime
   timeSlotStart String
   timeSlotEnd   String
 
@@ -163,7 +166,7 @@ model Voucher {
   price Float
 
   expireDate DateTime
-  status      ActivityStatus @default(ACTIVE)
+  status     ActivityStatus @default(ACTIVE)
 
   product Product[]
 
@@ -215,7 +218,7 @@ model Product {
   receipt   Receipt @relation(fields: [receiptId], references: [id])
 
   productType ProductType
-  quantity     Int
+  quantity    Int
 
   voucherId String?  @db.ObjectId
   voucher   Voucher? @relation(fields: [voucherId], references: [id])
@@ -281,7 +284,7 @@ model ReminderSchedule {
   scheduleType ReminderScheduleScheduleType @default(TIMED)
 
   communicationMethod CommunicationMethod[]
-  status               ActivityStatus        @default(ACTIVE)
+  status              ActivityStatus        @default(ACTIVE)
 
   subject String
   body    String
@@ -317,7 +320,7 @@ model Package {
   price Float
 
   durationMonths Int
-  subscriptions   Subscription[]
+  subscriptions  Subscription[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -394,7 +397,7 @@ enum PaymentStatus {
   CANCELLED
 }
 
-enum Role {
+enum UserRole {
   SUPER_ADMIN
   CLINIC_ADMIN
   RECEPTIONIST

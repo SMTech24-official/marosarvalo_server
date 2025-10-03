@@ -2,7 +2,7 @@ import { Router } from "express";
 import { UserController } from "./user.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
-import { upload } from "../../../helpars/fileUploader";
+import { upload } from "../../../helpers/fileUploader";
 import { parseBodyData } from "../../middlewares/parseBodyData";
 import validateRequest from "../../middlewares/validateRequest";
 import { UserValidations } from "./user.validation";

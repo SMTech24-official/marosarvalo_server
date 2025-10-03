@@ -1,4 +1,4 @@
-import { hashPassword } from "./../../../helpars/passwordHelpers";
+import { hashPassword } from "../../../helpers/passwordHelpers";
 import { UserRole } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 
@@ -6,10 +6,10 @@ import httpStatus from "http-status";
 
 import config from "../../../config";
 import ApiError from "../../../errors/ApiErrors";
-import { jwtHelpers } from "../../../helpars/jwtHelpers";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import prisma from "../../../shared/prisma";
-import emailSender from "../../../helpars/emailSender/emailSender";
-import { comparePassword } from "../../../helpars/passwordHelpers";
+import emailSender from "../../../helpers/emailSender/emailSender";
+import { comparePassword } from "../../../helpers/passwordHelpers";
 import { Request } from "express";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { generateEmailVerifyTemplate } from "./auth.template";
