@@ -1,4 +1,4 @@
-module.exports = ({ pascal, camel }) => `
+const template = ({ pascal, camel }) => `
 import { NestedFilter } from "../../../interfaces/nestedFiltering";
 import { rangeFilteringPrams } from "../../../utils/queryBuilder";
 
@@ -29,3 +29,5 @@ export const ${camel}Include = {
 	
 };
 `;
+
+export default template;

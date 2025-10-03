@@ -1,4 +1,4 @@
-module.exports = ({ pascal, camel }) => `
+const template = ({ pascal, camel }) => `
 import { z } from "zod";
 
 const create${pascal}Schema = z.object({
@@ -14,3 +14,5 @@ export const ${pascal}Validations = {
 };
 
 `;
+
+export default template;
