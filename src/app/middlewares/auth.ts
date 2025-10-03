@@ -7,10 +7,11 @@ import httpStatus from "http-status";
 import ApiError from "../../errors/ApiErrors";
 import { jwtHelpers } from "../../helpers/jwtHelpers";
 import prisma from "../../shared/prisma";
+import { UserRole } from "@prisma/client";
 
 //  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN)
 
-const auth = (...roles: string[]) => {
+const auth = (...roles: UserRole[]) => {
   return async (
     req: Request & { user?: any },
     res: Response,

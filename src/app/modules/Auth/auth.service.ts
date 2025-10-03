@@ -1,4 +1,4 @@
-import * as bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 import httpStatus from "http-status";
 
@@ -64,31 +64,6 @@ const loginUser = async (payload: { email: string; password: string }) => {
     accessToken,
     message: "Login Successful!",
   };
-};
-
-// Get current User Info
-const getUserInfo = async (user: JwtPayload) => {
-  const userProfile = await prisma.user.findUnique({
-    where: {
-      id: user?.id,
-    },
-    select: {
-      id: true,
-      email: true,
-      role: true,
-
-      // TODO: Add more fields
-
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-
-  if (!userProfile) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthenticated Request.");
-  }
-
-  return userProfile;
 };
 
 // Change Password
@@ -211,9 +186,8 @@ const refreshToken = async (payload: { refreshToken: string }) => {
   };
 };
 
-export const AuthServices = {
+export default {
   loginUser,
-  getUserInfo,
   changePassword,
   forgotPassword,
   refreshToken,

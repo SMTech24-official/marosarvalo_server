@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import { AuthServices } from "./auth.service";
+import AuthServices from "./auth.service";
 import config from "../../../config";
 
 // Login user
@@ -42,19 +42,6 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// Get current User Info
-const getUserInfo = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-
-  const result = await AuthServices.getUserInfo(user);
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "User profile retrieved successfully",
-    data: result,
-  });
-});
-
 // Change Password
 const changePassword = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
@@ -91,10 +78,9 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
-export const AuthController = {
+export default {
   loginUser,
   logoutUser,
-  getUserInfo,
   changePassword,
   forgotPassword,
   refreshToken,

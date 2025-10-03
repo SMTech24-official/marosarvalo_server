@@ -1,6 +1,6 @@
 import express from "express";
 import auth from "../../middlewares/auth";
-import { AuthController } from "./auth.controller";
+import AuthController from "./auth.controller";
 
 const router = express.Router();
 
@@ -10,8 +10,8 @@ router.post("/login", AuthController.loginUser);
 // Logout User
 router.post("/logout", auth(), AuthController.logoutUser);
 
-// Get Current User Info
-router.get("/me", auth(), AuthController.getUserInfo);
+// Get Current User Info - This should not be here
+// router.get("/me", auth(), AuthController.getUserInfo);
 
 // Change Password
 router.put("/change-password", auth(), AuthController.changePassword);
