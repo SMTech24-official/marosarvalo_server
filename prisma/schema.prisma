@@ -15,41 +15,46 @@ model User {
   clinicId     String?       @db.ObjectId
   clinic       Clinic?       @relation(fields: [clinicId], references: [id])
   appointments Appointment[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-}
 
-model Clinic {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  phone    String
-  email    String
-  address1 String
-  address2 String
+  disciplineId String?     @db.ObjectId
+  discipline   Discipline? @relation(fields: [disciplineId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Staff {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  user_id String
+  phone   String
+  email   String?
+  gender  String
+  address String?
+  role    String
+
+  disciplineId String     @db.ObjectId
+  discipline   Discipline @relation(fields: [disciplineId], references: [id])
+
+  clinicId String @db.ObjectId
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Clinic {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  phone     String
+  email     String
+  address_1 String
+  address_2 String
 
   users         User[]
   staff         Staff[]
   patients      Patient[]
   subscriptions Subscription[]
-}
-
-model Staff {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  user_id      String
-  phone        String
-  email        String?
-  gender       String
-  address      String?
-  disciplineId String  @db.ObjectId
-  role         String
-
-  clinicId   String     @db.ObjectId
-  discipline Discipline @relation(fields: [disciplineId], references: [id])
-  clinic     Clinic     @relation(fields: [clinicId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,111 +64,151 @@ model Discipline {
   id    String  @id @default(auto()) @map("_id") @db.ObjectId
   name  String
   staff Staff[]
+  user  User[]
+  bond  Bond[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Appointment Appointment[]
 }
 
 model Patient {
-  id                    String        @id @default(auto()) @map("_id") @db.ObjectId
-  firstName             String
-  lastName              String?
-  phone                 String
-  age                   Int
-  gender                String
-  email                 String?
-  address               String?
-  patient_document_id   String?
-  country               String?
-  guardian_name         String?
-  guardian_relationship String?
-  guardian_document_id  String?
-  medical_history       String?
-  allergies             String?
-  medications           String?
-  medical_conditions    String?
-  other_documents       String?
-  patient_status        PatientStatus @default(ACTIVE)
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String?
+  phone     String
+  email     String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  address             String?
+  patient_document_id String?
+  date_of_birth       DateTime?
+  gender              String
+
+  guardian_name        String?
+  guardian_relation    String?
+  guardian_document_id String? // TODO: Check Uploads
+
+  medical_condition String?
+  allergies         String?
+  medications       String?
+
+  documents String? // TODO: Check Uploads
+
+  other_documents String? // TODO: Check Uploads
+  patient_status  PatientStatus @default(ACTIVE)
 
   clinicId     String        @db.ObjectId
   clinic       Clinic        @relation(fields: [clinicId], references: [id])
   appointments Appointment[]
+
+  note String?
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Receipt   Receipt[]
+  Reminder  Reminder[]
+  Voucher   Voucher[]
 }
 
 model Appointment {
-  id              String            @id @default(auto()) @map("_id") @db.ObjectId
-  patientId       String            @db.ObjectId
-  patient_name    String
-  contact_number  String
-  service         String
-  specialist_name String
-  specialistId    String            @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  patientId String  @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  disciplineId String     @db.ObjectId
+  discipline   Discipline @relation(fields: [disciplineId], references: [id])
+
+  service String
+
+  specialistId String @db.ObjectId
+  specialist   User   @relation(fields: [specialistId], references: [id])
+
   date            DateTime
-  time            String
-  status          AppointmentStatus
-  notes           String?
-  documents       String?
+  time_slot_start String
+  time_slot_end   String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  patient    Patient @relation(fields: [patientId], references: [id])
-  specialist User    @relation(fields: [specialistId], references: [id])
-}
-
-model Bonds {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  discipline   String
-  service      String
-  session      String
-  price        Float
-  status       BondStatus @default(ACTIVE)
-  durationDays Int
+  status    AppointmentStatus
+  documents String? // TODO: Check Uploads
+  note      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Products {
-  id           String      @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
+model Bond {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  disciplineId String     @db.ObjectId
+  discipline   Discipline @relation(fields: [disciplineId], references: [id])
+
+  service  String // TODO: Need Service Model
+  sessions Int
+
+  price Float
+
+  status BondStatus @default(ACTIVE)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Product   Product[]
+}
+
+model Product {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  receiptId String  @db.ObjectId
+  receipt   Receipt @relation(fields: [receiptId], references: [id])
+
   product_type ProductType
-  price        Float
   quantity     Int
-  total        Float
+
+  voucherId String   @db.ObjectId
+  voucher   Voucher? @relation(fields: [voucherId], references: [id])
+
+  bondId String @db.ObjectId
+  bond   Bond?  @relation(fields: [bondId], references: [id])
+
+  serviceId String @db.ObjectId
+  // service Ser // TODO: Make Service
+  // TODO: Make sure all products have `price`
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model BillingAndInvoice {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  invoice_id     String
-  name           String
-  amount         Float
-  tax            Float
-  discount       Float
-  total          Float
-  payment_method PaymentMethod
-  payment_status PaymentStatus
+model Receipt {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  payment_date DateTime      @default(now())
-  status       BillingStatus @default(ACTIVE)
+  patientId String  @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  tax      Float
+  discount Float
+
+  paid Float
+
+  note String?
+
+  payment_method String
+
+  products Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Reminders {
-  id                   String              @id @default(auto()) @map("_id") @db.ObjectId
-  reminder_id          String
-  reminder_type        ReminderType
-  reminder_time        Int
-  reminder_message     String
+model Reminder {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  type     ReminderType
+  schedule DateTime
+
+  patientId String  @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+
   communication_method CommunicationMethod
 
   subject String
@@ -173,26 +218,55 @@ model Reminders {
   updatedAt DateTime @updatedAt
 }
 
-model Voucher {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  associate_name String
-  amount         Float
-  expire_date    DateTime
-  status         VoucherStatus @default(ACTIVE)
+// Scheduled Reminder - Runs on Interval
+model ReminderSchedule {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  type  String // TODO: Add reminder type
+  prior Int // Take in Minutes
+
+  description String?
+
+  communication_method CommunicationMethod[]
+  status               ReminderScheduleStatus @default(ACTIVE)
+
+  subject String
+  body    String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model membershipPackage {
-  id            String         @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  maxDoctors    Int
-  maxPatients   Int
-  price         Float
-  durationDays  Int
-  subscriptions Subscription[]
+model Voucher {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+
+  patientId String  @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  amount Float
+
+  expire_date DateTime
+  status      VoucherStatus @default(ACTIVE)
+
+  product Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Package {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name        String
+  description String
+  features    String[]
+
+  price Float
+
+  duration_months Int
+  subscriptions   Subscription[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -200,13 +274,16 @@ model membershipPackage {
 
 model Subscription {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  clinicId  String   @db.ObjectId
-  packageId String   @db.ObjectId
   startDate DateTime
   endDate   DateTime
 
-  clinic  Clinic            @relation(fields: [clinicId], references: [id])
-  package membershipPackage @relation(fields: [packageId], references: [id])
+  clinicId String @db.ObjectId
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
+
+  packageId String  @db.ObjectId
+  package   Package @relation(fields: [packageId], references: [id])
+
+  stripeId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -232,10 +309,16 @@ enum PatientStatus {
   INACTIVE
 }
 
+enum ReminderScheduleStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// TODO: Check if possible to use single Status
+
 enum ReminderType {
-  APPOINTMENT
-  BILLING
-  OTHER
+  IMMEDIATELY
+  SCHEDULED
 }
 
 enum CommunicationMethod {
@@ -281,6 +364,10 @@ enum Role {
 
 enum AppointmentStatus {
   SCHEDULED
+  PENDING
+  CONFIRMED
   COMPLETED
   CANCELLED
 }
+
+// TODO: Check which and which are the actual Status
