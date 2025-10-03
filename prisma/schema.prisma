@@ -8,14 +8,23 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  email        String        @unique
-  password     String
-  role         Role
-  clinicId     String?       @db.ObjectId
-  clinic       Clinic?       @relation(fields: [clinicId], references: [id])
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
+  password String
+  role     Role
+
+  // Relation to Clinic (optional)
+  clinicId String? @db.ObjectId
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
+
+  // One-to-many: User → Appointments
   appointments Appointment[]
 
+  // For Specialist
+  employeeId String?
+  profession String?
+
+  // One-to-many: Discipline → Users
   disciplineId String?     @db.ObjectId
   discipline   Discipline? @relation(fields: [disciplineId], references: [id])
 
@@ -24,14 +33,15 @@ model User {
 }
 
 model Staff {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  name    String
-  user_id String
-  phone   String
-  email   String?
-  gender  String
-  address String?
-  role    String
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  phone String
+  email String?
+
+  employeeId String
+  gender     String
+  address    String?
+  role       String
 
   disciplineId String     @db.ObjectId
   discipline   Discipline @relation(fields: [disciplineId], references: [id])
@@ -44,14 +54,14 @@ model Staff {
 }
 
 model Clinic {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  phone     String
-  email     String
-  address_1 String
-  address_2 String
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  phone    String
+  email    String
+  address1 String
+  address2 String
 
-  users         User[]
+  specialists   User[]
   staff         Staff[]
   patients      Patient[]
   subscriptions Subscription[]
@@ -61,15 +71,17 @@ model Clinic {
 }
 
 model Discipline {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  staff Staff[]
-  user  User[]
-  bond  Bond[]
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  Appointment Appointment[]
+  staff        Staff[]
+  specialists  User[]
+  bonds        Bond[]
+  services     Service[]
+  appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Patient {
@@ -79,23 +91,25 @@ model Patient {
   phone     String
   email     String?
 
-  address             String?
-  patient_document_id String?
-  date_of_birth       DateTime?
-  gender              String
+  address           String?
+  patientDocumentId String?
+  dateOfBirth       DateTime?
+  gender            String
 
-  guardian_name        String?
-  guardian_relation    String?
-  guardian_document_id String? // TODO: Check Uploads
+  guardianName      String?
+  guardianRelation  String?
+  guardianDocuments String[]
 
-  medical_condition String?
-  allergies         String?
-  medications       String?
+  contactPreferences CommunicationMethod[]
 
-  documents String? // TODO: Check Uploads
+  medicalCondition String?
+  allergies        String?
+  medications      String?
 
-  other_documents String? // TODO: Check Uploads
-  patient_status  PatientStatus @default(ACTIVE)
+  documents      String[]
+  otherDocuments String[]
+
+  patient_status ActivityStatus @default(ACTIVE)
 
   clinicId     String        @db.ObjectId
   clinic       Clinic        @relation(fields: [clinicId], references: [id])
@@ -103,11 +117,13 @@ model Patient {
 
   note String?
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Receipt   Receipt[]
-  Reminder  Reminder[]
-  Voucher   Voucher[]
+  receipts           Receipt[]
+  reminders          DirectReminder[]
+  vouchers           Voucher[]
+  scheduledReminders ScheduledReminderHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Appointment {
@@ -125,12 +141,31 @@ model Appointment {
   specialist   User   @relation(fields: [specialistId], references: [id])
 
   date            DateTime
-  time_slot_start String
-  time_slot_end   String
+  timeSlotStart String
+  timeSlotEnd   String
 
   status    AppointmentStatus
-  documents String? // TODO: Check Uploads
+  documents String[]
   note      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Voucher {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+
+  patientId String  @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  price Float
+
+  expireDate DateTime
+  status      ActivityStatus @default(ACTIVE)
+
+  product Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -143,16 +178,33 @@ model Bond {
   disciplineId String     @db.ObjectId
   discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
-  service  String // TODO: Need Service Model
-  sessions Int
+  serviceId String  @db.ObjectId
+  service   Service @relation(fields: [serviceId], references: [id])
+  sessions  Int
 
   price Float
 
-  status BondStatus @default(ACTIVE)
+  status   ActivityStatus @default(ACTIVE)
+  products Product[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Product   Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  disciplineId String     @db.ObjectId
+  discipline   Discipline @relation(fields: [disciplineId], references: [id])
+
+  price    Float
+  duration Int // In minutes
+
+  bonds    Bond[]
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Product {
@@ -162,18 +214,17 @@ model Product {
   receiptId String  @db.ObjectId
   receipt   Receipt @relation(fields: [receiptId], references: [id])
 
-  product_type ProductType
+  productType ProductType
   quantity     Int
 
-  voucherId String   @db.ObjectId
+  voucherId String?  @db.ObjectId
   voucher   Voucher? @relation(fields: [voucherId], references: [id])
 
-  bondId String @db.ObjectId
-  bond   Bond?  @relation(fields: [bondId], references: [id])
+  bondId String? @db.ObjectId
+  bond   Bond?   @relation(fields: [bondId], references: [id])
 
-  serviceId String @db.ObjectId
-  // service Ser // TODO: Make Service
-  // TODO: Make sure all products have `price`
+  serviceId String?  @db.ObjectId
+  service   Service? @relation(fields: [serviceId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,19 +239,18 @@ model Receipt {
   tax      Float
   discount Float
 
-  paid Float
+  paid Float // Paid Amount. Cause there maybe Due amount
 
-  note String?
-
-  payment_method String
-
-  products Product[]
+  note          String?
+  paymentMethod String // TODO: Check methods
+  products      Product[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Reminder {
+// Sends reminder directly - No interval
+model DirectReminder {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   type     ReminderType
@@ -209,7 +259,7 @@ model Reminder {
   patientId String  @db.ObjectId
   patient   Patient @relation(fields: [patientId], references: [id])
 
-  communication_method CommunicationMethod
+  communicationMethod CommunicationMethod
 
   subject String
   body    String
@@ -222,35 +272,36 @@ model Reminder {
 model ReminderSchedule {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  type  String // TODO: Add reminder type
-  prior Int // Take in Minutes
+  // This type is for what type of Message will be sent. Currently only reminders are of Appointments Related
+  type  ReminderScheduleType @default(APPOINTMENT)
+  prior Int? // Take in Minutes
 
-  description String?
+  description  String?
+  // This type is for which type of scheduled reminder is this. If TIMED - Reminder will be sent prior to a given time of appointment. DAY - in the day of Appointment. POST_APPOINTMENT and MISSED_APPOINTMENT are self explanatory
+  scheduleType ReminderScheduleScheduleType @default(TIMED)
 
-  communication_method CommunicationMethod[]
-  status               ReminderScheduleStatus @default(ACTIVE)
+  communicationMethod CommunicationMethod[]
+  status               ActivityStatus        @default(ACTIVE)
 
   subject String
   body    String
+
+  histories ScheduledReminderHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Voucher {
+model ScheduledReminderHistory {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
+  scheduleId String           @db.ObjectId
+  schedule   ReminderSchedule @relation(fields: [scheduleId], references: [id])
 
   patientId String  @db.ObjectId
   patient   Patient @relation(fields: [patientId], references: [id])
 
-  amount Float
-
-  expire_date DateTime
-  status      VoucherStatus @default(ACTIVE)
-
-  product Product[]
+  status DeliveryStatus @default(DELIVERED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -265,7 +316,7 @@ model Package {
 
   price Float
 
-  duration_months Int
+  durationMonths Int
   subscriptions   Subscription[]
 
   createdAt DateTime @default(now())
@@ -289,36 +340,30 @@ model Subscription {
   updatedAt DateTime @updatedAt
 }
 
-enum BillingStatus {
+enum ActivityStatus {
   ACTIVE
   INACTIVE
 }
 
-enum BondStatus {
-  ACTIVE
-  INACTIVE
+enum DeliveryStatus {
+  DELIVERED
+  FAILED
 }
-
-enum VoucherStatus {
-  ACTIVE
-  INACTIVE
-}
-
-enum PatientStatus {
-  ACTIVE
-  INACTIVE
-}
-
-enum ReminderScheduleStatus {
-  ACTIVE
-  INACTIVE
-}
-
-// TODO: Check if possible to use single Status
 
 enum ReminderType {
-  IMMEDIATELY
+  IMMEDIATE
   SCHEDULED
+}
+
+enum ReminderScheduleType {
+  APPOINTMENT
+}
+
+enum ReminderScheduleScheduleType {
+  TIMED
+  DAY
+  POST_APPOINTMENT
+  MISSED_APPOINTMENT
 }
 
 enum CommunicationMethod {
@@ -343,17 +388,11 @@ enum PaymentMethod {
 }
 
 enum PaymentStatus {
-  PAID
   PENDING
+  PAID
   FAILED
+  CANCELLED
 }
-
-// enum StaffRole {
-//   CLEANER
-//   CONSULTATION
-//   EMERGENCY
-//   OTHERS
-// }
 
 enum Role {
   SUPER_ADMIN

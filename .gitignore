@@ -11,3 +11,6 @@ uploads
 /prisma/prisma
 
 /generated/prisma
+
+
+LOCAL_README.md
