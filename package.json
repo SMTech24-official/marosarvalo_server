@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "cModule": "node scripts/generateModule.js",
     "postinstall": "npx prisma generate",
-    "update":"pnpm outdated && pnpm up --latest"
+    "update": "pnpm outdated && pnpm up --latest"
   },
   "keywords": [],
   "author": "Israfil",

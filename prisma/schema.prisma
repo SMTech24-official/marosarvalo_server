@@ -27,6 +27,8 @@ model User {
   employeeId String?
   profession String?
 
+  status ActivityStatus @default(ACTIVE)
+
   // One-to-many: Discipline → Users
   disciplineId String?     @db.ObjectId
   discipline   Discipline? @relation(fields: [disciplineId], references: [id])
