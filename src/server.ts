@@ -8,7 +8,7 @@ let server: Server;
 function main() {
   try {
     server = app.listen(config.port, () => {
-      console.log("Server is running on port", config.port);
+      console.log("Server is running on port:", config.port);
     });
   } catch (error) {
     console.log(error);
@@ -19,7 +19,7 @@ function main() {
 main();
 
 process.on("unhandledRejection", (err) => {
-  console.log(`😈 unahandledRejection is detected , shutting down ...`, err);
+  console.log(`😈 unhandledRejection is detected , shutting down ...`, err);
   if (server) {
     server.close(() => {
       process.exit(1);

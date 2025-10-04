@@ -1,55 +1,25 @@
 import express from "express";
 import auth from "../../middlewares/auth";
-import validateRequest from "../../middlewares/validateRequest";
-import { AuthController } from "./auth.controller";
-import { AuthValidation } from "./auth.validation";
+import AuthController from "./auth.controller";
 
 const router = express.Router();
 
-// user register
-router.post(
-	"/register",
-	validateRequest(AuthValidation.userRegisterSchema),
-	AuthController.register
-);
-// user login route
-router.post("/login", AuthController.loginUserWithEmail);
+// Login User
+router.post("/login", AuthController.loginUser);
 
-router.post("/otp-enter", AuthController.enterOtp);
+// Logout User
+router.post("/logout", auth(), AuthController.logoutUser);
 
-// user logout route
-router.post("/logout", AuthController.logoutUser);
+// Get Current User Info - This should not be here
+// router.get("/me", auth(), AuthController.getUserInfo);
 
-router.get("/get-me", auth(), AuthController.getMyProfile);
+// Change Password
+router.put("/change-password", auth(), AuthController.changePassword);
 
-router.put(
-	"/change-password",
-	auth(),
-	validateRequest(AuthValidation.changePasswordValidationSchema),
-	AuthController.changePassword
-);
-
+// Forgot Password
 router.post("/forgot-password", AuthController.forgotPassword);
 
-router.post("/reset-password", AuthController.resetPassword);
+// Refresh Token
+router.post("/refresh-token", AuthController.refreshToken);
 
-router.get("/verify-email", AuthController.verifyEmail);
-router.post(
-	"/refresh-token",
-	validateRequest(AuthValidation.refreshTokenValidationSchema),
-	AuthController.refreshToken
-);
-
-// // Google Login Routes
-// router.get(
-// 	"/google",
-// 	passport.authenticate("google", { scope: ["profile", "email"] })
-// );
-// router.get(
-// 	"/google/callback",
-// 	passport.authenticate("google", {
-// 		failureRedirect: `${config.frontend_url}/login`,
-// 		successRedirect: `${config.frontend_url}/`,
-// 	})
-// );
 export const AuthRoutes = router;
