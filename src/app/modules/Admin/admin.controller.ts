@@ -5,6 +5,22 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import AdminServices from "./admin.service";
 
+// Get Admin Dashboard Stats
+const getAdminDashboardStats = catchAsync(
+    async (req: Request, res: Response) => {
+        const result = await AdminServices.getAdminDashboardStats(
+            req.query as any
+        );
+
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: result.message,
+            data: result.data,
+        });
+    }
+);
+
 // Create new Admin
 const createNewAdmin = catchAsync(async (req: Request, res: Response) => {
     const result = await AdminServices.createNewAdmin(req.body);
@@ -42,4 +58,4 @@ const getAllClinic = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-export default { createNewAdmin, createNewClinic, getAllClinic };
+export default { getAdminDashboardStats, createNewAdmin, createNewClinic, getAllClinic };

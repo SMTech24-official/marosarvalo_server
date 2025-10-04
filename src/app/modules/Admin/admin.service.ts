@@ -4,7 +4,59 @@ import ApiError from "../../../errors/ApiErrors";
 import bcrypt from "bcrypt";
 import { CreateClinicInput, type CreateAdminInput } from "./admin.validation";
 import QueryBuilder from "../../../utils/queryBuilder";
-import { Clinic, Subscription } from "@prisma/client";
+import { Clinic, Subscription, SubscriptionStatus } from "@prisma/client";
+import { getCountdown, groupRevenue } from "./admin.utils";
+
+// Get Admin Dashboard Stats
+const getAdminDashboardStats = async (query: {
+    filterBy: "day" | "week" | "month" | "year" | undefined
+}) => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const now = new Date();
+
+    const [todaySale, total] = await Promise.all([
+        prisma.subscription.count({
+            where: {
+                status: "PAID",
+                paidAt: {
+                    gte: startOfToday,
+                    lte: now,
+                },
+            },
+        }),
+        prisma.subscription.findMany({
+            where: { status: "PAID" },
+            select: {
+                paidAt: true,
+                package: {
+                    select: {
+                        price: true,
+                    },
+                },
+            },
+        }),
+    ]);
+
+    const totalSale = total.length;
+    const totalIncome = total.reduce(
+        (prev, curr) => prev + curr.package.price,
+        0
+    );
+
+    const totalRevenue = groupRevenue(total as any, query.filterBy);
+
+    return {
+        message: "Dashboard Stats parsed successfully",
+        data: {
+            todaySale,
+            totalSale,
+            totalIncome,
+            totalRevenue,
+        },
+    };
+};
 
 // Create new Admin
 const createNewAdmin = async (body: CreateAdminInput) => {
@@ -85,6 +137,12 @@ const createNewClinic = async (body: CreateClinicInput) => {
                     phone: clinic.phone,
                     email: clinic.email,
                     address1: clinic.address,
+                    branding: {
+                        create: {
+                            title: clinic.name,
+                            email: clinic.email,
+                        },
+                    },
                 },
             },
         },
@@ -97,22 +155,6 @@ const createNewClinic = async (body: CreateClinicInput) => {
             clinicId: response.clinicId,
         },
     };
-};
-
-const getCountdown = (targetDate: Date) => {
-    const now = new Date(); // system-local tz, same as target if target is Date
-    const diffMs = targetDate.getTime() - now.getTime();
-
-    if (diffMs <= 0) {
-        return { days: 0, hours: 0, minutes: 0 };
-    }
-
-    const totalMinutes = Math.floor(diffMs / (1000 * 60));
-    const days = Math.floor(totalMinutes / (60 * 24));
-    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-    const minutes = totalMinutes % 60;
-
-    return { days, hours, minutes };
 };
 
 // Get All Clinics
@@ -144,7 +186,7 @@ const getAllClinic = async (query: Record<string, any>) => {
             name: clinic.name,
             phone: clinic.phone,
             email: clinic.email,
-            status: "ACTIVE", // TODO: Figure out where is this status coming from
+            status: clinic.status, // TODO: Add Nodecron Checker to check if subscription has ended. If so, update status
             subscription: {
                 startDate: clinic.subscription.startDate,
                 endDate: clinic.subscription.endDate,
@@ -162,4 +204,45 @@ const getAllClinic = async (query: Record<string, any>) => {
     };
 };
 
-export default { createNewAdmin, createNewClinic, getAllClinic };
+// Get All Payments - Need more clarification
+// const getAllPaymentHistory = async (query: Record<string, any>) => {
+//     const queryBuilder = new QueryBuilder(query, prisma.subscription);
+
+//     const clinics: Subscription[] = await queryBuilder
+//         .search(["name", "email", "phone"])
+//         .sort()
+//         .paginate()
+//         .include({
+
+//         })
+//         .execute();
+
+//     const pagination = await queryBuilder.countTotal();
+
+//     const formattedHistory = clinics.map((clinic) => {
+//         const data = {
+//             id: clinic.id,
+//             name: clinic.name,
+//             phone: clinic.phone,
+//             email: clinic.email,
+//             status: clinic.subscription?.status ?? "PENDING",
+//             amount: clinic.subscription?.package?.price ?? "UNKNOWN",
+
+//         };
+
+//         return data;
+//     });
+
+//     return {
+//         message: "Clinic Data fetched Successfully.",
+//         // data: formattedClinics,
+//         pagination,
+//     };
+// };
+
+export default {
+    getAdminDashboardStats,
+    createNewAdmin,
+    createNewClinic,
+    getAllClinic,
+};

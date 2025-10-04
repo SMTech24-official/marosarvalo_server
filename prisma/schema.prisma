@@ -42,6 +42,8 @@ model Clinic {
   disciplines   Discipline[]
   receipts      Receipt[]
 
+  status ActivityStatus @default(INACTIVE)
+
   branding Branding?
 
   createdAt DateTime @default(now())
@@ -405,12 +407,17 @@ model Package {
 }
 
 model Subscription {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name  String?
+  email String?
+
+  paidAt    DateTime?
   startDate DateTime?
   endDate   DateTime?
 
-  clinicId String @db.ObjectId
-  clinic   Clinic @relation(fields: [clinicId], references: [id])
+  clinicId String? @db.ObjectId
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
 
   packageId String  @db.ObjectId
   package   Package @relation(fields: [packageId], references: [id])
