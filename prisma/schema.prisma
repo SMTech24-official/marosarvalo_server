@@ -10,15 +10,18 @@ datasource db {
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name     String
-  email    String   @unique
-  password String
-  phone    String?
-  role     UserRole
-  address  String?
+  name         String
+  email        String   @unique
+  password     String
+  phone        String?
+  role         UserRole
+  address      String?
+  introduction String?
 
-  clinicId      String?        @db.ObjectId
-  clinic        Clinic?        @relation(fields: [clinicId], references: [id])
+  clinicId String? @db.ObjectId
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
+
+  staff         Staff?
   notifications Notification[]
 
   status ActivityStatus @default(ACTIVE)
@@ -81,9 +84,12 @@ model Staff {
   gender     String
   address    String?
   role       String
+  profession String?
 
   // One-to-many: User → Appointments
   appointments Appointment[]
+  userId       String        @unique @db.ObjectId
+  user         User          @relation(fields: [userId], references: [id])
 
   disciplineId String     @db.ObjectId
   discipline   Discipline @relation(fields: [disciplineId], references: [id])
@@ -219,9 +225,8 @@ model Appointment {
   specialistId String @db.ObjectId
   specialist   Staff  @relation(fields: [specialistId], references: [id])
 
-  date          DateTime
-  timeSlotStart String
-  timeSlotEnd   String
+  date     DateTime @db.Date
+  timeSlot String
 
   status    AppointmentStatus
   documents String[]
@@ -273,11 +278,13 @@ model Bond {
 model Service {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  disciplineId String     @db.ObjectId
-  discipline   Discipline @relation(fields: [disciplineId], references: [id])
+  name String
 
   price    Float
   duration Int // In minutes
+
+  disciplineId String     @db.ObjectId
+  discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
   bonds        Bond[]
   products     Product[]

@@ -7,31 +7,31 @@ import UserServices from "./me.service";
 
 // Get current User Info
 const getUserInfo = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-  const result = await UserServices.getUserInfo(user);
+    const user = req.user;
+    const result = await UserServices.getUserInfo(user);
 
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: result.message,
-    data: result.data,
-  });
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
 });
 
 // Update User Info
 const updateUserInfo = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-  const result = await UserServices.updateUserInfo(user, req.body);
+    const user = req.user;
+    const result = await UserServices.updateUserInfo(req.body, user);
 
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: result.message,
-    data: result.data,
-  });
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
 });
 
 export default {
-  getUserInfo,
-  updateUserInfo,
+    getUserInfo,
+    updateUserInfo,
 };

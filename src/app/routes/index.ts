@@ -4,6 +4,7 @@ import auth from "../middlewares/auth";
 import { AuthRoutes } from "../modules/Auth/auth.routes";
 import { AdminRoutes } from "../modules/Admin/admin.route";
 import { MeRoutes } from "../modules/Me/me.route";
+import { SpecialistRoutes } from "../modules/Specialist/specialist.route";
 
 const router = express.Router();
 
@@ -18,9 +19,16 @@ const moduleRoutes = [
     },
     {
         path: "/me",
-        handlers: [auth(), MeRoutes],
+        handlers: [MeRoutes],
     },
-];
+    {
+        path: "/specialist",
+        handlers: [auth("SPECIALIST"), SpecialistRoutes],
+    },
+] satisfies {
+    path: string;
+    handlers: any[];
+}[];
 
 moduleRoutes.forEach((route) => router.use(route.path, ...route.handlers));
 

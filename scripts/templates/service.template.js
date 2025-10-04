@@ -8,7 +8,7 @@ import { Prisma } from "@prisma/client";
 
 
 const get${pascal}s = async (query: Record<string, unknown>) => {
-	const queryBuilder = new QueryBuilder(query, prisma.${camel});
+	const queryBuilder = new QueryBuilder(prisma.${camel}, query);
 	const results = await queryBuilder
 		.filter()
 		.sort()
@@ -16,8 +16,8 @@ const get${pascal}s = async (query: Record<string, unknown>) => {
 		.fields()
 		.execute();
 
-	const meta = await queryBuilder.countTotal();
-	return { data: results, meta };
+	const pagination = await queryBuilder.countTotal();
+	return { data: results, pagination };
 };
 
 

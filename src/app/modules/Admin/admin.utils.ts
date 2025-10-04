@@ -17,6 +17,8 @@ export const getCountdown = (
 
     return { days, hours, minutes };
 };
+
+
 type FilterBy = "day" | "week" | "month" | "year" | undefined;
 
 interface Payment {
@@ -29,10 +31,10 @@ interface GroupedResult {
     total: number;
 }
 
-export function groupRevenue(
+export const groupRevenue = (
     data: Payment[],
     filterBy: FilterBy
-): GroupedResult[] {
+): GroupedResult[] => {
     const groups: Record<string, number> = {};
 
     for (const item of data) {
@@ -66,4 +68,4 @@ export function groupRevenue(
         .sort(
             (a, b) => new Date(a.label).getTime() - new Date(b.label).getTime()
         );
-}
+};

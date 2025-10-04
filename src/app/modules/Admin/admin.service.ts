@@ -9,7 +9,7 @@ import { getCountdown, groupRevenue } from "./admin.utils";
 
 // Get Admin Dashboard Stats
 const getAdminDashboardStats = async (query: {
-    filterBy: "day" | "week" | "month" | "year" | undefined
+    filterBy: "day" | "week" | "month" | "year" | undefined;
 }) => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -80,8 +80,9 @@ const createNewAdmin = async (body: CreateAdminInput) => {
             id: true,
             email: true,
             role: true,
-
-            // TODO: Add more fields
+            address: true,
+            phone: true,
+            introduction: true,
 
             createdAt: true,
             updatedAt: true,
@@ -159,7 +160,7 @@ const createNewClinic = async (body: CreateClinicInput) => {
 
 // Get All Clinics
 const getAllClinic = async (query: Record<string, any>) => {
-    const queryBuilder = new QueryBuilder(query, prisma.clinic);
+    const queryBuilder = new QueryBuilder(prisma.clinic, query);
 
     const clinics: (Clinic & {
         subscription: { startDate: Date; endDate: Date };

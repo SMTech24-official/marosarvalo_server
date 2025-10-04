@@ -1,6 +1,6 @@
 const template = ({
-  pascal,
-  camel,
+    pascal,
+    camel,
 }) => `import type { Request, Response } from "express"
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
@@ -16,7 +16,7 @@ const get${pascal}s = catchAsync(async (req: Request, res: Response) => {
 		success: true,
 		message: "${pascal}s retrieved successfully",
 		data: result.data,
-		meta: result.meta,
+		pagination: result.pagination,
 	});
 });
 
