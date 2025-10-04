@@ -60,12 +60,12 @@ model Staff {
 }
 
 model Clinic {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   name     String
   phone    String
-  email    String
+  email    String  @unique
   address1 String
-  address2 String
+  address2 String?
 
   specialists   User[]
   staff         Staff[]

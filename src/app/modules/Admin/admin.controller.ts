@@ -7,14 +7,39 @@ import AdminServices from "./admin.service";
 
 // Create new Admin
 const createNewAdmin = catchAsync(async (req: Request, res: Response) => {
-  const result = await AdminServices.createNewAdmin(req.body);
+    const result = await AdminServices.createNewAdmin(req.body);
 
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.CREATED,
-    message: result.message,
-    data: result.data,
-  });
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
 });
 
-export default { createNewAdmin };
+// Create new Clinic - with Clinic Admin
+const createNewClinic = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminServices.createNewClinic(req.body);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get All Clinic
+const getAllClinic = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminServices.getAllClinic(req.query);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+export default { createNewAdmin, createNewClinic, getAllClinic };

@@ -10,9 +10,21 @@ const router = Router();
 
 // Create new Admin
 router.post(
-  "/administrators",
-  auth("SUPER_ADMIN"),
-  AdminControllers.createNewAdmin
+    "/administrators",
+    auth("SUPER_ADMIN"),
+    validateRequest(AdminValidations.createAdminSchema),
+    AdminControllers.createNewAdmin
 );
+
+// Create new Clinic
+router.post(
+    "/clinic",
+    auth("SUPER_ADMIN"),
+    validateRequest(AdminValidations.createClinicSchema),
+    AdminControllers.createNewClinic
+);
+
+// Get all Clinic
+router.get("/clinic", auth("SUPER_ADMIN"), AdminControllers.getAllClinic);
 
 export const AdminRoutes = router;
