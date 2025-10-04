@@ -17,43 +17,11 @@ model User {
   role     UserRole
   address  String?
 
-  // Relation to Clinic (optional)
-  clinicId String? @db.ObjectId
-  clinic   Clinic? @relation(fields: [clinicId], references: [id])
-
-  // One-to-many: User → Appointments
-  appointments Appointment[]
-
-  // For Specialist
-  employeeId String?
-  profession String?
+  clinicId      String?        @db.ObjectId
+  clinic        Clinic?        @relation(fields: [clinicId], references: [id])
+  notifications Notification[]
 
   status ActivityStatus @default(ACTIVE)
-
-  // One-to-many: Discipline → Users
-  disciplineId String?     @db.ObjectId
-  discipline   Discipline? @relation(fields: [disciplineId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Staff {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  phone String
-  email String?
-
-  employeeId String
-  gender     String
-  address    String?
-  role       String
-
-  disciplineId String     @db.ObjectId
-  discipline   Discipline @relation(fields: [disciplineId], references: [id])
-
-  clinicId String @db.ObjectId
-  clinic   Clinic @relation(fields: [clinicId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,6 +39,93 @@ model Clinic {
   staff         Staff[]
   patients      Patient[]
   subscriptions Subscription[]
+  disciplines   Discipline[]
+  receipts      Receipt[]
+
+  branding Branding?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Shows Branding in Invoice
+model Branding {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  title String
+  email String
+
+  logo      String?
+  signature String?
+
+  clinicId String  @unique @db.ObjectId
+  clinic   Clinic? @relation(fields: [clinicId], references: [id])
+
+  note String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Staff {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  phone String
+  email String?
+
+  dateOfBirth DateTime? @db.Date
+
+  employeeId String
+  gender     String
+  address    String?
+  role       String
+
+  // One-to-many: User → Appointments
+  appointments Appointment[]
+
+  disciplineId String     @db.ObjectId
+  discipline   Discipline @relation(fields: [disciplineId], references: [id])
+
+  clinicId String @db.ObjectId
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
+
+  // Working Hours and Holiday
+  workingHour WorkingHour?
+  holiday     Holiday?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkingHour {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Times based on Days - Can be Empty
+  // { from: { h: "HH", m: "MM" }, to: { h: "HH", m: "MM" }  }
+  saturday  Json?
+  sunday    Json?
+  monday    Json?
+  tuesday   Json?
+  wednesday Json?
+  thursday  Json?
+  friday    Json?
+
+  staffId String @unique @db.ObjectId
+  staff   Staff  @relation(fields: [staffId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Holiday {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  date   DateTime @db.Date
+  reason String
+  time   String? // Saveable to DB, but can't be calculated
+
+  staffId String @unique @db.ObjectId
+  staff   Staff  @relation(fields: [staffId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -80,11 +135,26 @@ model Discipline {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
+  clinicId String @db.ObjectId
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
+
   staff        Staff[]
-  specialists  User[]
   bonds        Bond[]
   services     Service[]
   appointments Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  content String
+  status  NotificationStatus @default(CREATED)
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -141,10 +211,11 @@ model Appointment {
   disciplineId String     @db.ObjectId
   discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
-  service String
+  serviceId String  @db.ObjectId
+  service   Service @relation(fields: [serviceId], references: [id])
 
   specialistId String @db.ObjectId
-  specialist   User   @relation(fields: [specialistId], references: [id])
+  specialist   Staff  @relation(fields: [specialistId], references: [id])
 
   date          DateTime
   timeSlotStart String
@@ -206,8 +277,9 @@ model Service {
   price    Float
   duration Int // In minutes
 
-  bonds    Bond[]
-  products Product[]
+  bonds        Bond[]
+  products     Product[]
+  appointments Appointment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -238,6 +310,9 @@ model Product {
 
 model Receipt {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  clinicId String @db.ObjectId
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
 
   patientId String  @db.ObjectId
   patient   Patient @relation(fields: [patientId], references: [id])
@@ -330,9 +405,9 @@ model Package {
 }
 
 model Subscription {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  startDate DateTime
-  endDate   DateTime
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  startDate DateTime?
+  endDate   DateTime?
 
   clinicId String @db.ObjectId
   clinic   Clinic @relation(fields: [clinicId], references: [id])
@@ -340,20 +415,34 @@ model Subscription {
   packageId String  @db.ObjectId
   package   Package @relation(fields: [packageId], references: [id])
 
-  stripeId String
+  transactionId String
+  status        SubscriptionStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+// ENUMs
 enum ActivityStatus {
   ACTIVE
   INACTIVE
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 enum DeliveryStatus {
   DELIVERED
   FAILED
+}
+
+enum NotificationStatus {
+  VIEWED
+  DELIVERED
+  CREATED
 }
 
 enum ReminderType {
@@ -393,7 +482,7 @@ enum PaymentMethod {
   OTHER
 }
 
-enum PaymentStatus {
+enum SubscriptionStatus {
   PENDING
   PAID
   FAILED
