@@ -5,6 +5,7 @@ import { AuthRoutes } from "../modules/Auth/auth.routes";
 import { AdminRoutes } from "../modules/Admin/admin.route";
 import { MeRoutes } from "../modules/Me/me.route";
 import { SpecialistRoutes } from "../modules/Specialist/specialist.route";
+import { StripeRoutes } from "../modules/Stripe/stripe.route";
 
 const router = express.Router();
 
@@ -24,6 +25,10 @@ const moduleRoutes = [
     {
         path: "/specialist",
         handlers: [auth("SPECIALIST"), SpecialistRoutes],
+    },
+    {
+        path: "/stripe",
+        handlers: [StripeRoutes],
     },
 ] satisfies {
     path: string;

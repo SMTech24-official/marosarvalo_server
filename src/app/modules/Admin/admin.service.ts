@@ -1,10 +1,15 @@
 import prisma from "../../../shared/prisma";
-import httpStatus from "http-status";
+import httpStatus, { status } from "http-status";
 import ApiError from "../../../errors/ApiErrors";
 import bcrypt from "bcrypt";
 import { CreateClinicInput, type CreateAdminInput } from "./admin.validation";
 import QueryBuilder from "../../../utils/queryBuilder";
-import { Clinic, Subscription, SubscriptionStatus } from "@prisma/client";
+import {
+    Clinic,
+    OrderClinicData,
+    Subscription,
+    SubscriptionStatus,
+} from "@prisma/client";
 import { getCountdown, groupRevenue } from "./admin.utils";
 
 // Get Admin Dashboard Stats
@@ -158,6 +163,42 @@ const createNewClinic = async (body: CreateClinicInput) => {
     };
 };
 
+// Get All Bookings
+const getAllBookings = async (query: Record<string, any>) => {
+    const queryBuilder = new QueryBuilder(prisma.orderClinicData, query);
+
+    const bookings: (OrderClinicData & {
+        subscription: {
+            status: SubscriptionStatus;
+        };
+    })[] = await queryBuilder
+        .search(["name", "email", "phone"])
+        .sort()
+        .paginate()
+        .include({
+            subscription: {
+                status: true,
+            },
+        })
+        .execute();
+    const pagination = await queryBuilder.countTotal();
+
+    const formattedBookings = bookings.map((booking) => {
+        const { subscription, ...data } = booking;
+
+        return {
+            ...data,
+            status: subscription.status,
+        };
+    });
+
+    return {
+        message: "Bookings data fetched",
+        data: formattedBookings,
+        pagination,
+    };
+};
+
 // Get All Clinics
 const getAllClinic = async (query: Record<string, any>) => {
     const queryBuilder = new QueryBuilder(prisma.clinic, query);
@@ -245,5 +286,6 @@ export default {
     getAdminDashboardStats,
     createNewAdmin,
     createNewClinic,
+    getAllBookings,
     getAllClinic,
 };

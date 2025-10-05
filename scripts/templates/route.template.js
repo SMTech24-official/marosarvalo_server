@@ -5,7 +5,6 @@ import ${pascal}Validations from "./${camel}.validation";
 
 const router = Router();
 
-router.get("/", auth(), ${pascal}Controllers.get${pascal}s)
 
 export const ${pascal}Routes = router;`;
 

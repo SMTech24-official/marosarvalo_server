@@ -15,6 +15,9 @@ router.post(
     AdminControllers.createNewAdmin
 );
 
+// Get All Bookings
+router.get("/bookings", AdminControllers.getAllBookings);
+
 // Create new Clinic
 router.post(
     "/clinic",
