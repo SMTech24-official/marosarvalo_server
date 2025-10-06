@@ -6,7 +6,7 @@ import { CreateClinicInput, type CreateAdminInput } from "./admin.validation";
 import QueryBuilder from "../../../utils/queryBuilder";
 import {
     Clinic,
-    OrderClinicData,
+    ClinicOrder,
     Subscription,
     SubscriptionStatus,
 } from "@prisma/client";
@@ -100,7 +100,7 @@ const createNewAdmin = async (body: CreateAdminInput) => {
     };
 };
 
-// Create new Clinic
+// Create new Clinic // TODO: Add Clinic to Subscription
 const createNewClinic = async (body: CreateClinicInput) => {
     const clinic = body.clinic;
     const user = body.user;
@@ -163,38 +163,80 @@ const createNewClinic = async (body: CreateClinicInput) => {
     };
 };
 
-// Get All Bookings
-const getAllBookings = async (query: Record<string, any>) => {
-    const queryBuilder = new QueryBuilder(prisma.orderClinicData, query);
+// Get All Bookings - Status = Is it created yet?
+// const getAllBookingsBak = async (query: Record<string, any>) => {
+//     const queryBuilder = new QueryBuilder(prisma.clinicOrder, query);
 
-    const bookings: (OrderClinicData & {
-        subscription: {
-            status: SubscriptionStatus;
-        };
+//     const bookings: (ClinicOrder & {
+//         subscription: {
+//             status: SubscriptionStatus;
+//         };
+//     })[] = await queryBuilder
+//         .search(["name", "email", "phone"])
+//         .sort()
+//         .paginate()
+//         .include({
+//             subscription: {
+//                 status: true,
+//             },
+//         })
+//         .execute();
+//     const pagination = await queryBuilder.countTotal();
+
+//     const formattedBookings = bookings.map((booking) => {
+//         const { subscription, ...data } = booking;
+
+//         return {
+//             ...data,
+//             status: subscription.status,
+//         };
+//     });
+
+//     return {
+//         message: "Bookings data fetched",
+//         data: formattedBookings,
+//         pagination,
+//     };
+// };
+
+// TODO:  Update subscription create with phone
+const getAllBookings = async (query: Record<string, any>) => {
+    const queryBuilder = new QueryBuilder(prisma.subscription, query);
+
+    const subscriptions: (Subscription & {
+        clinic?: Clinic;
     })[] = await queryBuilder
-        .search(["name", "email", "phone"])
+        .search(["name", "email"])
         .sort()
         .paginate()
-        .include({
-            subscription: {
-                status: true,
+        .execute({
+            select: {
+                clinic: {
+                    select: {
+                        id: true,
+                    },
+                },
             },
-        })
-        .execute();
+        });
+
     const pagination = await queryBuilder.countTotal();
 
-    const formattedBookings = bookings.map((booking) => {
-        const { subscription, ...data } = booking;
+    const formattedData = subscriptions.map((subscription) => {
+        const data = {
+            id: subscription.id,
+            name: subscription.name,
+            email: subscription.email,
+            phone: subscription.phone,
 
-        return {
-            ...data,
-            status: subscription.status,
+            status: subscription.clinic ? "COMPLETE" : "PENDING",
         };
+
+        return data;
     });
 
     return {
         message: "Bookings data fetched",
-        data: formattedBookings,
+        data: formattedData,
         pagination,
     };
 };
@@ -246,41 +288,48 @@ const getAllClinic = async (query: Record<string, any>) => {
     };
 };
 
-// Get All Payments - Need more clarification
-// const getAllPaymentHistory = async (query: Record<string, any>) => {
-//     const queryBuilder = new QueryBuilder(query, prisma.subscription);
+// Get All Payments
+const getAllPaymentHistory = async (query: Record<string, any>) => {
+    const queryBuilder = new QueryBuilder(prisma.subscription, query);
 
-//     const clinics: Subscription[] = await queryBuilder
-//         .search(["name", "email", "phone"])
-//         .sort()
-//         .paginate()
-//         .include({
+    const subscriptions: (Subscription & {
+        package: {
+            price: number;
+        };
+    })[] = await queryBuilder
+        .search(["name", "email"])
+        .sort()
+        .paginate()
+        .execute({
+            select: {
+                package: {
+                    price: true,
+                },
+            },
+        });
 
-//         })
-//         .execute();
+    const pagination = await queryBuilder.countTotal();
 
-//     const pagination = await queryBuilder.countTotal();
+    const formattedData = subscriptions.map((subscription) => {
+        const data = {
+            id: subscription.id,
+            name: subscription.name,
+            email: subscription.email,
+            price: subscription.package.price,
+            transactionId: subscription.transactionId,
+            status: subscription.status,
+            createdAt: subscription.createdAt,
+        };
 
-//     const formattedHistory = clinics.map((clinic) => {
-//         const data = {
-//             id: clinic.id,
-//             name: clinic.name,
-//             phone: clinic.phone,
-//             email: clinic.email,
-//             status: clinic.subscription?.status ?? "PENDING",
-//             amount: clinic.subscription?.package?.price ?? "UNKNOWN",
+        return data;
+    });
 
-//         };
-
-//         return data;
-//     });
-
-//     return {
-//         message: "Clinic Data fetched Successfully.",
-//         // data: formattedClinics,
-//         pagination,
-//     };
-// };
+    return {
+        message: "Payments data fetched",
+        data: formattedData,
+        pagination,
+    };
+};
 
 export default {
     getAdminDashboardStats,
@@ -288,4 +337,5 @@ export default {
     createNewClinic,
     getAllBookings,
     getAllClinic,
+    getAllPaymentHistory,
 };

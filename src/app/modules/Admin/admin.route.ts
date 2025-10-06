@@ -28,4 +28,8 @@ router.post(
 // Get all Clinic
 router.get("/clinic", AdminControllers.getAllClinic);
 
+// Get All Payment history
+router.get("/payment", AdminControllers.getAllPaymentHistory);
+
+
 export const AdminRoutes = router;

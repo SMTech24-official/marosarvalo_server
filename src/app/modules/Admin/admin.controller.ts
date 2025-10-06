@@ -71,10 +71,24 @@ const getAllClinic = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// Get All Payments
+const getAllPaymentHistory = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminServices.getAllPaymentHistory(req.query);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
 export default {
     getAdminDashboardStats,
     createNewAdmin,
     createNewClinic,
     getAllBookings,
     getAllClinic,
+    getAllPaymentHistory
 };

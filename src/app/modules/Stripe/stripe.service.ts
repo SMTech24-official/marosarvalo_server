@@ -8,6 +8,7 @@ import { CreateClinicInput } from "./stripe.validation";
 const createCheckoutRequest = async (payload: CreateClinicInput) => {
     const { clinic, user, package: packageId } = payload;
 
+    // TODO: Do what needs to be done
     // Create Stripe Instance
     const stripe = {
         transactionId: "inFuture",
@@ -15,7 +16,7 @@ const createCheckoutRequest = async (payload: CreateClinicInput) => {
     };
 
     //  Create Temp Data
-    const response = await prisma.orderClinicData.create({
+    const response = await prisma.clinicOrder.create({
         data: {
             name: clinic.name,
             email: clinic.email,
@@ -31,6 +32,7 @@ const createCheckoutRequest = async (payload: CreateClinicInput) => {
                 create: {
                     name: clinic.name,
                     email: clinic.email,
+                    phone: clinic.phone,
                     transactionId: stripe.transactionId,
                     packageId: packageId,
                 },
