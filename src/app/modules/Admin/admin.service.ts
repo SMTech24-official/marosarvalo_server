@@ -253,8 +253,7 @@ const getAllClinic = async (query: Record<string, any>) => {
         .paginate()
         .include({
             subscription: {
-                startDate: true,
-                endDate: true,
+                select: { startDate: true, endDate: true },
             },
         })
         .execute();
@@ -303,7 +302,7 @@ const getAllPaymentHistory = async (query: Record<string, any>) => {
         .execute({
             select: {
                 package: {
-                    price: true,
+                    select: { price: true },
                 },
             },
         });

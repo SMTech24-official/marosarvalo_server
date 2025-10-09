@@ -32,7 +32,8 @@ const getDoctorsCount = catchAsync(async (req: Request, res: Response) => {
 // Get New Customers Count
 const getNewCustomersCount = catchAsync(async (req: Request, res: Response) => {
     const result = await SpecialistServices.getNewCustomersCount(
-        req.query as any
+        req.query as any,
+        req.user
     );
     sendResponse(res, {
         success: true,
@@ -52,8 +53,8 @@ const getAppointmentsOverview = catchAsync(
         sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
-            message: "Appointments Overview parsed.",
-            data: result,
+            message: result.message,
+            data: result.data,
         });
     }
 );

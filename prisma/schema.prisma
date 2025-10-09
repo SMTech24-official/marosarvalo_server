@@ -7,16 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// TODO: add profile picture handle
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name         String
-  email        String   @unique
-  password     String
-  phone        String?
-  role         UserRole
-  address      String?
-  introduction String?
+  name           String
+  email          String   @unique
+  password       String
+  phone          String?
+  role           UserRole
+  address        String?
+  introduction   String?
+  profilePicture String?
 
   clinicId String? @db.ObjectId
   clinic   Clinic? @relation(fields: [clinicId], references: [id])
@@ -78,11 +80,14 @@ model Branding {
   @@map("brandings")
 }
 
+// TODO: Add profile picture to Staff
 model Staff {
-  id    String  @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  phone String
-  email String?
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name           String
+  phone          String
+  email          String?
+  profilePicture String?
 
   dateOfBirth DateTime? @db.Date
 

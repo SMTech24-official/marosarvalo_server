@@ -54,11 +54,26 @@ const getDoctorsCount = async (query: {
 };
 
 // Get Appointments Count
-const getNewCustomersCount = async (query: {
-    filterBy: "day" | "week" | "month" | undefined;
-}) => {
+const getNewCustomersCount = async (
+    query: {
+        filterBy: "day" | "week" | "month" | undefined;
+    },
+    user: JwtPayload
+) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+    });
+
     const count = await prisma.patient.count({
         where: {
+            appointments: {
+                some: {
+                    specialistId: userData?.id,
+                },
+            },
+            clinicId: userData?.clinicId!,
             createdAt: getDateRange(query.filterBy),
         },
     });
@@ -89,6 +104,11 @@ const getAppointmentsOverview = async (
     });
 
     const appointmentsOverview = groupAppointment(appointments, query.filterBy);
+
+    return {
+        message: "Appointments Overview parsed",
+        data: appointmentsOverview,
+    };
 };
 
 // Get upcoming Appointments
@@ -126,17 +146,16 @@ const getUpcomingAppointments = async (
         })
         .include({
             specialist: {
-                name: true,
+                select: { name: true },
             },
             discipline: {
-                name: true,
+                select: { name: true },
             },
             service: {
-                name: true,
+                select: { name: true },
             },
             patient: {
-                firstName: true,
-                lastName: true,
+                select: { firstName: true, lastName: true },
             },
         })
         .execute();
@@ -179,7 +198,9 @@ const getAppointmentsCalender = async (
 
     const appointments: (Appointment & {
         specialist: {
+            id: string;
             name: string;
+            profilePicture: string;
         };
 
         discipline: {
@@ -209,18 +230,16 @@ const getAppointmentsCalender = async (
         })
         .include({
             specialist: {
-                name: true,
+                select: { id: true, name: true, profilePicture: true },
             },
             discipline: {
-                name: true,
+                select: { name: true },
             },
             service: {
-                name: true,
+                select: { name: true },
             },
             patient: {
-                firstName: true,
-                lastName: true,
-                phone: true,
+                select: { firstName: true, lastName: true, phone: true },
             },
         })
         .execute();
@@ -241,7 +260,7 @@ const getAppointmentsCalender = async (
 
             discipline: appointment.discipline.name,
             service: appointment.service.name,
-            specialist: appointment.specialist.name,
+            specialist: { ...appointment.specialist },
             date: appointment.date,
             timeSlot: appointment.timeSlot,
             status: appointment.status,
