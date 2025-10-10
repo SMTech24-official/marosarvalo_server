@@ -3,6 +3,8 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import ClinicServices from "./clinic.service";
+import ApiError from "../../../errors/ApiErrors";
+import config from "../../../config";
 
 //==============================================
 //            Doctor Controllers
@@ -25,6 +27,29 @@ const getDoctorsCount = catchAsync(async (req: Request, res: Response) => {
 //==============================================
 //          Appointment Controllers
 //=============================================
+
+// Create Appointment
+const createAppointment = catchAsync(async (req: Request, res: Response) => {
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const documents = files?.documents;
+
+    if (documents.length === 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "`documents` are mandatory");
+    }
+
+    req.body.documents = documents.map(
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+    );
+
+    const result = await ClinicServices.createAppointment(req.body);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
+});
 
 // Get Appointments Count
 const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
@@ -89,12 +114,12 @@ const getAppointments = catchAsync(async (req: Request, res: Response) => {
 });
 
 //==============================================
-//           Customer Controllers
+//           Patient Controllers
 //=============================================
 
-// Get New Customers Count
-const getNewCustomersCount = catchAsync(async (req: Request, res: Response) => {
-    const result = await ClinicServices.getNewCustomersCount(
+// Get new Patients Count
+const getNewPatientsCount = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getNewPatientsCount(
         req.query as any,
         req.user
     );
@@ -103,6 +128,93 @@ const getNewCustomersCount = catchAsync(async (req: Request, res: Response) => {
         statusCode: httpStatus.OK,
         message: result.message,
         data: result.count,
+    });
+});
+
+// Create new Patient
+const createPatient = catchAsync(async (req: Request, res: Response) => {
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const guardianDocuments = files?.guardianDocuments;
+    const documents = files?.documents;
+    const otherDocuments = files?.otherDocuments;
+
+    if (documents.length === 0) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "`documents` are mandatory");
+    }
+
+    req.body.guardianDocuments = guardianDocuments.map(
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+    );
+    req.body.documents = documents.map(
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+    );
+    req.body.otherDocuments = otherDocuments.map(
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+    );
+
+    const result = await ClinicServices.createPatient(req.body, req.user);
+
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get Patients
+const getPatients = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getPatients(req.query, req.user);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+// Get Patient by Id
+const getPatientById = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getPatientById(req.params.id);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get Patient Appointments
+const getPatientAppointments = catchAsync(
+    async (req: Request, res: Response) => {
+        const result = await ClinicServices.getPatientAppointments(
+            req.params.id,
+            req.query
+        );
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: result.message,
+            data: result.data,
+            pagination: result.pagination,
+        });
+    }
+);
+
+// Get Patient Bonds
+const getPatientBonds = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getPatientBonds(
+        req.params.id,
+        req.query
+    );
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
     });
 });
 
@@ -123,18 +235,83 @@ const getServicesStatistics = catchAsync(
     }
 );
 
+//==============================================
+//              Receipt Controllers
+//==============================================
+
+// Create Receipt
+const createReceipt = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.createReceipt(req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get Receipts
+const getReceipts = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getReceipts(req.query, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+// Get Receipt Details by Id
+const getReceiptDetailsById = catchAsync(
+    async (req: Request, res: Response) => {
+        const result = await ClinicServices.getReceiptDetailsById(
+            req.params.id
+        );
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: result.message,
+            data: result.data,
+        });
+    }
+);
+
+// Delete Receipt
+const deleteReceipt = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.deleteReceipt(req.params.id);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
 export default {
     // Doctor Controllers
     getDoctorsCount,
 
     // Appointment Controllers
+    createAppointment,
     getAppointmentsCount,
     getAppointmentsOverview,
     getAppointments,
     getAppointmentsCalender,
 
-    // Customer Controllers
-    getNewCustomersCount,
+    // Patient Controllers
+    getNewPatientsCount,
+    createPatient,
+    getPatients,
+    getPatientById,
+    getPatientAppointments,
+    getPatientBonds,
+
+    // Receipt Controllers
+    createReceipt,
+    getReceipts,
+    getReceiptDetailsById,
+    deleteReceipt,
 
     // Service Controllers
     getServicesStatistics,

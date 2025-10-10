@@ -6,6 +6,7 @@ import { AdminRoutes } from "../modules/Admin/admin.route";
 import { MeRoutes } from "../modules/Me/me.route";
 import { SpecialistRoutes } from "../modules/Specialist/specialist.route";
 import { StripeRoutes } from "../modules/Stripe/stripe.route";
+import { ClinicRoutes } from "../modules/Clinic/clinic.route";
 
 const router = express.Router();
 
@@ -25,6 +26,10 @@ const moduleRoutes = [
     {
         path: "/specialist",
         handlers: [auth("SPECIALIST"), SpecialistRoutes],
+    },
+    {
+        path: "/clinic",
+        handlers: [auth("CLINIC_ADMIN", "RECEPTIONIST"), ClinicRoutes],
     },
     {
         path: "/stripe",

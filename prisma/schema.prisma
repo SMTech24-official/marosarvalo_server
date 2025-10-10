@@ -196,10 +196,10 @@ model Patient {
   phone     String
   email     String?
 
-  address           String?
-  patientDocumentId String?
-  dateOfBirth       DateTime?
-  gender            String
+  address     String?
+  documentId  String?
+  dateOfBirth DateTime?
+  gender      String
 
   guardianName      String?
   guardianRelation  String?
@@ -214,11 +214,12 @@ model Patient {
   documents      String[]
   otherDocuments String[]
 
-  patient_status ActivityStatus @default(ACTIVE)
+  status ActivityStatus @default(ACTIVE)
 
   clinicId     String        @db.ObjectId
   clinic       Clinic        @relation(fields: [clinicId], references: [id])
   appointments Appointment[]
+  bonds        Bond[]
 
   note String?
 
@@ -266,9 +267,6 @@ model Voucher {
 
   name String
 
-  patientId String  @db.ObjectId
-  patient   Patient @relation(fields: [patientId], references: [id])
-
   price Float
 
   expireDate DateTime
@@ -278,6 +276,8 @@ model Voucher {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?  @db.ObjectId
 
   @@map("vouchers")
 }
@@ -285,6 +285,9 @@ model Voucher {
 model Bond {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
+
+  patientId String  @db.ObjectId
+  patient   Patient @relation(fields: [patientId], references: [id])
 
   disciplineId String     @db.ObjectId
   discipline   Discipline @relation(fields: [disciplineId], references: [id])
@@ -326,14 +329,13 @@ model Service {
 }
 
 model Product {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
   receiptId String  @db.ObjectId
   receipt   Receipt @relation(fields: [receiptId], references: [id])
 
-  productType ProductType
-  quantity    Int
+  type     ProductType
+  quantity Int
 
   voucherId String?  @db.ObjectId
   voucher   Voucher? @relation(fields: [voucherId], references: [id])
@@ -343,6 +345,9 @@ model Product {
 
   serviceId String?  @db.ObjectId
   service   Service? @relation(fields: [serviceId], references: [id])
+
+  otherId String?
+  other   Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -362,7 +367,9 @@ model Receipt {
   tax      Float
   discount Float
 
-  paid Float // Paid Amount. Cause there maybe Due amount
+  paid     Float // Paid Amount. Cause there maybe Due amount
+  subTotal Float // Before Calculation
+  total    Float // After all the Calculation
 
   note          String?
   paymentMethod String // TODO: Check methods
@@ -517,7 +524,7 @@ enum ActivityStatus {
 enum Gender {
   MALE
   FEMALE
-  OTHER
+  OTHERS
 }
 
 enum DeliveryStatus {
