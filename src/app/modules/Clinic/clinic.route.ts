@@ -110,4 +110,103 @@ router.delete("/receipts/:id", ClinicControllers.deleteReceipt);
 // Get Services Statistics
 router.get("/services/statistics", ClinicControllers.getServicesStatistics);
 
+// Get Services List
+router.get("/services", ClinicControllers.getServices);
+
+// Create Service
+router.post(
+    "/services",
+    validateRequest(clinicValidation.createServiceSchema),
+    ClinicControllers.createService
+);
+
+// Update Service
+router.patch(
+    "/services/:id",
+    validateRequest(clinicValidation.updateServiceSchema),
+    ClinicControllers.updateService
+);
+
+// Delete Service
+router.delete("/services/:id", ClinicControllers.deleteService);
+
+//==============================================
+//    Discipline Routes ".../disciplines"
+//=============================================
+
+// Get Disciplines
+router.get("/disciplines", ClinicControllers.getDisciplines);
+
+// Create Discipline
+router.post(
+    "/disciplines",
+    validateRequest(clinicValidation.createDisciplineSchema),
+    ClinicControllers.createDiscipline
+);
+
+// Update Discipline
+router.patch(
+    "/disciplines/:id",
+    validateRequest(clinicValidation.updateDisciplineSchema),
+    ClinicControllers.updateDiscipline
+);
+
+// Delete Discipline
+router.delete("/disciplines/:id", ClinicControllers.deleteDiscipline);
+
+//==============================================
+//    Communication Routes ".../communications"
+//=============================================
+
+// Create Reminder Schedule
+router.post(
+    "/communications/reminders",
+    validateRequest(clinicValidation.createReminderScheduleSchema),
+    ClinicControllers.createReminderSchedules
+);
+
+// Get Reminder History
+router.get(
+    "/communications/reminders/history",
+    ClinicControllers.getReminderScheduleHistory
+);
+
+//==============================================
+//    Settings Routes ".../settings"
+//=============================================
+
+// Get Basic Info
+router.get("/settings/basic", ClinicControllers.getBasicInfo);
+
+// Update Basic Info
+router.patch(
+    "/settings/basic",
+    validateRequest(clinicValidation.updateClinicInfoSchema),
+    ClinicControllers.updateClinicInfo
+);
+
+// Get Branding Info
+router.get("/settings/branding", ClinicControllers.getBrandingInfo);
+
+// Update Branding Info
+router.patch(
+    "/settings/branding",
+    validateRequest(clinicValidation.updateBrandingInfoSchema),
+    ClinicControllers.updateBrandingInfo
+);
+
+//==============================================
+//    Staff Routes ".../staff"
+//=============================================
+
+// Create New Staff
+router.post(
+    "/staff",
+    validateRequest(clinicValidation.createStaffSchema),
+    ClinicControllers.createNewStaff
+);
+
+// Get All Staff
+router.get("/staff", ClinicControllers.getAllStaff);
+
 export const ClinicRoutes = router;
