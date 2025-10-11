@@ -236,6 +236,232 @@ const getServicesStatistics = catchAsync(
 );
 
 //==============================================
+//             Communication Controllers
+//==============================================
+
+// Create Reminder Schedules
+const createReminderSchedules = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.createReminderSchedules(req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get History
+const getReminderScheduleHistory = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getReminderScheduleHistory(req.query, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+//==============================================
+//              Report Controllers
+//==============================================
+
+// Get Basic Report
+const getClinicBasicReport = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getClinicBasicReport(req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get Cancellation Info
+const getCancellationInfo = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getCancellationInfo(req.query, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+//==============================================
+//             Setting Controllers
+//==============================================
+
+// Get Basic Info
+const getBasicInfo = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getBasicInfo(req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Update Clinic Info
+const updateClinicInfo = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.updateClinicInfo(req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get Branding Info
+const getBrandingInfo = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getBrandingInfo(req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Update Branding Info
+const updateBrandingInfo = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.updateBrandingInfo(req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+//==============================================
+//             Service Controllers
+//==============================================
+
+// Get Services List
+const getServices = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getServices(req.query, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+// Create Service
+const createService = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.createService(req.body);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Update Service
+const updateService = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.updateService(req.params.id, req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Delete Service
+const deleteService = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.deleteService(req.params.id, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+//==============================================
+//             Discipline Controllers
+//==============================================
+
+// Get Disciplines
+const getDisciplines = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getDisciplines(req.query, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+// Create Discipline
+const createDiscipline = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.createDiscipline(req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Update Discipline
+const updateDiscipline = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.updateDiscipline(req.params.id, req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Delete Discipline
+const deleteDiscipline = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.deleteDiscipline(req.params.id, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+//==============================================
+//              Staff Controllers
+//==============================================
+
+// Create New Staff
+const createNewStaff = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.createNewStaff(req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get All Staff
+const getAllStaff = catchAsync(async (req: Request, res: Response) => {
+    const result = await ClinicServices.getAllStaff(req.query, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+//==============================================
 //              Receipt Controllers
 //==============================================
 
@@ -313,6 +539,34 @@ export default {
     getReceiptDetailsById,
     deleteReceipt,
 
+    // Communication Controllers
+    createReminderSchedules,
+    getReminderScheduleHistory,
+
+    // Report Controllers
+    getClinicBasicReport,
+    getCancellationInfo,
+
+    // Setting Controllers
+    getBasicInfo,
+    updateClinicInfo,
+    getBrandingInfo,
+    updateBrandingInfo,
+
     // Service Controllers
+    getServices,
+    createService,
+    updateService,
+    deleteService,
     getServicesStatistics,
+
+    // Discipline Controllers
+    getDisciplines,
+    createDiscipline,
+    updateDiscipline,
+    deleteDiscipline,
+
+    // Staff Controllers
+    createNewStaff,
+    getAllStaff,
 };

@@ -75,9 +75,75 @@ export type CreateReminderScheduleInput = z.infer<
     typeof createReminderScheduleSchema
 >;
 
+const updateClinicInfoSchema = z.object({
+    name: z.string().optional(),
+    phone: z.string().optional(),
+    email: z.string().optional(),
+    address1: z.string().optional(),
+    address2: z.string().optional(),
+});
+export type UpdateClinicInfoInput = z.infer<typeof updateClinicInfoSchema>;
+
+const updateBrandingInfoSchema = z.object({
+    title: z.string(),
+    email: z.string(),
+    note: z.string(),
+});
+export type UpdateBrandingInfoInput = z.infer<typeof updateBrandingInfoSchema>;
+
+// Services
+const createServiceSchema = z.object({
+    disciplineId: z.string(),
+    name: z.string(),
+    duration: z.number(),
+    price: z.number(),
+});
+export type CreateServiceInput = z.infer<typeof createServiceSchema>;
+
+const updateServiceSchema = z.object({
+    disciplineId: z.string().optional(),
+    name: z.string().optional(),
+    duration: z.number().optional(),
+    price: z.number().optional(),
+});
+export type UpdateServiceInput = z.infer<typeof updateServiceSchema>;
+
+// Discipline
+
+const createDisciplineSchema = z.object({
+    name: z.string(),
+});
+export type CreateDisciplineInput = z.infer<typeof createDisciplineSchema>;
+
+const updateDisciplineSchema = z.object({
+    name: z.string(),
+});
+export type UpdateDisciplineInput = z.infer<typeof updateDisciplineSchema>;
+
+// Staff
+const createStaffSchema = z.object({
+    name: z.string(),
+    employeeId: z.string(),
+    email: z.email(),
+    phone: z.string(),
+    disciplineId: z.string(),
+    role: z.string(),
+    gender: z.enum(Gender),
+    address: z.string(),
+    password: z.string().optional(),
+});
+export type CreateStaffInput = z.infer<typeof createStaffSchema>;
+
 export default {
     createAppointmentSchema,
     createPatientSchema,
     createReceiptSchema,
     createReminderScheduleSchema,
+    updateClinicInfoSchema,
+    updateBrandingInfoSchema,
+    createServiceSchema,
+    updateServiceSchema,
+    createDisciplineSchema,
+    updateDisciplineSchema,
+    createStaffSchema,
 };

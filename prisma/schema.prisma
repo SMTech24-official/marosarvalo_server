@@ -93,21 +93,23 @@ model Staff {
   dateOfBirth DateTime? @db.Date
 
   employeeId String
-  gender     String
+  gender     Gender
   address    String?
   role       String
   profession String?
 
   // One-to-many: User → Appointments
   appointments Appointment[]
-  userId       String        @unique @db.ObjectId
-  user         User          @relation(fields: [userId], references: [id])
+  userId       String?       @unique @db.ObjectId
+  user         User?         @relation(fields: [userId], references: [id])
 
   disciplineId String     @db.ObjectId
   discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
   clinicId String @db.ObjectId
   clinic   Clinic @relation(fields: [clinicId], references: [id])
+
+  status ActivityStatus @default(ACTIVE)
 
   // Working Hours and Holiday
   workingHour WorkingHour?
@@ -253,9 +255,11 @@ model Appointment {
   date     DateTime @db.Date
   timeSlot String
 
-  status    AppointmentStatus
+  status    AppointmentStatus @default(PENDING)
   documents String[]
   note      String?
+
+  cancelReason String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

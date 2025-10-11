@@ -4,12 +4,15 @@ import {
     Appointment,
     Bond,
     CommunicationMethod,
+    Discipline,
     Patient,
     Product,
     ProductType,
     Receipt,
     ReminderScheduleType,
     ScheduledReminderHistory,
+    Service,
+    Staff,
     UserRole,
 } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
@@ -27,10 +30,18 @@ import ApiError from "../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import {
     CreateAppointmentInput,
+    CreateDisciplineInput,
     CreatePatientInput,
     CreateReceiptInput,
     CreateReminderScheduleInput,
+    CreateServiceInput,
+    CreateStaffInput,
+    UpdateBrandingInfoInput,
+    UpdateClinicInfoInput,
+    UpdateDisciplineInput,
+    UpdateServiceInput,
 } from "./clinic.validation";
+import { hashPassword } from "../../../helpers/passwordHelpers";
 
 // TODO: Make it Uni-useable for Clinic AND Receptionist
 
@@ -967,16 +978,6 @@ const deleteReceipt = async (id: string) => {
 };
 
 //==============================================
-//              Staff Services
-//==============================================
-
-// Get Staff Schedule
-const getStaffSchedules = async (
-    query: Record<string, any>,
-    user: JwtPayload
-) => {};
-
-//==============================================
 //             Communication Services
 //==============================================
 
@@ -1202,11 +1203,244 @@ const getClinicBasicReport = async (user: JwtPayload) => {
         attendance: getAttendanceStats(appointments),
         totalPatients: patients.length,
         popularServices: countServices(appointmentsOfServices),
+        cancellation: {
+            total: appointments.filter((item) => item.status === "CANCELLED")
+                .length,
+            rate:
+                appointments.length === 0
+                    ? 0
+                    : (appointments.filter(
+                          (item) => item.status === "CANCELLED"
+                      ).length /
+                          appointments.length) *
+                      100,
+        },
     };
 
     return {
         message: "Basic Report parsed",
         data: formattedData,
+    };
+};
+
+// Get revenue by service - IDK! Bond and Voucher is not clear
+const getRevenueByService = async () => {};
+
+// Get cancellation Info
+const getCancellationInfo = async (
+    query: Record<string, any>,
+    user: JwtPayload
+) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const queryBuilder = new QueryBuilder(prisma.appointment, query);
+
+    const appointments: (Appointment & {
+        patient: {
+            id: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+        };
+        service: {
+            id: string;
+            name: string;
+        };
+        specialist: {
+            id: string;
+            name: string;
+        };
+    })[] = await queryBuilder
+        .rawFilter({
+            patient: {
+                clinicId: userData?.clinicId,
+            },
+            status: "CANCELLED",
+        })
+        .sort()
+        .paginate()
+        .include({
+            patient: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                },
+            },
+            service: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+            specialist: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        })
+        .execute();
+    const pagination = await queryBuilder.countTotal();
+
+    const formattedData = appointments.map((appointment) => {
+        const data = {
+            id: appointment.id,
+            date: appointment.date,
+            timeSlot: appointment.timeSlot,
+            service: appointment.service,
+            specialist: appointment.specialist,
+            patient: appointment.patient,
+            status: appointment.status,
+            reason: appointment.cancelReason,
+        };
+
+        return data;
+    });
+
+    return {
+        message: "Cancellation data parsed",
+        data: formattedData,
+        pagination,
+    };
+};
+
+//==============================================
+//             Setting Services
+//==============================================
+
+// Get basic Info about clinic
+const getBasicInfo = async (user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        include: {
+            clinic: true,
+        },
+    });
+
+    const clinic = userData?.clinic!;
+
+    const formattedData = {
+        name: clinic.name,
+        phone: clinic.phone,
+        email: clinic.email,
+        address1: clinic.address1,
+        address2: clinic.address2,
+    };
+
+    return {
+        message: "Clinic Data parsed",
+        data: formattedData,
+    };
+};
+
+// Update clinic info
+const updateClinicInfo = async (
+    payload: UpdateClinicInfoInput,
+    user: JwtPayload
+) => {
+    const response = await prisma.user.update({
+        where: {
+            id: user.id,
+        },
+        data: {
+            clinic: {
+                update: {
+                    data: {
+                        ...payload,
+                    },
+                },
+            },
+        },
+        include: {
+            clinic: true,
+        },
+    });
+
+    const clinic = response.clinic!;
+
+    const formattedData = {
+        name: clinic.name,
+        phone: clinic.phone,
+        email: clinic.email,
+        address1: clinic.address1,
+        address2: clinic.address2,
+    };
+
+    return {
+        message: "Clinic Data updated",
+        data: formattedData,
+    };
+};
+
+// Get Branding info
+const getBrandingInfo = async (user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        include: {
+            clinic: {
+                select: {
+                    branding: true,
+                },
+            },
+        },
+    });
+
+    return {
+        message: "Branding Info parsed",
+        data: userData?.clinic?.branding,
+    };
+};
+
+// Update Branding Info
+const updateBrandingInfo = async (
+    payload: UpdateBrandingInfoInput,
+    user: JwtPayload
+) => {
+    const response = await prisma.user.update({
+        where: {
+            id: user.id,
+        },
+        data: {
+            clinic: {
+                update: {
+                    branding: {
+                        upsert: {
+                            create: {
+                                ...payload,
+                            },
+                            update: {
+                                ...payload,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        select: {
+            clinic: {
+                select: {
+                    branding: true,
+                },
+            },
+        },
+    });
+
+    return {
+        message: "Branding Info updated",
+        data: response.clinic?.branding,
     };
 };
 
@@ -1263,6 +1497,455 @@ const getServicesStatistics = async (user: JwtPayload) => {
     };
 };
 
+// Get Services list
+const getServices = async (query: Record<string, any>, user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const queryBuilder = new QueryBuilder(prisma.service, query);
+
+    const services: (Service & {
+        discipline: {
+            name: string;
+            id: string;
+        };
+    })[] = await queryBuilder
+        .rawFilter({
+            discipline: { clinicId: userData?.clinicId! },
+        })
+        .search(["name"])
+        .sort()
+        .include({
+            discipline: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        })
+        .paginate()
+        .execute();
+    const pagination = await queryBuilder.countTotal();
+
+    const formattedData: Record<string, any>[] = [];
+
+    services.forEach((service) => {
+        formattedData.push({
+            id: service.id,
+            discipline: { ...service.discipline },
+            name: service.name,
+            price: service.name,
+            duration: service.duration,
+        });
+    });
+
+    return {
+        message: "Services Data parsed",
+        data: formattedData,
+        pagination,
+    };
+};
+
+// Create new Service
+const createService = async (payload: CreateServiceInput) => {
+    const response = await prisma.service.create({
+        data: {
+            ...payload,
+        },
+        include: {
+            discipline: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+    });
+
+    return {
+        message: "New Service created",
+
+        data: response,
+    };
+};
+
+// Update Service
+const updateService = async (
+    serviceId: string,
+    payload: UpdateServiceInput,
+    user: JwtPayload
+) => {
+    const service = await prisma.service.findUnique({
+        where: {
+            id: serviceId,
+            discipline: {
+                clinic: {
+                    specialists: {
+                        some: {
+                            id: user.id,
+                            role: {
+                                in: ["CLINIC_ADMIN", "RECEPTIONIST"],
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (!service) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Service Not Found!");
+    }
+
+    const response = await prisma.service.update({
+        where: { id: service.id },
+        data: { ...payload },
+        select: {
+            id: true,
+            discipline: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+            price: true,
+            duration: true,
+        },
+    });
+
+    return {
+        message: "Service Data updated",
+        data: response,
+    };
+};
+
+// Delete Service
+const deleteService = async (serviceId: string, user: JwtPayload) => {
+    const service = await prisma.service.findUnique({
+        where: {
+            id: serviceId,
+            discipline: {
+                clinic: {
+                    specialists: {
+                        some: {
+                            id: user.id,
+                            role: {
+                                in: ["CLINIC_ADMIN", "RECEPTIONIST"],
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (!service) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Service Not Found!");
+    }
+
+    const response = await prisma.service.delete({
+        where: { id: service.id },
+        select: {
+            id: true,
+        },
+    });
+
+    return {
+        message: "Service deleted successfully",
+        data: response,
+    };
+};
+
+//==============================================
+//             Discipline Services
+//==============================================
+
+// Get disciplines
+const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const queryBuilder = new QueryBuilder(prisma.discipline, query);
+
+    const disciplines: Discipline[] = await queryBuilder
+        .rawFilter({
+            clinicId: userData?.clinicId,
+        })
+        .search(["name"])
+        .sort()
+        .paginate()
+        .execute();
+    const pagination = await queryBuilder.countTotal();
+
+    const formattedData = disciplines.map((discipline) => {
+        const data = {
+            id: discipline.id,
+            name: discipline.name,
+        };
+
+        return data;
+    });
+
+    return {
+        message: "Disciplines Data parsed",
+        data: formattedData,
+        pagination,
+    };
+};
+
+// Create discipline
+const createDiscipline = async (
+    payload: CreateDisciplineInput,
+    user: JwtPayload
+) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const response = await prisma.discipline.create({
+        data: {
+            ...payload,
+            clinicId: userData?.clinicId!,
+        },
+    });
+
+    return {
+        message: "New Discipline created",
+        data: response,
+    };
+};
+
+// Update Discipline
+const updateDiscipline = async (
+    serviceId: string,
+    payload: UpdateDisciplineInput,
+    user: JwtPayload
+) => {
+    const discipline = await prisma.discipline.findUnique({
+        where: {
+            id: serviceId,
+            clinic: {
+                specialists: {
+                    some: {
+                        id: user.id,
+                        role: {
+                            in: ["CLINIC_ADMIN", "RECEPTIONIST"],
+                        },
+                    },
+                },
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (!discipline) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Service Not Found!");
+    }
+
+    const response = await prisma.discipline.update({
+        where: { id: discipline.id },
+        data: { ...payload },
+    });
+
+    return {
+        message: "Service Data updated",
+        data: response,
+    };
+};
+
+// Delete Discipline
+const deleteDiscipline = async (disciplineId: string, user: JwtPayload) => {
+    const discipline = await prisma.discipline.findUnique({
+        where: {
+            id: disciplineId,
+            clinic: {
+                specialists: {
+                    some: {
+                        id: user.id,
+                        role: {
+                            in: ["CLINIC_ADMIN", "RECEPTIONIST"],
+                        },
+                    },
+                },
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    if (!discipline) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Discipline Not Found!");
+    }
+
+    const response = await prisma.discipline.delete({
+        where: { id: discipline.id },
+        select: {
+            id: true,
+        },
+    });
+
+    return {
+        message: "Discipline deleted successfully",
+        data: response,
+    };
+};
+
+//==============================================
+//              Staff Services
+//==============================================
+
+// Get Staff Schedule
+const getStaffSchedules = async (
+    query: Record<string, any>,
+    user: JwtPayload
+) => {};
+
+// Create new Staff
+const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const { password, ...rest } = payload;
+
+    const staffData = {
+        ...rest,
+        clinicId: userData?.clinicId!,
+    };
+    let response;
+
+    if (
+        payload.role.toUpperCase() === UserRole.SPECIALIST ||
+        payload.role.toUpperCase() === UserRole.RECEPTIONIST
+    ) {
+        if (!password) {
+            throw new ApiError(
+                httpStatus.BAD_REQUEST,
+                "Password required for Specialist and Receptionist"
+            );
+        }
+
+        const hashedPass = await hashPassword(password);
+
+        const res = await prisma.user.create({
+            data: {
+                name: payload.name,
+                email: payload.email,
+                role: payload.role as UserRole,
+                password: hashedPass,
+                staff: {
+                    create: {
+                        ...staffData,
+                    },
+                },
+            },
+            select: {
+                staff: true,
+            },
+        });
+
+        response = res.staff;
+    } else {
+        response = await prisma.staff.create({
+            data: {
+                ...staffData,
+            },
+        });
+    }
+
+    return {
+        message: "New Staff created",
+        data: response,
+    };
+};
+
+// Get All Staff
+const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const queryBuilder = new QueryBuilder(prisma.staff, query);
+
+    const staffs: (Staff & {
+        discipline: {
+            id: string;
+            name: string;
+        };
+    })[] = await queryBuilder
+        .rawFilter({
+            clinicId: userData?.clinicId!,
+        })
+        .search(["name"])
+        .sort()
+        .paginate()
+        .include({
+            discipline: {
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        })
+        .execute();
+    const pagination = await queryBuilder.countTotal();
+
+    const formattedData = staffs.map((staff) => {
+        const data = {
+            id: staff.id,
+            name: staff.name,
+            email: staff.email,
+            role: staff.role,
+            status: staff.status,
+            discipline: staff.discipline,
+        };
+
+        return data;
+    });
+
+    return {
+        message: "Staff Data parsed",
+        data: formattedData,
+        pagination,
+    };
+};
+
 export default {
     // Doctor Services
     getDoctorsCount,
@@ -1288,6 +1971,34 @@ export default {
     getReceiptDetailsById,
     deleteReceipt,
 
+    // Communication Services
+    createReminderSchedules,
+    getReminderScheduleHistory,
+
+    // Report Services
+    getClinicBasicReport,
+    getCancellationInfo,
+
+    // Settings Services
+    getBasicInfo,
+    updateClinicInfo,
+    getBrandingInfo,
+    updateBrandingInfo,
+
     // Service Services
+    getServices,
+    createService,
+    updateService,
+    deleteService,
     getServicesStatistics,
+
+    // Discipline Services
+    getDisciplines,
+    createDiscipline,
+    updateDiscipline,
+    deleteDiscipline,
+
+    // Staff Services
+    createNewStaff,
+    getAllStaff,
 };
