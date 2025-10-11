@@ -53,8 +53,9 @@ model Clinic {
 
   branding Branding?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  ReminderSchedule ReminderSchedule[]
 
   @@map("clinics")
 }
@@ -406,6 +407,9 @@ model DirectReminder {
 model ReminderSchedule {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
+  clinicId String @db.ObjectId
+  clinic   Clinic @relation(fields: [clinicId], references: [id])
+
   // This type is for what type of Message will be sent. Currently only reminders are of Appointments Related
   type  ReminderScheduleType @default(APPOINTMENT)
   prior Int? // Take in Minutes
@@ -414,8 +418,8 @@ model ReminderSchedule {
   // This type is for which type of scheduled reminder is this. If TIMED - Reminder will be sent prior to a given time of appointment. DAY - in the day of Appointment. POST_APPOINTMENT and MISSED_APPOINTMENT are self explanatory
   scheduleType ReminderScheduleScheduleType @default(TIMED)
 
-  communicationMethod CommunicationMethod[]
-  status              ActivityStatus        @default(ACTIVE)
+  communicationMethods CommunicationMethod[]
+  status               ActivityStatus        @default(ACTIVE)
 
   subject String
   body    String
@@ -595,6 +599,7 @@ enum AppointmentStatus {
   CONFIRMED
   COMPLETED
   CANCELLED
+  MISSED
 }
 
 // TODO: Check which and which are the actual Status

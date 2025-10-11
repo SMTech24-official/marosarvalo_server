@@ -1,11 +1,10 @@
-import { CommunicationMethod, Gender, ProductType } from "@prisma/client";
+import {
+    CommunicationMethod,
+    Gender,
+    ProductType,
+    ReminderScheduleType,
+} from "@prisma/client";
 import { z } from "zod";
-
-const createClinicSchema = z.object({});
-export type CreateClinicInput = z.infer<typeof createClinicSchema>;
-
-const updateClinicSchema = z.object({});
-export type UpdateClinicInput = z.infer<typeof updateClinicSchema>;
 
 const createAppointmentSchema = z.object({
     patientId: z.string(),
@@ -64,10 +63,21 @@ const createReceiptSchema = z.object({
 });
 export type CreateReceiptInput = z.infer<typeof createReceiptSchema>;
 
+const createReminderScheduleSchema = z.object({
+    type: z.enum(ReminderScheduleType),
+    prior: z.number().optional(),
+    description: z.string().optional(),
+    communicationMethods: z.array(z.enum(CommunicationMethod)),
+    subject: z.string(),
+    body: z.string(),
+});
+export type CreateReminderScheduleInput = z.infer<
+    typeof createReminderScheduleSchema
+>;
+
 export default {
-    createClinicSchema,
-    updateClinicSchema,
     createAppointmentSchema,
     createPatientSchema,
     createReceiptSchema,
+    createReminderScheduleSchema,
 };

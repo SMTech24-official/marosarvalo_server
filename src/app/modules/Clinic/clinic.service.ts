@@ -3,16 +3,23 @@ import QueryBuilder from "../../../utils/queryBuilder";
 import {
     Appointment,
     Bond,
+    CommunicationMethod,
     Patient,
     Product,
     ProductType,
     Receipt,
+    ReminderScheduleType,
+    ScheduledReminderHistory,
+    UserRole,
 } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import {
     applyTaxAndDiscount,
+    countServices,
+    getAttendanceStats,
     getDateRange,
     getNewestDate,
+    getWeeklyStats,
     groupAppointment,
     parseTimeString,
 } from "./clinic.utils";
@@ -22,6 +29,7 @@ import {
     CreateAppointmentInput,
     CreatePatientInput,
     CreateReceiptInput,
+    CreateReminderScheduleInput,
 } from "./clinic.validation";
 
 // TODO: Make it Uni-useable for Clinic AND Receptionist
@@ -967,6 +975,240 @@ const getStaffSchedules = async (
     query: Record<string, any>,
     user: JwtPayload
 ) => {};
+
+//==============================================
+//             Communication Services
+//==============================================
+
+// Create Reminder Schedules - Only for Clinic Admin
+const createReminderSchedules = async (
+    payload: CreateReminderScheduleInput,
+    user: JwtPayload
+) => {
+    if (user.role !== UserRole.CLINIC_ADMIN) {
+        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized Request");
+    }
+
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const response = await prisma.reminderSchedule.create({
+        data: { ...payload, clinicId: userData?.clinicId! },
+    });
+
+    return {
+        message: "Reminder Schedule created",
+        data: response,
+    };
+};
+
+// Get History
+const getReminderScheduleHistory = async (
+    query: Record<string, any>,
+    user: JwtPayload
+) => {
+    if (user.role !== UserRole.CLINIC_ADMIN) {
+        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized Request");
+    }
+
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const queryBuilder = new QueryBuilder(
+        prisma.scheduledReminderHistory,
+        query
+    );
+
+    const histories: (ScheduledReminderHistory & {
+        patient: {
+            firstName: true;
+            lastName: true;
+            email: true;
+        };
+        schedule: {
+            type: ReminderScheduleType;
+            subject: string;
+            communicationMethods: CommunicationMethod;
+        };
+    })[] = await queryBuilder
+        .sort()
+        .paginate()
+        .rawFilter({
+            patient: {
+                clinicId: userData?.clinicId,
+                ...(query.searchTerm
+                    ? {
+                          OR: [
+                              {
+                                  firstName: {
+                                      contains: query.searchTerm,
+                                      mode: "insensitive",
+                                  },
+                              },
+                              {
+                                  lastName: {
+                                      contains: query.searchTerm,
+                                      mode: "insensitive",
+                                  },
+                              },
+                          ],
+                      }
+                    : {}),
+            },
+        })
+        .include({
+            patient: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                },
+            },
+            schedule: {
+                select: {
+                    type: true,
+                    subject: true,
+                    communicationMethods: true,
+                },
+            },
+        })
+        .execute();
+
+    const pagination = await queryBuilder.countTotal();
+
+    const formattedData = histories.map((history) => {
+        const data = {
+            patient: history.patient,
+            type: history.schedule.type,
+            communicationMethods: history.schedule.communicationMethods,
+            subject: history.schedule.subject,
+            status: history.status,
+            sentAt: history.createdAt,
+        };
+
+        return data;
+    });
+
+    return {
+        message: "Reminder sent History parsed",
+        data: formattedData,
+        pagination,
+    };
+};
+
+//==============================================
+//              Voucher Services
+//==============================================
+// TODO: Not sure what to do about this either!
+
+//==============================================
+//              Report Services
+//==============================================
+
+// Get basic Report - w/o any change in request - This month
+const getClinicBasicReport = async (user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    const now = new Date();
+
+    // Start of current month
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // Start of next month
+    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    const [receipts, appointments, patients, appointmentsOfServices] =
+        await Promise.all([
+            prisma.receipt.findMany({
+                where: {
+                    clinicId: userData?.clinicId!,
+                    createdAt: {
+                        gte: startOfMonth,
+                        lt: startOfNextMonth,
+                    },
+                },
+                select: {
+                    paid: true,
+                    createdAt: true,
+                },
+            }),
+            prisma.appointment.findMany({
+                where: {
+                    patient: {
+                        clinicId: userData?.clinicId!,
+                    },
+                    date: {
+                        gte: startOfMonth,
+                        lt: startOfNextMonth,
+                    },
+                },
+                select: {
+                    status: true,
+                },
+            }),
+            prisma.patient.findMany({
+                where: {
+                    clinicId: userData?.clinicId!,
+                },
+                select: {
+                    id: true,
+                },
+            }),
+            prisma.appointment.findMany({
+                where: {
+                    patient: {
+                        clinicId: userData?.clinicId!,
+                    },
+                    createdAt: {
+                        gte: startOfMonth,
+                        lt: startOfNextMonth,
+                    },
+                },
+                select: {
+                    service: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                },
+            }),
+        ]);
+
+    const formattedData = {
+        revenue: {
+            total: receipts.reduce((p, c) => p + c.paid, 0),
+            statistics: getWeeklyStats(receipts),
+        },
+        attendance: getAttendanceStats(appointments),
+        totalPatients: patients.length,
+        popularServices: countServices(appointmentsOfServices),
+    };
+
+    return {
+        message: "Basic Report parsed",
+        data: formattedData,
+    };
+};
 
 //==============================================
 //             Service Services
