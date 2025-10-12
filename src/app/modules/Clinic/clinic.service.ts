@@ -22,6 +22,7 @@ import {
     getAttendanceStats,
     getDateRange,
     getNewestDate,
+    getUserClinicId,
     getWeeklyStats,
     groupAppointment,
     parseTimeString,
@@ -40,6 +41,7 @@ import {
     UpdateClinicInfoInput,
     UpdateDisciplineInput,
     UpdateServiceInput,
+    UpdateStaffInput,
 } from "./clinic.validation";
 import { hashPassword } from "../../../helpers/passwordHelpers";
 
@@ -56,20 +58,11 @@ const getDoctorsCount = async (
     },
     user: JwtPayload
 ) => {
-    const clinicAdmin = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-            role: "CLINIC_ADMIN",
-        },
-    });
-
-    if (!clinicAdmin) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Request");
-    }
+    const clinicId = await getUserClinicId(user);
 
     const count = await prisma.user.count({
         where: {
-            clinicId: clinicAdmin?.clinicId!,
+            clinicId: clinicId,
             role: "SPECIALIST",
             status: "ACTIVE",
             createdAt: getDateRange(query.filterBy),
@@ -93,21 +86,12 @@ const getAppointmentsCount = async (
     },
     user: JwtPayload
 ) => {
-    const clinicAdmin = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-            role: "CLINIC_ADMIN",
-        },
-    });
-
-    if (!clinicAdmin) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Request");
-    }
+    const clinicId = await getUserClinicId(user);
 
     const count = await prisma.appointment.count({
         where: {
             patient: {
-                clinicId: clinicAdmin?.clinicId!,
+                clinicId: clinicId,
             },
             status: {
                 not: "CANCELLED",
@@ -129,21 +113,12 @@ const getAppointmentsOverview = async (
     },
     user: JwtPayload
 ) => {
-    const clinicAdmin = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-            role: "CLINIC_ADMIN",
-        },
-    });
-
-    if (!clinicAdmin) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Request");
-    }
+    const clinicId = await getUserClinicId(user);
 
     const appointments = await prisma.appointment.findMany({
         where: {
             patient: {
-                clinicId: clinicAdmin?.clinicId!,
+                clinicId: clinicId,
             },
             status: {
                 not: "CANCELLED",
@@ -167,16 +142,7 @@ const getAppointmentsCalender = async (
     query: Record<string, any>,
     user: JwtPayload
 ) => {
-    const clinicAdmin = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-            role: "CLINIC_ADMIN",
-        },
-    });
-
-    if (!clinicAdmin) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Request");
-    }
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -209,7 +175,7 @@ const getAppointmentsCalender = async (
             patient: {
                 contains: query.searchTerm,
                 mode: "insensitive",
-                clinicId: clinicAdmin.clinicId,
+                clinicId: clinicId,
             },
             specialistId: user.id,
             status: {
@@ -394,20 +360,11 @@ const getNewPatientsCount = async (
     },
     user: JwtPayload
 ) => {
-    const clinicAdmin = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-            role: "CLINIC_ADMIN",
-        },
-    });
-
-    if (!clinicAdmin) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Request");
-    }
+    const clinicId = await getUserClinicId(user);
 
     const count = await prisma.patient.count({
         where: {
-            clinicId: clinicAdmin?.clinicId!,
+            clinicId: clinicId,
             createdAt: getDateRange(query.filterBy),
         },
     });
@@ -427,16 +384,12 @@ const createPatient = async (
     },
     user: JwtPayload
 ) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const response = await prisma.patient.create({
         data: {
             ...payload,
-            clinicId: userData?.clinicId!,
+            clinicId: clinicId,
         },
     });
 
@@ -448,11 +401,7 @@ const createPatient = async (
 
 // Get Patients
 const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(prisma.patient, query);
 
@@ -468,7 +417,7 @@ const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
         .paginate()
         .filter(["status"])
         .rawFilter({
-            clinicId: userData?.clinicId,
+            clinicId: clinicId,
         })
         .include({
             appointments: {
@@ -720,19 +669,12 @@ const getPatientBonds = async (
 
 // Create Receipt
 const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const response = await prisma.receipt.create({
         data: {
             ...payload,
-            clinicId: userData?.clinicId!,
+            clinicId: clinicId,
             products: {
                 createMany: {
                     data: payload.products.map((product) => {
@@ -773,14 +715,7 @@ const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
 
 // Get Receipts
 const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(prisma.receipt, query);
 
@@ -800,7 +735,7 @@ const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
         .sort()
         .paginate()
         .rawFilter({
-            clinicId: userData?.clinicId,
+            clinicId: clinicId,
         })
         .include({
             patient: {
@@ -986,21 +921,10 @@ const createReminderSchedules = async (
     payload: CreateReminderScheduleInput,
     user: JwtPayload
 ) => {
-    if (user.role !== UserRole.CLINIC_ADMIN) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized Request");
-    }
-
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const response = await prisma.reminderSchedule.create({
-        data: { ...payload, clinicId: userData?.clinicId! },
+        data: { ...payload, clinicId: clinicId },
     });
 
     return {
@@ -1014,18 +938,7 @@ const getReminderScheduleHistory = async (
     query: Record<string, any>,
     user: JwtPayload
 ) => {
-    if (user.role !== UserRole.CLINIC_ADMIN) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized Request");
-    }
-
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(
         prisma.scheduledReminderHistory,
@@ -1048,7 +961,7 @@ const getReminderScheduleHistory = async (
         .paginate()
         .rawFilter({
             patient: {
-                clinicId: userData?.clinicId,
+                clinicId: clinicId,
                 ...(query.searchTerm
                     ? {
                           OR: [
@@ -1120,14 +1033,7 @@ const getReminderScheduleHistory = async (
 
 // Get basic Report - w/o any change in request - This month
 const getClinicBasicReport = async (user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const now = new Date();
 
@@ -1141,7 +1047,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
         await Promise.all([
             prisma.receipt.findMany({
                 where: {
-                    clinicId: userData?.clinicId!,
+                    clinicId: clinicId,
                     createdAt: {
                         gte: startOfMonth,
                         lt: startOfNextMonth,
@@ -1155,7 +1061,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
             prisma.appointment.findMany({
                 where: {
                     patient: {
-                        clinicId: userData?.clinicId!,
+                        clinicId: clinicId,
                     },
                     date: {
                         gte: startOfMonth,
@@ -1168,7 +1074,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
             }),
             prisma.patient.findMany({
                 where: {
-                    clinicId: userData?.clinicId!,
+                    clinicId: clinicId,
                 },
                 select: {
                     id: true,
@@ -1177,7 +1083,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
             prisma.appointment.findMany({
                 where: {
                     patient: {
-                        clinicId: userData?.clinicId!,
+                        clinicId: clinicId,
                     },
                     createdAt: {
                         gte: startOfMonth,
@@ -1231,14 +1137,7 @@ const getCancellationInfo = async (
     query: Record<string, any>,
     user: JwtPayload
 ) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -1260,7 +1159,7 @@ const getCancellationInfo = async (
     })[] = await queryBuilder
         .rawFilter({
             patient: {
-                clinicId: userData?.clinicId,
+                clinicId: clinicId,
             },
             status: "CANCELLED",
         })
@@ -1450,20 +1349,11 @@ const updateBrandingInfo = async (
 
 // Get Services Statistics
 const getServicesStatistics = async (user: JwtPayload) => {
-    const clinicAdmin = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-            role: "CLINIC_ADMIN",
-        },
-    });
-
-    if (!clinicAdmin) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Request");
-    }
+    const clinicId = await getUserClinicId(user);
 
     const disciplines = await prisma.discipline.findMany({
         where: {
-            clinicId: clinicAdmin.clinicId!,
+            clinicId: clinicId!,
         },
         include: {
             services: {
@@ -1499,14 +1389,7 @@ const getServicesStatistics = async (user: JwtPayload) => {
 
 // Get Services list
 const getServices = async (query: Record<string, any>, user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(prisma.service, query);
 
@@ -1517,7 +1400,7 @@ const getServices = async (query: Record<string, any>, user: JwtPayload) => {
         };
     })[] = await queryBuilder
         .rawFilter({
-            discipline: { clinicId: userData?.clinicId! },
+            discipline: { clinicId: clinicId },
         })
         .search(["name"])
         .sort()
@@ -1674,20 +1557,13 @@ const deleteService = async (serviceId: string, user: JwtPayload) => {
 
 // Get disciplines
 const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(prisma.discipline, query);
 
     const disciplines: Discipline[] = await queryBuilder
         .rawFilter({
-            clinicId: userData?.clinicId,
+            clinicId: clinicId,
         })
         .search(["name"])
         .sort()
@@ -1716,19 +1592,12 @@ const createDiscipline = async (
     payload: CreateDisciplineInput,
     user: JwtPayload
 ) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const response = await prisma.discipline.create({
         data: {
             ...payload,
-            clinicId: userData?.clinicId!,
+            clinicId: clinicId,
         },
     });
 
@@ -1828,20 +1697,13 @@ const getStaffSchedules = async (
 
 // Create new Staff
 const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const { password, ...rest } = payload;
 
     const staffData = {
         ...rest,
-        clinicId: userData?.clinicId!,
+        clinicId: clinicId,
     };
     let response;
 
@@ -1892,14 +1754,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
 
 // Get All Staff
 const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
+    const clinicId = await getUserClinicId(user);
 
     const queryBuilder = new QueryBuilder(prisma.staff, query);
 
@@ -1910,7 +1765,7 @@ const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
         };
     })[] = await queryBuilder
         .rawFilter({
-            clinicId: userData?.clinicId!,
+            clinicId: clinicId,
         })
         .search(["name"])
         .sort()
@@ -1943,6 +1798,85 @@ const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
         message: "Staff Data parsed",
         data: formattedData,
         pagination,
+    };
+};
+
+// Get Staff by Id
+const getStaffById = async (staffId: string, user: JwtPayload) => {
+    const clinicId = await getUserClinicId(user);
+
+    const staff = await prisma.staff.findUnique({
+        where: {
+            id: staffId,
+            clinicId: clinicId,
+        },
+    });
+
+    if (!staff) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found!");
+    }
+
+    return { message: "Staff Data parsed", data: staff };
+};
+
+// Update Staff data
+const updateStaffData = async (
+    staffId: string,
+    payload: UpdateStaffInput,
+    user: JwtPayload
+) => {
+    const clinicId = await getUserClinicId(user);
+
+    const exists = await prisma.staff.findUnique({
+        where: {
+            id: staffId,
+            clinicId,
+        },
+    });
+
+    if (!exists) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found!");
+    }
+
+    const response = await prisma.staff.update({
+        where: {
+            id: exists.id,
+        },
+        data: {
+            ...payload,
+        },
+    });
+
+    return {
+        message: "Staff Data updated",
+        data: response,
+    };
+};
+
+// Delete Staff data
+const deleteStaffData = async (staffId: string, user: JwtPayload) => {
+    const clinicId = await getUserClinicId(user);
+
+    const exists = await prisma.staff.findUnique({
+        where: {
+            id: staffId,
+            clinicId,
+        },
+    });
+
+    if (!exists) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found!");
+    }
+
+    const response = await prisma.staff.delete({
+        where: {
+            id: exists.id,
+        },
+    });
+
+    return {
+        message: "Staff Data updated",
+        data: response,
     };
 };
 

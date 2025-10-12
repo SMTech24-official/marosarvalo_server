@@ -134,6 +134,18 @@ const createStaffSchema = z.object({
 });
 export type CreateStaffInput = z.infer<typeof createStaffSchema>;
 
+const updateStaffSchema = z.object({
+    name: z.string().optional(),
+    employeeId: z.string().optional(),
+    email: z.email().optional(),
+    phone: z.string().optional(),
+    disciplineId: z.string().optional(),
+    role: z.string().optional(),
+    gender: z.enum(Gender).optional(),
+    address: z.string().optional(),
+});
+export type UpdateStaffInput = z.infer<typeof updateStaffSchema>;
+
 export default {
     createAppointmentSchema,
     createPatientSchema,

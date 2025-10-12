@@ -10,6 +10,8 @@ import {
     getWeek,
     getYear,
 } from "date-fns";
+import { JwtPayload } from "jsonwebtoken";
+import prisma from "../../../shared/prisma";
 
 type FilterBy = "day" | "week" | "month" | "year" | undefined;
 
@@ -224,4 +226,18 @@ export const countServices = (items: ServiceItem[]): ServiceCount => {
         acc[name] = (acc[name] || 0) + 1;
         return acc;
     }, {});
+};
+
+// Get Clinic ID from user
+export const getUserClinicId = async (user: JwtPayload) => {
+    const userData = await prisma.user.findUnique({
+        where: {
+            id: user.id,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    return userData?.clinicId ?? "";
 };
