@@ -1,12 +1,9 @@
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment } from "@prisma/client";
-import {
-    groupAppointment,
-    getDateRange,
-    getUserClinicId,
-} from "../../clinic.utils";
+import { getDateRange, getUserClinicId } from "../../clinic.utils";
 import { JwtPayload } from "jsonwebtoken";
+import { groupAppointment } from "./appointments.utils";
 
 // Get Appointments Count
 const getAppointmentsCount = async (

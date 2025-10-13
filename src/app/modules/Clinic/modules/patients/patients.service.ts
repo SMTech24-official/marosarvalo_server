@@ -2,14 +2,11 @@ import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment, Bond, Patient } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
-import {
-    getDateRange,
-    getNewestDate,
-    getUserClinicId,
-} from "../../clinic.utils";
+import { getDateRange, getUserClinicId } from "../../clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreatePatientInput } from "../../clinic.validation";
+import { getNewestDate } from "./patients.utils";
 
 // Get New Patients Count
 const getNewPatientsCount = async (
