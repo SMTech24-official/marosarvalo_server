@@ -158,4 +158,5 @@ export default {
     createDisciplineSchema,
     updateDisciplineSchema,
     createStaffSchema,
+    updateStaffSchema
 };
