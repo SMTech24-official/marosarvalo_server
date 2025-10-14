@@ -1,14 +1,14 @@
 import { Router } from "express";
 import ReceiptControllers from "./receipts.controller";
 import validateRequest from "../../../../middlewares/validateRequest";
-import clinicValidation from "../../clinic.validation";
+import receiptValidations from "./receipts.validation";
 
 const router = Router();
 
 // Create Receipt
 router.post(
     "/",
-    validateRequest(clinicValidation.createReceiptSchema),
+    validateRequest(receiptValidations.createReceiptSchema),
     ReceiptControllers.createReceipt
 );
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import PatientControllers from "./patients.controller";
 import validateRequest from "../../../../middlewares/validateRequest";
-import clinicValidation from "../../clinic.validation";
+import patientValidations from "./patients.validation";
 import { fileUploader } from "../../../../../helpers/fileUploader";
 import { parseBodyData } from "../../../../middlewares/parseBodyData";
 
@@ -25,7 +25,7 @@ router.post(
         },
     ]),
     parseBodyData,
-    validateRequest(clinicValidation.createPatientSchema),
+    validateRequest(patientValidations.createPatientSchema),
     PatientControllers.createPatient
 );
 

@@ -1,14 +1,14 @@
 import { Router } from "express";
 import StaffControllers from "./staff.controller";
 import validateRequest from "../../../../middlewares/validateRequest";
-import clinicValidation from "../../clinic.validation";
+import staffValidations from "./staff.validation";
 
 const router = Router();
 
 // Create New Staff
 router.post(
     "/",
-    validateRequest(clinicValidation.createStaffSchema),
+    validateRequest(staffValidations.createStaffSchema),
     StaffControllers.createNewStaff
 );
 
@@ -21,7 +21,7 @@ router.get("/:id", StaffControllers.getStaffById);
 // Update Staff data
 router.patch(
     "/:id",
-    validateRequest(clinicValidation.updateStaffSchema),
+    validateRequest(staffValidations.updateStaffSchema),
     StaffControllers.updateStaffData
 );
 

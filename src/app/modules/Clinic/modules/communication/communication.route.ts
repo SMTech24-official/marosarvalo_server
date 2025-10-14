@@ -1,14 +1,14 @@
 import { Router } from "express";
 import CommunicationControllers from "./communication.controller";
 import validateRequest from "../../../../middlewares/validateRequest";
-import clinicValidation from "../../clinic.validation";
+import communicationValidations from "./communication.validation";
 
 const router = Router();
 
 // Create Reminder Schedule
 router.post(
     "/reminders",
-    validateRequest(clinicValidation.createReminderScheduleSchema),
+    validateRequest(communicationValidations.createReminderScheduleSchema),
     CommunicationControllers.createReminderSchedules
 );
 

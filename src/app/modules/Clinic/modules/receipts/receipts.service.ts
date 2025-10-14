@@ -5,7 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { getUserClinicId } from "../../clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
-import { CreateReceiptInput } from "../../clinic.validation";
+import { CreateReceiptInput } from "./receipts.validation";
 
 // Create Receipt
 const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {

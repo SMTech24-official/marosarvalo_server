@@ -1,7 +1,7 @@
 import { Router } from "express";
 import SettingsControllers from "./settings.controller";
 import validateRequest from "../../../../middlewares/validateRequest";
-import clinicValidation from "../../clinic.validation";
+import settingsValidations from "./settings.validation";
 
 const router = Router();
 
@@ -11,7 +11,7 @@ router.get("/basic", SettingsControllers.getBasicInfo);
 // Update Basic Info
 router.patch(
     "/basic",
-    validateRequest(clinicValidation.updateClinicInfoSchema),
+    validateRequest(settingsValidations.updateClinicInfoSchema),
     SettingsControllers.updateClinicInfo
 );
 
@@ -21,7 +21,7 @@ router.get("/branding", SettingsControllers.getBrandingInfo);
 // Update Branding Info
 router.patch(
     "/branding",
-    validateRequest(clinicValidation.updateBrandingInfoSchema),
+    validateRequest(settingsValidations.updateBrandingInfoSchema),
     SettingsControllers.updateBrandingInfo
 );
 

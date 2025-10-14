@@ -1,7 +1,7 @@
 import { Router } from "express";
 import DisciplineControllers from "./disciplines.controller";
 import validateRequest from "../../../../middlewares/validateRequest";
-import clinicValidation from "../../clinic.validation";
+import disciplineValidations from "./disciplines.validation";
 
 const router = Router();
 
@@ -11,14 +11,14 @@ router.get("/", DisciplineControllers.getDisciplines);
 // Create Discipline
 router.post(
     "/",
-    validateRequest(clinicValidation.createDisciplineSchema),
+    validateRequest(disciplineValidations.createDisciplineSchema),
     DisciplineControllers.createDiscipline
 );
 
 // Update Discipline
 router.patch(
     "/:id",
-    validateRequest(clinicValidation.updateDisciplineSchema),
+    validateRequest(disciplineValidations.updateDisciplineSchema),
     DisciplineControllers.updateDiscipline
 );
 

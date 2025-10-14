@@ -5,7 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { getDateRange, getUserClinicId } from "../../clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
-import { CreatePatientInput } from "../../clinic.validation";
+import { CreatePatientInput } from "./patients.validation";
 import { getNewestDate } from "./patients.utils";
 
 // Get New Patients Count
