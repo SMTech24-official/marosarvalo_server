@@ -3,7 +3,7 @@ import prisma from "../../../../../shared/prisma";
 import {
     UpdateBrandingInfoInput,
     UpdateClinicInfoInput,
-} from "../../clinic.validation";
+} from "./settings.validation";
 
 // Get basic Info about clinic
 const getBasicInfo = async (user: JwtPayload) => {

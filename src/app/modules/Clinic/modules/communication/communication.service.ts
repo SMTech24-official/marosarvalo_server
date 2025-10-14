@@ -7,7 +7,7 @@ import {
 } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { getUserClinicId } from "../../clinic.utils";
-import { CreateReminderScheduleInput } from "../../clinic.validation";
+import { CreateReminderScheduleInput } from "./communication.validation";
 
 // Create Reminder Schedules - Only for Clinic Admin
 const createReminderSchedules = async (

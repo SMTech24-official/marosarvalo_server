@@ -5,7 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { getUserClinicId } from "../.././clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
-import { CreateStaffInput, UpdateStaffInput } from "../.././clinic.validation";
+import { CreateStaffInput, UpdateStaffInput } from "./staff.validation";
 import { hashPassword } from "../../../../../helpers/passwordHelpers";
 
 // Get Staff Schedule

@@ -1,9 +1,14 @@
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment } from "@prisma/client";
-import { getDateRange, getUserClinicId } from "../../clinic.utils";
+import {
+    getDateRange,
+    getUserClinicId,
+    parseTimeString,
+} from "../../clinic.utils";
 import { JwtPayload } from "jsonwebtoken";
 import { groupAppointment } from "./appointments.utils";
+import { CreateAppointmentInput } from "./appointments.validation";
 
 // Get Appointments Count
 const getAppointmentsCount = async (
@@ -78,12 +83,15 @@ const getAppointmentsCalender = async (
             name: string;
             profilePicture: string;
         };
+
         discipline: {
             name: string;
         };
+
         service: {
             name: string;
         };
+
         patient: {
             firstName: string;
             lastName: string;
@@ -123,10 +131,29 @@ const getAppointmentsCalender = async (
     const pagination = await queryBuilder.countTotal();
 
     const formattedData = appointments.map((appointment) => {
-        return {
-            ...appointment,
-            // Add any formatting logic here if needed
+        const data = {
+            id: appointment.id,
+
+            patient: {
+                name: `${appointment.patient.firstName}${
+                    appointment.patient.lastName
+                        ? " " + appointment.patient.lastName
+                        : ""
+                }`,
+                phone: appointment.patient.phone,
+            },
+
+            discipline: appointment.discipline.name,
+            service: appointment.service.name,
+            specialist: { ...appointment.specialist },
+            date: appointment.date,
+            timeSlot: appointment.timeSlot,
+            status: appointment.status,
+            note: appointment.note,
+            documents: appointment.documents,
         };
+
+        return data;
     });
 
     return {
@@ -213,10 +240,21 @@ const getAppointments = async (
     const pagination = await queryBuilder.countTotal();
 
     const formattedData = appointments.map((appointment) => {
-        return {
-            ...appointment,
-            // Add any formatting logic here if needed
+        const startTime = parseTimeString(appointment.timeSlot.split("-")[0]);
+
+        const dateTime = new Date(appointment.date);
+        dateTime.setHours(startTime.hours, startTime.minutes);
+
+        const data = {
+            id: appointment.id,
+            patient: appointment.patient,
+            discipline: appointment.discipline.name,
+            service: appointment.service.name,
+            specialist: appointment.specialist,
+            dateTime: dateTime.toJSON(),
         };
+
+        return data;
     });
 
     return {
@@ -228,7 +266,7 @@ const getAppointments = async (
 
 // Create new Appointment - // TODO: Check availability of Specialist
 const createAppointment = async (
-    payload: any // Replace with CreateAppointmentInput & { documents: string[] }
+    payload: CreateAppointmentInput & { documents: string[] }
 ) => {
     const response = await prisma.appointment.create({
         data: {
