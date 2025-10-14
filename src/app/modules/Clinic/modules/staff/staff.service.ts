@@ -8,7 +8,7 @@ import httpStatus from "http-status";
 import { CreateStaffInput, UpdateStaffInput } from "./staff.validation";
 import { hashPassword } from "../../../../../helpers/passwordHelpers";
 import { endOfDay, startOfDay } from "date-fns";
-import { toZonedTime, format } from "date-fns-tz";
+import { toZonedTime } from "date-fns-tz";
 
 // Create new Staff
 const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {

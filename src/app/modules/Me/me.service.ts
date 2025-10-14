@@ -3,6 +3,8 @@ import prisma from "../../../shared/prisma";
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiErrors";
 import { JwtPayload } from "jsonwebtoken";
+import { UserRole } from "@prisma/client";
+import { UpdatesUserInfoInput } from "./me.validation";
 
 // Get current User Info
 const getUserInfo = async (user: JwtPayload) => {
@@ -48,7 +50,7 @@ const getUserInfo = async (user: JwtPayload) => {
 
 // Update user Info
 const updateUserInfo = async (
-    payload: Record<string, any>,
+    payload: UpdatesUserInfoInput,
     user: JwtPayload
 ) => {
     const { name, phone, address, introduction, employeeId, profession } =
@@ -68,7 +70,7 @@ const updateUserInfo = async (
 
     let response;
 
-    if (user.role === "RECEPTIONIST") {
+    if (user.role === UserRole.RECEPTIONIST) {
         response = await prisma.user.update({
             where: {
                 id: user.id,
