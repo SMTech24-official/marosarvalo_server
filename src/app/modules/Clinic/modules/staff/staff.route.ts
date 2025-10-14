@@ -28,4 +28,7 @@ router.patch(
 // Delete Staff data
 router.delete("/:id", StaffControllers.deleteStaffData);
 
+// Get Staff Schedules
+router.get("/schedules", StaffControllers.getStaffSchedules);
+
 export const StaffRoutes = router;

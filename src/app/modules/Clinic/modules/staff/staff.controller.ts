@@ -64,6 +64,22 @@ const deleteStaffData = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// Get Staff Schedules
+const getStaffSchedules = catchAsync(async (req: Request, res: Response) => {
+    const clientTimezone = req.headers["x-client-timezone"] || "UTC";
+
+    const result = await StaffServices.getStaffSchedules(
+        clientTimezone as string,
+        req.user
+    );
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
 // Export all functions
 export default {
     createNewStaff,
@@ -71,4 +87,5 @@ export default {
     getStaffById,
     updateStaffData,
     deleteStaffData,
+    getStaffSchedules,
 };

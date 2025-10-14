@@ -252,8 +252,8 @@ model Appointment {
     specialistId String @db.ObjectId
     specialist   Staff  @relation(fields: [specialistId], references: [id])
 
-    date     DateTime @db.Date
-    timeSlot String
+    date     DateTime
+    timeSlot String // 10:30am - 11:00am
 
     status    AppointmentStatus @default(PENDING)
     documents String[]

@@ -1,13 +1,19 @@
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import {
+    ActivityStatus,
     CommunicationMethod,
     ReminderScheduleType,
     ScheduledReminderHistory,
 } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { getUserClinicId } from "../../clinic.utils";
-import { CreateReminderScheduleInput } from "./communication.validation";
+import {
+    CreateReminderScheduleInput,
+    UpdateReminderScheduleInput,
+} from "./communication.validation";
+import httpStatus from "http-status";
+import ApiError from "../../../../../errors/ApiErrors";
 
 // Create Reminder Schedules - Only for Clinic Admin
 const createReminderSchedules = async (
@@ -22,6 +28,146 @@ const createReminderSchedules = async (
 
     return {
         message: "Reminder Schedule created",
+        data: response,
+    };
+};
+
+// Get Reminder Schedules
+const getReminderSchedules = async (user: JwtPayload) => {
+    const clinicId = await getUserClinicId(user);
+
+    const reminders = await prisma.reminderSchedule.findMany({
+        where: {
+            clinicId,
+        },
+    });
+
+    return {
+        message: "Reminder Schedules Data parsed",
+        data: reminders,
+    };
+};
+
+// Update Reminder Schedule
+const updateSchedule = async (
+    scheduleId: string,
+    payload: UpdateReminderScheduleInput,
+    user: JwtPayload
+) => {
+    const clinicId = await getUserClinicId(user);
+
+    const exists = await prisma.reminderSchedule.findUnique({
+        where: {
+            id: scheduleId,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    if (!exists) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
+    }
+
+    if (exists.clinicId !== clinicId) {
+        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
+    }
+
+    const response = await prisma.reminderSchedule.update({
+        where: {
+            id: scheduleId,
+            clinicId: clinicId,
+        },
+        data: {
+            ...payload,
+        },
+    });
+
+    return {
+        message: "Reminder Schedule updated",
+        data: response,
+    };
+};
+
+// Delete Reminder Schedule
+const deleteSchedule = async (scheduleId: string, user: JwtPayload) => {
+    const clinicId = await getUserClinicId(user);
+
+    const exists = await prisma.reminderSchedule.findUnique({
+        where: {
+            id: scheduleId,
+        },
+        select: {
+            clinicId: true,
+        },
+    });
+
+    if (!exists) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
+    }
+
+    if (exists.clinicId !== clinicId) {
+        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
+    }
+
+    const response = await prisma.reminderSchedule.delete({
+        where: {
+            id: scheduleId,
+            clinicId: clinicId,
+        },
+    });
+
+    return {
+        message: "Reminder Schedule deleted",
+        data: response,
+    };
+};
+
+// Update Reminder activity status
+const updateReminderStatus = async (
+    scheduleId: string,
+    status: ActivityStatus,
+    user: JwtPayload
+) => {
+    const clinicId = await getUserClinicId(user);
+
+    const exists = await prisma.reminderSchedule.findUnique({
+        where: {
+            id: scheduleId,
+        },
+        select: {
+            clinicId: true,
+            status: true,
+        },
+    });
+
+    if (!exists) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
+    }
+
+    if (exists.clinicId !== clinicId) {
+        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
+    }
+
+    if (exists.status === status) {
+        throw new ApiError(
+            httpStatus.BAD_REQUEST,
+            "Schedule is already " + status
+        );
+    }
+
+    const response = await prisma.reminderSchedule.update({
+        where: {
+            id: scheduleId,
+            clinicId: clinicId,
+        },
+        data: {
+            status: status,
+        },
+    });
+
+    return {
+        message: "Reminder Schedule status updated",
         data: response,
     };
 };
@@ -117,5 +263,9 @@ const getReminderScheduleHistory = async (
 
 export default {
     createReminderSchedules,
+    getReminderSchedules,
+    updateSchedule,
+    deleteSchedule,
+    updateReminderStatus,
     getReminderScheduleHistory,
 };

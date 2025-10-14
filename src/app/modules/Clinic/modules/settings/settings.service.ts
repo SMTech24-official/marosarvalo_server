@@ -4,6 +4,7 @@ import {
     UpdateBrandingInfoInput,
     UpdateClinicInfoInput,
 } from "./settings.validation";
+import { getUserClinicId } from "../../clinic.utils";
 
 // Get basic Info about clinic
 const getBasicInfo = async (user: JwtPayload) => {
@@ -130,6 +131,13 @@ const updateBrandingInfo = async (
         message: "Branding Info updated",
         data: response.clinic?.branding,
     };
+};
+
+// Get Subscription data
+const getSubscriptionData = async (user: JwtPayload) => {
+    const clinicId = getUserClinicId(user);
+
+    // const subscription = await prisma.subscription.
 };
 
 // Export functions

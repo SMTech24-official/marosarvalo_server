@@ -7,12 +7,8 @@ import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreateStaffInput, UpdateStaffInput } from "./staff.validation";
 import { hashPassword } from "../../../../../helpers/passwordHelpers";
-
-// Get Staff Schedule
-const getStaffSchedules = async (
-    query: Record<string, any>,
-    user: JwtPayload
-) => {};
+import { endOfDay, startOfDay } from "date-fns";
+import { toZonedTime, format } from "date-fns-tz";
 
 // Create new Staff
 const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
@@ -199,10 +195,89 @@ const deleteStaffData = async (staffId: string, user: JwtPayload) => {
     };
 };
 
+// Update Staff working hours
+const updateWorkingHours = async (staffId: string, payload: any) => {};
+
+// Get Staff Schedule
+const getStaffSchedules = async (clientTimezone: string, user: JwtPayload) => {
+    const clinicId = await getUserClinicId(user);
+
+    const todayStart = startOfDay(new Date());
+    const todayEnd = endOfDay(new Date());
+
+    const now = new Date();
+    const clientNow = toZonedTime(now, clientTimezone);
+
+    const days = [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+    ];
+    const today = days[clientNow.getDay()];
+
+    const availableStaffs = await prisma.staff.findMany({
+        where: {
+            clinicId,
+            holiday: {
+                date: {
+                    not: {
+                        gte: todayStart,
+                        lte: todayEnd,
+                    },
+                },
+            },
+            workingHour: {
+                [today]: {
+                    not: null,
+                },
+            },
+        },
+        include: {
+            workingHour: {
+                [today]: true,
+            },
+        },
+    });
+
+    const formattedData = availableStaffs.map((staff) => {
+        let todaySch: {
+            from: { h: string; m: string };
+            to: { h: string; m: string };
+        } | null = null;
+        if (staff.workingHour) {
+            todaySch = (staff.workingHour as Record<typeof today, any>)[
+                today
+            ] as {
+                from: { h: string; m: string };
+                to: { h: string; m: string };
+            };
+        }
+
+        const data = {
+            id: staff.id,
+            name: staff.name,
+            role: staff.role,
+            timeSlot: todaySch,
+        };
+
+        return data;
+    });
+
+    return {
+        message: "Today Staff Schedules parsed",
+        data: formattedData,
+    };
+};
+
 export default {
     createNewStaff,
     getAllStaff,
     getStaffById,
     updateStaffData,
     deleteStaffData,
+    getStaffSchedules,
 };

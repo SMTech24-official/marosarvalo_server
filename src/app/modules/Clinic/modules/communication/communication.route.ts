@@ -12,6 +12,25 @@ router.post(
     CommunicationControllers.createReminderSchedules
 );
 
+// Get Reminder Schedules
+router.get("/reminders", CommunicationControllers.getReminderSchedules);
+
+// Update Reminder Schedule
+router.patch(
+    "/reminders/:id",
+    validateRequest(communicationValidations.updateReminderScheduleSchema),
+    CommunicationControllers.updateSchedule
+);
+
+// Delete Reminder Schedule
+router.delete("/reminders/:id", CommunicationControllers.deleteSchedule);
+
+// Update Reminder Status
+router.patch(
+    "/reminders/:id/status/:status",
+    CommunicationControllers.updateReminderStatus
+);
+
 // Get Reminder History
 router.get(
     "/reminders/history",
