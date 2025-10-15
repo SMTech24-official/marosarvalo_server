@@ -1,5 +1,3 @@
-import { Prisma } from "@prisma/client";
-
 class QueryBuilder {
     private model: any;
     private query: Record<string, unknown>;
