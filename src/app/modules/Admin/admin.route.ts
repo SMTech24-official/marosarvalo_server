@@ -2,8 +2,11 @@ import { Router } from "express";
 import AdminControllers from "./admin.controller";
 import validateRequest from "../../middlewares/validateRequest";
 import AdminValidations from "./admin.validation";
+import moduleRoutes from "./routes";
 
 const router = Router();
+
+moduleRoutes.forEach((route) => router.use(route.path, ...route.handlers));
 
 // Get Admin Dashboard Stats
 router.get("/stats", AdminControllers.getAdminDashboardStats);
@@ -18,18 +21,7 @@ router.post(
 // Get All Bookings
 router.get("/bookings", AdminControllers.getAllBookings);
 
-// Create new Clinic
-router.post(
-    "/clinic",
-    validateRequest(AdminValidations.createClinicSchema),
-    AdminControllers.createNewClinic
-);
-
-// Get all Clinic
-router.get("/clinic", AdminControllers.getAllClinic);
-
 // Get All Payment history
 router.get("/payment", AdminControllers.getAllPaymentHistory);
-
 
 export const AdminRoutes = router;

@@ -28,3 +28,7 @@
 
 -   How do we detect if the appointment has been missed or completed?
 -   will it be updated by receptionists?
+
+### Clinics
+
+-   Should deleting clinic delete every data of that clinic?

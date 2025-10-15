@@ -34,6 +34,7 @@ model User {
     @@map("users")
 }
 
+// TODO: Exclude admin data when getting specialists
 model Clinic {
     id       String  @id @default(auto()) @map("_id") @db.ObjectId
     name     String
@@ -42,14 +43,14 @@ model Clinic {
     address1 String
     address2 String?
 
-    specialists   User[]
-    staff         Staff[]
-    patients      Patient[]
-    subscriptions Subscription[]
-    disciplines   Discipline[]
-    receipts      Receipt[]
+    specialists User[]
+    staff       Staff[]
+    patients    Patient[]
+    disciplines Discipline[]
+    receipts    Receipt[]
 
-    status ActivityStatus @default(INACTIVE)
+    subscription Subscription?
+    status       ActivityStatus @default(INACTIVE)
 
     branding Branding?
 
@@ -456,16 +457,18 @@ model ScheduledReminderHistory {
 model Package {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
-    name        String
-    description String
+    packageType PackageType     @default(BASIC)
+    usageType   UsageType       @default(INDIVIDUAL)
+    planType    PlanType        @default(BASIC)
+    duration    PackageDuration @default(QUARTERLY)
     features    String[]
 
-    productId String? // Stripe Product Id
+    priceId String // Stripe Price Id
 
-    price Float
+    price         Float
+    subscriptions Subscription[]
 
-    durationMonths Int
-    subscriptions  Subscription[]
+    status ActivityStatus @default(ACTIVE)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -508,13 +511,13 @@ model Subscription {
     orderId String?      @unique @db.ObjectId
     order   ClinicOrder? @relation(fields: [orderId], references: [id])
 
-    clinicId String? @db.ObjectId
+    clinicId String? @unique @db.ObjectId
     clinic   Clinic? @relation(fields: [clinicId], references: [id])
 
     packageId String  @db.ObjectId
     package   Package @relation(fields: [packageId], references: [id])
 
-    transactionId String
+    transactionId String?
     status        SubscriptionStatus @default(PENDING)
 
     createdAt DateTime @default(now())
@@ -581,6 +584,29 @@ enum PaymentMethod {
     VOUCHER
     BOND
     OTHER
+}
+
+enum PackageType {
+    BASIC
+    PRO
+}
+
+enum UsageType {
+    INDIVIDUAL
+    AGENCY
+    DEVELOPER
+}
+
+enum PlanType {
+    BASIC
+    PREMIUM
+    ENTERPRISE
+}
+
+enum PackageDuration {
+    QUARTERLY
+    SEMI_ANNUAL
+    ANNUAL
 }
 
 enum SubscriptionStatus {

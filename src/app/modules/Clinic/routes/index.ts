@@ -6,6 +6,7 @@ import { AppointmentRoutes } from "../modules/appointments/appointments.route";
 import { ReceiptRoutes } from "../modules/receipts/receipts.route";
 import { CommunicationRoutes } from "../modules/communication/communication.route";
 import { SettingsRoutes } from "../modules/settings/settings.route";
+import { ReportsRoutes } from "../modules/reports/reports.route";
 
 const moduleRoutes = [
     {
@@ -39,6 +40,10 @@ const moduleRoutes = [
     {
         path: "/settings",
         handlers: [SettingsRoutes],
+    },
+    {
+        path: "/reports",
+        handlers: [ReportsRoutes],
     },
 ] satisfies {
     path: string;

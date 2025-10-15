@@ -4,52 +4,54 @@ import routeTemplate from "./templates/route.template.js";
 import controllerTemplate from "./templates/controller.template.js";
 import serviceTemplate from "./templates/service.template.js";
 import validationsTemplate from "./templates/validation.template.js";
-import constantsTemplate from "./templates/constants.template.js";
 
-const moduleName = process.argv[2];
+let moduleName = process.argv[2];
+let baseName = process.argv[3];
 if (!moduleName) {
-  console.error(
-    "❌ Please provide a module name. Example: npm run cModule Investor"
-  );
-  process.exit(1);
+    console.error(
+        "❌ Please provide a module name. Example: npm run cModule Investor"
+    );
+    process.exit(1);
 }
 
-const { baseDir, pascal, camel, lower } = getModulePaths(moduleName);
+const { baseDir, pascal, camel, lower } = getModulePaths(moduleName, baseName);
 
 if (!fs.existsSync(baseDir)) {
-  fs.mkdirSync(baseDir, { recursive: true });
-  console.log(`📁 Created: ${baseDir}`);
+    fs.mkdirSync(baseDir, { recursive: true });
+    console.log(`📁 Created: ${baseDir}`);
 }
 
 const files = [
-  {
-    name: `${camel}.route.ts`,
-    content: routeTemplate({ pascal, camel, lower }),
-  },
-  {
-    name: `${camel}.controller.ts`,
-    content: controllerTemplate({ pascal, camel }),
-  },
-  {
-    name: `${camel}.service.ts`,
-    content: serviceTemplate({ pascal, camel, lower }),
-  },
-  //   {
-  //     name: `${camel}.constant.ts`,
-  //     content: constantsTemplate({ pascal, camel, lower }),
-  //   },
-  {
-    name: `${camel}.validation.ts`,
-    content: validationsTemplate({ pascal, camel, lower }),
-  },
+    {
+        name: `${camel}.route.ts`,
+        content: routeTemplate({ pascal, camel, lower, subdir: !!baseDir }),
+    },
+    {
+        name: `${camel}.controller.ts`,
+        content: controllerTemplate({ pascal, camel, subdir: !!baseDir }),
+    },
+    {
+        name: `${camel}.service.ts`,
+        content: serviceTemplate({ pascal, camel, lower, subdir: !!baseDir }),
+    },
+    {
+        name: `${camel}.validation.ts`,
+        content: validationsTemplate({
+            pascal,
+            camel,
+            lower,
+            subdir: !!baseDir,
+        }),
+    },
 ];
 
 files.forEach(({ name, content }) => {
-  const filePath = `${baseDir}/${name}`;
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, content, "utf8");
-    console.log(`✅ Created: ${filePath}`);
-  } else {
-    console.log(`⚠️ Skipped (already exists): ${filePath}`);
-  }
+    const filePath = `${baseDir}/${name}`;
+
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, content, "utf8");
+        console.log(`✅ Created: ${filePath}`);
+    } else {
+        console.log(`⚠️ Skipped (already exists): ${filePath}`);
+    }
 });

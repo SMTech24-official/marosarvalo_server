@@ -1,7 +1,4 @@
 import prisma from "../../../shared/prisma";
-import QueryBuilder from "../../../utils/queryBuilder";
-import config from "../../../config";
-import { Prisma } from "@prisma/client";
 import { CreateClinicInput } from "./stripe.validation";
 
 // Create checkout request
@@ -33,7 +30,6 @@ const createCheckoutRequest = async (payload: CreateClinicInput) => {
                     name: clinic.name,
                     email: clinic.email,
                     phone: clinic.phone,
-                    transactionId: stripe.transactionId,
                     packageId: packageId,
                 },
             },

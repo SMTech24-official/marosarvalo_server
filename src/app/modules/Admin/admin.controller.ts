@@ -33,34 +33,9 @@ const createNewAdmin = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-// Create new Clinic - with Clinic Admin
-const createNewClinic = catchAsync(async (req: Request, res: Response) => {
-    const result = await AdminServices.createNewClinic(req.body);
-
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.CREATED,
-        message: result.message,
-        data: result.data,
-    });
-});
-
 // Get All Bookings
 const getAllBookings = catchAsync(async (req: Request, res: Response) => {
     const result = await AdminServices.getAllBookings(req.query);
-
-    sendResponse(res, {
-        success: true,
-        statusCode: httpStatus.OK,
-        message: result.message,
-        data: result.data,
-        pagination: result.pagination,
-    });
-});
-
-// Get All Clinic
-const getAllClinic = catchAsync(async (req: Request, res: Response) => {
-    const result = await AdminServices.getAllClinic(req.query);
 
     sendResponse(res, {
         success: true,
@@ -87,8 +62,6 @@ const getAllPaymentHistory = catchAsync(async (req: Request, res: Response) => {
 export default {
     getAdminDashboardStats,
     createNewAdmin,
-    createNewClinic,
     getAllBookings,
-    getAllClinic,
-    getAllPaymentHistory
+    getAllPaymentHistory,
 };
