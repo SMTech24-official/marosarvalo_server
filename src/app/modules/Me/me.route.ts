@@ -11,7 +11,7 @@ router.get("/", auth(), UserController.getUserInfo);
 router.put(
     "/",
     auth("SUPER_ADMIN", "RECEPTIONIST"),
-    UserController.updateUserInfo
+    UserController.updateUserInfo,
 );
 
 export const MeRoutes = router;

@@ -1,5 +1,5 @@
 export const getCountdown = (
-    targetDate?: Date
+    targetDate?: Date,
 ): { days: number; hours: number; minutes: number } | null => {
     if (!targetDate) return null;
 

@@ -17,7 +17,7 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
     }
 
     req.body.documents = documents.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
 
     const result = await AppointmentServices.createAppointment(req.body);
@@ -34,7 +34,7 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
 const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.getAppointmentsCount(
         req.query as any,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -74,14 +74,14 @@ const changeAppointmentStatus = catchAsync(
         const { id, status } = req.params;
         if (
             !Object.values(AppointmentStatus).includes(
-                status.toUpperCase() as any
+                status.toUpperCase() as any,
             )
         ) {
             throw new ApiError(
                 httpStatus.BAD_REQUEST,
                 `Invalid status value. Supported: ${Object.values(
-                    AppointmentStatus
-                ).join(", ")}`
+                    AppointmentStatus,
+                ).join(", ")}`,
             );
         }
 
@@ -89,7 +89,7 @@ const changeAppointmentStatus = catchAsync(
             id,
             status as AppointmentStatus,
             req.body,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -97,7 +97,7 @@ const changeAppointmentStatus = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Appointments Overview
@@ -105,7 +105,7 @@ const getAppointmentsOverview = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentServices.getAppointmentsOverview(
             req.query as any,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -113,7 +113,7 @@ const getAppointmentsOverview = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Appointments Calendar
@@ -121,7 +121,7 @@ const getAppointmentsCalender = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentServices.getAppointmentsCalender(
             req.query as any,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -130,14 +130,14 @@ const getAppointmentsCalender = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Get Appointments
 const getAppointments = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.getAppointments(
         req.query as any,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

@@ -15,7 +15,7 @@ router.get("/stats", AdminControllers.getAdminDashboardStats);
 router.post(
     "/administrators",
     validateRequest(AdminValidations.createAdminSchema),
-    AdminControllers.createNewAdmin
+    AdminControllers.createNewAdmin,
 );
 
 // Get All Bookings

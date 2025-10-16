@@ -104,7 +104,7 @@ class QueryBuilder {
                     acc[field] = true;
                     return acc;
                 },
-                {}
+                {},
             );
         }
         return this;
@@ -128,7 +128,7 @@ class QueryBuilder {
                         return [key, value];
                     }
                     return [key, { include: value }];
-                })
+                }),
             ),
         };
         return this;

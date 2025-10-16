@@ -54,12 +54,12 @@ Patient: ${appointment.patient.firstName} ${appointment.patient.lastName}
 Time: ${startTime.toString()}
 Send Reminder Via: ${schedule.communicationMethods
             .filter((method) =>
-                appointment.patient.contactPreferences.includes(method)
+                appointment.patient.contactPreferences.includes(method),
             )
             .join(", ")}
 Time Remaining: ${format(
             addMinutes(startOfDay(new Date()), schedule.prior!),
-            "HH:mm"
+            "HH:mm",
         )}
 `);
     });
@@ -68,7 +68,7 @@ Time Remaining: ${format(
 // Run the Untimed Schedules, e.g. post appointments, missed appointments
 const runUntimedSchedules = async (
     schedule: ReminderSchedule,
-    delay: number
+    delay: number,
 ) => {
     // Check if it's DAY type and it's not time to send it!
     if (schedule.scheduleType === "DAY") {
@@ -107,7 +107,7 @@ const runUntimedSchedules = async (
         appointments.forEach((appointment) => {
             const startTime = genStartTime(
                 appointment.date,
-                appointment.timeSlot
+                appointment.timeSlot,
             );
 
             // Send Mail and Stuff!
@@ -116,12 +116,12 @@ Patient: ${appointment.patient.firstName} ${appointment.patient.lastName}
 Time: ${startTime.toString()}
 Send Reminder Via: ${schedule.communicationMethods
                 .filter((method) =>
-                    appointment.patient.contactPreferences.includes(method)
+                    appointment.patient.contactPreferences.includes(method),
                 )
                 .join(", ")}
 Time Remaining: ${format(
                 addMinutes(startOfDay(new Date()), schedule.prior!),
-                "HH:mm"
+                "HH:mm",
             )}
 `);
         });

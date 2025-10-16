@@ -9,8 +9,6 @@ import { CreateReceiptInput } from "./receipts.validation";
 
 // Create Receipt
 const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
-    ;
-
     const response = await prisma.receipt.create({
         data: {
             ...payload,
@@ -55,8 +53,6 @@ const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
 
 // Get Receipts
 const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
-    ;
-
     const queryBuilder = new QueryBuilder(prisma.receipt, query);
 
     const receipts: (Receipt & {

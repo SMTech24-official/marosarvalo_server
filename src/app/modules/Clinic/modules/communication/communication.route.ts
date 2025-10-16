@@ -9,7 +9,7 @@ const router = Router();
 router.post(
     "/reminders",
     validateRequest(communicationValidations.createReminderScheduleSchema),
-    CommunicationControllers.createReminderSchedules
+    CommunicationControllers.createReminderSchedules,
 );
 
 // Get Reminder Schedules
@@ -19,7 +19,7 @@ router.get("/reminders", CommunicationControllers.getReminderSchedules);
 router.patch(
     "/reminders/:id",
     validateRequest(communicationValidations.updateReminderScheduleSchema),
-    CommunicationControllers.updateSchedule
+    CommunicationControllers.updateSchedule,
 );
 
 // Delete Reminder Schedule
@@ -28,13 +28,13 @@ router.delete("/reminders/:id", CommunicationControllers.deleteSchedule);
 // Update Reminder Status
 router.patch(
     "/reminders/:id/status/:status",
-    CommunicationControllers.updateReminderStatus
+    CommunicationControllers.updateReminderStatus,
 );
 
 // Get Reminder History
 router.get(
     "/reminders/history",
-    CommunicationControllers.getReminderScheduleHistory
+    CommunicationControllers.getReminderScheduleHistory,
 );
 
 export const CommunicationRoutes = router;

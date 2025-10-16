@@ -15,7 +15,7 @@ const createCheckoutRequest = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 export default { createCheckoutRequest };

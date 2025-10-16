@@ -26,7 +26,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
         if (!password) {
             throw new ApiError(
                 httpStatus.BAD_REQUEST,
-                "Password required for Specialist and Receptionist"
+                "Password required for Specialist and Receptionist",
             );
         }
 
@@ -131,7 +131,7 @@ const getStaffById = async (staffId: string, user: JwtPayload) => {
 const updateStaffData = async (
     staffId: string,
     payload: UpdateStaffInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const exists = await prisma.staff.findUnique({
         where: {

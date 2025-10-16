@@ -20,7 +20,7 @@ const getDisciplines = catchAsync(async (req: Request, res: Response) => {
 const createDiscipline = catchAsync(async (req: Request, res: Response) => {
     const result = await DisciplineServices.createDiscipline(
         req.body,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -35,7 +35,7 @@ const updateDiscipline = catchAsync(async (req: Request, res: Response) => {
     const result = await DisciplineServices.updateDiscipline(
         req.params.id,
         req.body,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -49,7 +49,7 @@ const updateDiscipline = catchAsync(async (req: Request, res: Response) => {
 const deleteDiscipline = catchAsync(async (req: Request, res: Response) => {
     const result = await DisciplineServices.deleteDiscipline(
         req.params.id,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

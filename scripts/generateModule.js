@@ -9,7 +9,7 @@ let moduleName = process.argv[2];
 let baseName = process.argv[3];
 if (!moduleName) {
     console.error(
-        "❌ Please provide a module name. Example: npm run cModule Investor"
+        "❌ Please provide a module name. Example: npm run cModule Investor",
     );
     process.exit(1);
 }

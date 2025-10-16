@@ -41,7 +41,7 @@ const getBrandingInfo = catchAsync(async (req: Request, res: Response) => {
 const updateBrandingInfo = catchAsync(async (req: Request, res: Response) => {
     const result = await SettingsServices.updateBrandingInfo(
         req.body,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

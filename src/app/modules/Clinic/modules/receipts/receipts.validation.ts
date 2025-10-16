@@ -9,7 +9,7 @@ const createReceiptSchema = z.object({
             type: z.enum(ProductType),
             id: z.string(),
             quantity: z.number(),
-        })
+        }),
     ),
 
     tax: z.number(),

@@ -31,7 +31,7 @@ const getReceipts = catchAsync(async (req: Request, res: Response) => {
 const getReceiptDetailsById = catchAsync(
     async (req: Request, res: Response) => {
         const result = await ReceiptServices.getReceiptDetailsById(
-            req.params.id
+            req.params.id,
         );
         sendResponse(res, {
             success: true,
@@ -39,7 +39,7 @@ const getReceiptDetailsById = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Delete Receipt
@@ -52,7 +52,6 @@ const deleteReceipt = catchAsync(async (req: Request, res: Response) => {
         data: result.data,
     });
 });
-
 
 // Export all functions
 export default {

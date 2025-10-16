@@ -7,17 +7,17 @@ import path from "path";
  */
 
 export const deleteFile = async (fileUrl: string) => {
-  try {
-    // Extract the filename from the URL
-    const filename = path.basename(new URL(fileUrl).pathname);
-    const fullPath = path.join(process.cwd(), "uploads", filename);
+    try {
+        // Extract the filename from the URL
+        const filename = path.basename(new URL(fileUrl).pathname);
+        const fullPath = path.join(process.cwd(), "uploads", filename);
 
-    // console.log(filename, fullPath);
+        // console.log(filename, fullPath);
 
-    await fs.promises.access(fullPath);
-    await fs.promises.unlink(fullPath);
-    // console.log(`Deleted file: ${filename}`);
-  } catch (error) {
-    console.error(`Failed to delete file: ${fileUrl}`, error);
-  }
+        await fs.promises.access(fullPath);
+        await fs.promises.unlink(fullPath);
+        // console.log(`Deleted file: ${filename}`);
+    } catch (error) {
+        console.error(`Failed to delete file: ${fileUrl}`, error);
+    }
 };

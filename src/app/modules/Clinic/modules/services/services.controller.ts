@@ -14,7 +14,7 @@ const getServicesStatistics = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Services List
@@ -45,7 +45,7 @@ const updateService = catchAsync(async (req: Request, res: Response) => {
     const result = await ServiceServices.updateService(
         req.params.id,
         req.body,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

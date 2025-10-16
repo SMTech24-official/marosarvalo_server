@@ -28,14 +28,14 @@ const createNewClinic = async (body: CreateClinicInput) => {
     if (userExists) {
         throw new ApiError(
             httpStatus.BAD_REQUEST,
-            "User with Email already Exists"
+            "User with Email already Exists",
         );
     }
 
     if (clinicExists) {
         throw new ApiError(
             httpStatus.BAD_REQUEST,
-            "Clinic with Email already Exists"
+            "Clinic with Email already Exists",
         );
     }
 

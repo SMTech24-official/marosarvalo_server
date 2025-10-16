@@ -9,7 +9,7 @@ import SpecialistsService from "./specialists.service";
 const getSpecialistsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await SpecialistsService.getSpecialistsCount(
         req.query as any,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

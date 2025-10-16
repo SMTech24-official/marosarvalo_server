@@ -13,7 +13,7 @@ const auth = (...roles: UserRole[]) => {
     return async (
         req: Request & { user?: any },
         res: Response,
-        next: NextFunction
+        next: NextFunction,
     ) => {
         try {
             const token = req.headers.authorization;
@@ -21,13 +21,13 @@ const auth = (...roles: UserRole[]) => {
             if (!token) {
                 throw new ApiError(
                     httpStatus.UNAUTHORIZED,
-                    "Unauthorized Request"
+                    "Unauthorized Request",
                 );
             }
 
             const verifiedUser = jwtHelpers.verifyToken(
                 token,
-                config.jwt.jwt_secret as Secret
+                config.jwt.jwt_secret as Secret,
             );
 
             const user = await prisma.user.findUnique({
@@ -49,13 +49,13 @@ const auth = (...roles: UserRole[]) => {
             if (!user) {
                 throw new ApiError(
                     httpStatus.UNAUTHORIZED,
-                    "Unauthorized Request"
+                    "Unauthorized Request",
                 );
             }
             if (user.status !== "ACTIVE") {
                 throw new ApiError(
                     httpStatus.UNAUTHORIZED,
-                    "Your Account Status is Inactive. Contact Admin."
+                    "Your Account Status is Inactive. Contact Admin.",
                 );
             }
 
@@ -65,7 +65,7 @@ const auth = (...roles: UserRole[]) => {
             ) {
                 throw new ApiError(
                     httpStatus.FORBIDDEN,
-                    "Your Associated Clinic's Status is Inactive."
+                    "Your Associated Clinic's Status is Inactive.",
                 );
             }
 

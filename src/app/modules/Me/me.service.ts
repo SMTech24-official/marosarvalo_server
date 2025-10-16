@@ -51,7 +51,7 @@ const getUserInfo = async (user: JwtPayload) => {
 // Update user Info
 const updateUserInfo = async (
     payload: UpdatesUserInfoInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const { name, phone, address, introduction, employeeId, profession } =
         payload;

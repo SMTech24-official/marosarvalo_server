@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
     "/",
     validateRequest(packageValidation.createPackageSchema),
-    PackageControllers.createPackage
+    PackageControllers.createPackage,
 );
 
 // Get All Packages
@@ -22,7 +22,7 @@ router.get("/:id", PackageControllers.getSinglePackage);
 router.patch(
     "/:id",
     validateRequest(packageValidation.updatePackageSchema),
-    PackageControllers.updatePackage
+    PackageControllers.updatePackage,
 );
 
 // Delete Package

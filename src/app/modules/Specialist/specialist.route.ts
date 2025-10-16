@@ -15,19 +15,19 @@ router.get("/customers/count", SpecialistControllers.getNewCustomersCount);
 // Get Appointments Overview
 router.get(
     "/appointments/overview",
-    SpecialistControllers.getAppointmentsOverview
+    SpecialistControllers.getAppointmentsOverview,
 );
 
 // Get Upcoming Appointments
 router.get(
     "/appointments/upcoming",
-    SpecialistControllers.getUpcomingAppointments
+    SpecialistControllers.getUpcomingAppointments,
 );
 
 // Get Appointments Calendar
 router.get(
     "/appointments/calendar",
-    SpecialistControllers.getAppointmentsCalender
+    SpecialistControllers.getAppointmentsCalender,
 );
 
 export const SpecialistRoutes = router;

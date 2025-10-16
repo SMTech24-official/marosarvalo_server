@@ -46,7 +46,7 @@ export const getModulePaths = (moduleName, baseName) => {
         baseDir: path.join(
             process.cwd(),
             "src/app/modules" + (baseName ? `/${baseName}/modules` : ""),
-            baseName ? toCamel(moduleName) : pascal
+            baseName ? toCamel(moduleName) : pascal,
         ),
         pascal,
         camel: toCamel(moduleName),

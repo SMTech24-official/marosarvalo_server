@@ -7,7 +7,7 @@ const getSpecialistsCount = async (
     query: {
         filterBy: "day" | "week" | "month" | undefined;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const count = await prisma.user.count({
         where: {

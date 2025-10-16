@@ -13,7 +13,7 @@ const sendResponse = <T>(
             totalPage: number;
         };
         data?: T | null | undefined;
-    }
+    },
 ) => {
     res.status(jsonData.statusCode).json({
         success: jsonData.success,

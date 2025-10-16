@@ -19,7 +19,7 @@ const getClinicBasicReport = catchAsync(async (req: Request, res: Response) => {
 const getCancellationInfo = catchAsync(async (req: Request, res: Response) => {
     const result = await ReportsServices.getCancellationInfo(
         req.query,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

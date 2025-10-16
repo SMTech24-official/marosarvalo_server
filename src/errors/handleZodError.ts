@@ -9,7 +9,7 @@ const handleZodError = (error: ZodError): IGenericErrorResponse => {
                 path: issue?.path[issue.path.length - 1] as string | number,
                 message: issue?.message,
             };
-        }
+        },
     );
 
     const statusCode = 400;

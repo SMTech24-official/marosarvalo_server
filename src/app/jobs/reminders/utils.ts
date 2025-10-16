@@ -8,7 +8,7 @@ export const genStartTime = (date: Date, timeSlot: string) => {
         parseInt(fromHour) + (fromAmPm === "pm" && fromHour !== "12" ? 12 : 0),
         parseInt(fromMinute),
         0,
-        0
+        0,
     );
 
     return date;

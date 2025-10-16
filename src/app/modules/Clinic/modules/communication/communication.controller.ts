@@ -10,7 +10,7 @@ const createReminderSchedules = catchAsync(
     async (req: Request, res: Response) => {
         const result = await CommunicationServices.createReminderSchedules(
             req.body,
-            req.user
+            req.user,
         );
 
         sendResponse(res, {
@@ -19,7 +19,7 @@ const createReminderSchedules = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Reminder Schedules
@@ -40,7 +40,7 @@ const updateSchedule = catchAsync(async (req: Request, res: Response) => {
     const result = await CommunicationServices.updateSchedule(
         scheduleId,
         req.body,
-        req.user
+        req.user,
     );
 
     sendResponse(res, {
@@ -56,7 +56,7 @@ const deleteSchedule = catchAsync(async (req: Request, res: Response) => {
     const scheduleId = req.params.id;
     const result = await CommunicationServices.deleteSchedule(
         scheduleId,
-        req.user
+        req.user,
     );
 
     sendResponse(res, {
@@ -74,7 +74,7 @@ const updateReminderStatus = catchAsync(async (req: Request, res: Response) => {
 
     if (
         !Object.values(ActivityStatus).includes(
-            status?.toUpperCase() as ActivityStatus
+            status?.toUpperCase() as ActivityStatus,
         )
     ) {
         res.status(httpStatus.NOT_FOUND);
@@ -83,7 +83,7 @@ const updateReminderStatus = catchAsync(async (req: Request, res: Response) => {
     const result = await CommunicationServices.updateReminderStatus(
         scheduleId,
         status as ActivityStatus,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -98,7 +98,7 @@ const getReminderScheduleHistory = catchAsync(
     async (req: Request, res: Response) => {
         const result = await CommunicationServices.getReminderScheduleHistory(
             req.query,
-            req.user
+            req.user,
         );
 
         sendResponse(res, {
@@ -108,7 +108,7 @@ const getReminderScheduleHistory = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Export all functions

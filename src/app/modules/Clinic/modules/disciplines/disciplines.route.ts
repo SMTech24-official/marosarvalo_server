@@ -12,14 +12,14 @@ router.get("/", DisciplineControllers.getDisciplines);
 router.post(
     "/",
     validateRequest(disciplineValidations.createDisciplineSchema),
-    DisciplineControllers.createDiscipline
+    DisciplineControllers.createDiscipline,
 );
 
 // Update Discipline
 router.patch(
     "/:id",
     validateRequest(disciplineValidations.updateDisciplineSchema),
-    DisciplineControllers.updateDiscipline
+    DisciplineControllers.updateDiscipline,
 );
 
 // Delete Discipline

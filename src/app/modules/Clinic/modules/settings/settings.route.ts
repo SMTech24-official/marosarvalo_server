@@ -12,7 +12,7 @@ router.get("/basic", SettingsControllers.getBasicInfo);
 router.patch(
     "/basic",
     validateRequest(settingsValidations.updateClinicInfoSchema),
-    SettingsControllers.updateClinicInfo
+    SettingsControllers.updateClinicInfo,
 );
 
 // Get Branding Info
@@ -22,7 +22,7 @@ router.get("/branding", SettingsControllers.getBrandingInfo);
 router.patch(
     "/branding",
     validateRequest(settingsValidations.updateBrandingInfoSchema),
-    SettingsControllers.updateBrandingInfo
+    SettingsControllers.updateBrandingInfo,
 );
 
 export const SettingsRoutes = router;

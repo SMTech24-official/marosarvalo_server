@@ -47,7 +47,7 @@ const getAdminDashboardStats = async (query: {
     const totalSale = total.length;
     const totalIncome = total.reduce(
         (prev, curr) => prev + curr.package.price,
-        0
+        0,
     );
 
     const totalRevenue = groupRevenue(total as any, query.filterBy);

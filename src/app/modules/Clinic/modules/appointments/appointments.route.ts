@@ -17,7 +17,7 @@ router.post(
     ]),
     parseBodyData,
     validateRequest(appointmentValidations.createAppointmentSchema),
-    AppointmentControllers.createAppointment
+    AppointmentControllers.createAppointment,
 );
 
 // Get Appointments

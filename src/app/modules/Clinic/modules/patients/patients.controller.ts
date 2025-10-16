@@ -10,7 +10,7 @@ import config from "../../../../../config";
 const getNewPatientsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await PatientServices.getNewPatientsCount(
         req.query as any,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -32,13 +32,13 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
     }
 
     req.body.guardianDocuments = guardianDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
     req.body.documents = documents.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
     req.body.otherDocuments = otherDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
 
     const result = await PatientServices.createPatient(req.body, req.user);
@@ -80,7 +80,7 @@ const getPatientAppointments = catchAsync(
     async (req: Request, res: Response) => {
         const result = await PatientServices.getPatientAppointments(
             req.params.id,
-            req.query
+            req.query,
         );
         sendResponse(res, {
             success: true,
@@ -89,14 +89,14 @@ const getPatientAppointments = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Get Patient Bonds
 const getPatientBonds = catchAsync(async (req: Request, res: Response) => {
     const result = await PatientServices.getPatientBonds(
         req.params.id,
-        req.query
+        req.query,
     );
     sendResponse(res, {
         success: true,

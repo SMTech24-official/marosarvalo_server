@@ -13,7 +13,7 @@ interface GroupedResult {
 
 export const groupAppointment = (
     data: Appointment[],
-    filterBy: FilterBy
+    filterBy: FilterBy,
 ): GroupedResult[] => {
     const groups: Record<string, number> = {};
 
@@ -46,6 +46,6 @@ export const groupAppointment = (
     return Object.entries(groups)
         .map(([label, total]) => ({ label, total }))
         .sort(
-            (a, b) => new Date(a.label).getTime() - new Date(b.label).getTime()
+            (a, b) => new Date(a.label).getTime() - new Date(b.label).getTime(),
         );
 };

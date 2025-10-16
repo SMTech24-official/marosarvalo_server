@@ -15,14 +15,14 @@ router.get("/", ServiceControllers.getServices);
 router.post(
     "/",
     validateRequest(serviceValidations.createServiceSchema),
-    ServiceControllers.createService
+    ServiceControllers.createService,
 );
 
 // Update Service
 router.patch(
     "/:id",
     validateRequest(serviceValidations.updateServiceSchema),
-    ServiceControllers.updateService
+    ServiceControllers.updateService,
 );
 
 // Delete Service

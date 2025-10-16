@@ -17,7 +17,7 @@ const getAppointmentsCount = async (
     query: {
         filterBy: "day" | "week" | "month" | undefined;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const count = await prisma.appointment.count({
         where: {
@@ -58,7 +58,7 @@ const getNewCustomersCount = async (
     query: {
         filterBy: "day" | "week" | "month" | undefined;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const userData = await prisma.user.findUnique({
         where: {
@@ -89,7 +89,7 @@ const getAppointmentsOverview = async (
     query: {
         filterBy: "day" | "week" | "month" | "year" | undefined;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const appointments = await prisma.appointment.findMany({
         where: {
@@ -114,7 +114,7 @@ const getAppointmentsOverview = async (
 // Get upcoming Appointments
 const getUpcomingAppointments = async (
     query: Record<string, any>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -192,7 +192,7 @@ const getUpcomingAppointments = async (
 
 const getAppointmentsCalender = async (
     query: Record<string, any>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 

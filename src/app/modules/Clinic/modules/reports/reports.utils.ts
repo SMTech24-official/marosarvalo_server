@@ -44,7 +44,7 @@ type AttendanceStats = {
 export const getAttendanceStats = (
     appointments: {
         status: AppointmentStatus;
-    }[]
+    }[],
 ): AttendanceStats => {
     const stats: AttendanceStats = { attended: 0, missed: 0 };
 

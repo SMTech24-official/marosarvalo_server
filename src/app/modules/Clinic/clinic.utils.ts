@@ -60,7 +60,7 @@ type Slot = { date: Date; timeSlot: string };
 export const applyTaxAndDiscount = (
     amount: number,
     taxPercent: number,
-    discountPercent: number
+    discountPercent: number,
 ): number => {
     const afterTax = amount * (1 + taxPercent / 100);
     const afterDiscount = afterTax * (1 - discountPercent / 100);

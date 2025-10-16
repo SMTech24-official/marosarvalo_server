@@ -35,7 +35,7 @@ const getBasicInfo = async (user: JwtPayload) => {
 // Update clinic info
 const updateClinicInfo = async (
     payload: UpdateClinicInfoInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const response = await prisma.user.update({
         where: {
@@ -95,7 +95,7 @@ const getBrandingInfo = async (user: JwtPayload) => {
 // Update Branding Info
 const updateBrandingInfo = async (
     payload: UpdateBrandingInfoInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const response = await prisma.user.update({
         where: {

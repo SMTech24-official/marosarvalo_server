@@ -12,8 +12,6 @@ import { Discipline } from "@prisma/client";
 
 // Get disciplines
 const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
-    ;
-
     const queryBuilder = new QueryBuilder(prisma.discipline, query);
 
     const disciplines: (Discipline & {
@@ -61,10 +59,8 @@ const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
 // Create discipline
 const createDiscipline = async (
     payload: CreateDisciplineInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
-    ;
-
     const response = await prisma.discipline.create({
         data: {
             ...payload,
@@ -82,7 +78,7 @@ const createDiscipline = async (
 const updateDiscipline = async (
     disciplineId: string,
     payload: UpdateDisciplineInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const discipline = await prisma.discipline.findUnique({
         where: {

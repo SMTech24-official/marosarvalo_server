@@ -16,5 +16,5 @@ export type SendReminderInput = z.infer<typeof sendReminderSchema>;
 export default {
     createReminderSchema,
     updateReminderSchema,
-    sendReminderSchema
+    sendReminderSchema,
 };

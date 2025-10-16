@@ -9,10 +9,10 @@ import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
 const app: Application = express();
 
 export const corsOptions = {
-	origin: ["http://localhost:3000", "http://localhost:3001"],
-	methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-	allowedHeaders: ["Content-Type", "Authorization"],
-	credentials: true,
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
 };
 
 // Middleware setup
@@ -25,9 +25,9 @@ app.use(express.static("public"));
 
 // Route handler for the root endpoint
 app.get("/", (req: Request, res: Response) => {
-	res.send({
-		message: "How's Project API",
-	});
+    res.send({
+        message: "How's Project API",
+    });
 });
 
 // app.use("/uploads", express.static(path.join("/var/www/uploads")));
@@ -41,14 +41,14 @@ app.use(GlobalErrorHandler);
 
 // 404 Not Found handler
 app.use((req: Request, res: Response, next: NextFunction) => {
-	res.status(httpStatus.NOT_FOUND).json({
-		success: false,
-		message: "API NOT FOUND!",
-		error: {
-			path: req.originalUrl,
-			message: "Your requested path is not found!",
-		},
-	});
+    res.status(httpStatus.NOT_FOUND).json({
+        success: false,
+        message: "API NOT FOUND!",
+        error: {
+            path: req.originalUrl,
+            message: "Your requested path is not found!",
+        },
+    });
 });
 
 export default app;

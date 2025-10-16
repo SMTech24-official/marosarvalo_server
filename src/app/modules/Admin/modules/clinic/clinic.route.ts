@@ -9,7 +9,7 @@ const router = Router();
 router.post(
     "/",
     validateRequest(ClinicValidations.createClinicSchema),
-    ClinicControllers.createNewClinic
+    ClinicControllers.createNewClinic,
 );
 
 // Get all Clinic
@@ -22,7 +22,7 @@ router.get("/:id", ClinicControllers.getSingleClinic);
 router.patch(
     "/:id",
     validateRequest(ClinicValidations.updateClinicSchema),
-    ClinicControllers.updateClinic
+    ClinicControllers.updateClinic,
 );
 
 // Delete Clinic

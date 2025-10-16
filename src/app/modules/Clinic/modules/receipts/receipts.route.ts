@@ -9,7 +9,7 @@ const router = Router();
 router.post(
     "/",
     validateRequest(receiptValidations.createReceiptSchema),
-    ReceiptControllers.createReceipt
+    ReceiptControllers.createReceipt,
 );
 
 // Get Receipts

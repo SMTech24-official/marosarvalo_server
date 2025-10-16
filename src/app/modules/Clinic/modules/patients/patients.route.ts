@@ -26,7 +26,7 @@ router.post(
     ]),
     parseBodyData,
     validateRequest(patientValidations.createPatientSchema),
-    PatientControllers.createPatient
+    PatientControllers.createPatient,
 );
 
 // Get Patients

@@ -8,7 +8,7 @@ import SpecialistServices from "./specialist.service";
 const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await SpecialistServices.getAppointmentsCount(
         req.query as any,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -33,7 +33,7 @@ const getDoctorsCount = catchAsync(async (req: Request, res: Response) => {
 const getNewCustomersCount = catchAsync(async (req: Request, res: Response) => {
     const result = await SpecialistServices.getNewCustomersCount(
         req.query as any,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -48,7 +48,7 @@ const getAppointmentsOverview = catchAsync(
     async (req: Request, res: Response) => {
         const result = await SpecialistServices.getAppointmentsOverview(
             req.query as any,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -56,7 +56,7 @@ const getAppointmentsOverview = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Upcoming Appointments
@@ -64,7 +64,7 @@ const getUpcomingAppointments = catchAsync(
     async (req: Request, res: Response) => {
         const result = await SpecialistServices.getUpcomingAppointments(
             req.query as any,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -73,7 +73,7 @@ const getUpcomingAppointments = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Get Appointments Calendar
@@ -81,7 +81,7 @@ const getAppointmentsCalender = catchAsync(
     async (req: Request, res: Response) => {
         const result = await SpecialistServices.getAppointmentsCalender(
             req.query as any,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -90,7 +90,7 @@ const getAppointmentsCalender = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 export default {

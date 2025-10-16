@@ -13,10 +13,8 @@ const getNewPatientsCount = async (
     query: {
         filterBy: "day" | "week" | "month" | undefined;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
-    ;
-
     const count = await prisma.patient.count({
         where: {
             clinicId: user.clinicId,
@@ -37,10 +35,8 @@ const createPatient = async (
         documents: string[];
         otherDocuments: string[];
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
-    ;
-
     const response = await prisma.patient.create({
         data: {
             ...payload,
@@ -56,8 +52,6 @@ const createPatient = async (
 
 // Get Patients
 const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
-    ;
-
     const queryBuilder = new QueryBuilder(prisma.patient, query);
 
     const patients: (Patient & {
@@ -169,7 +163,7 @@ const getPatientById = async (patientId: string) => {
 // Get Patient Appointments - // TODO: Check which Id. _id or documentId
 const getPatientAppointments = async (
     patientId: string,
-    query: Record<string, any>
+    query: Record<string, any>,
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
@@ -244,7 +238,7 @@ const getPatientAppointments = async (
 // Get Patient Bonds - // TODO: Check which Id. _id or documentId
 const getPatientBonds = async (
     patientId: string,
-    query: Record<string, any>
+    query: Record<string, any>,
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
@@ -316,13 +310,11 @@ const getPatientBonds = async (
 // Search Patient
 const searchPatient = async (
     query: { searchTerm?: string },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     if (!query.searchTerm) {
         throw new ApiError(httpStatus.BAD_REQUEST, "searchTerm is required");
     }
-
-    ;
 
     const patients = await prisma.patient.findMany({
         where: {

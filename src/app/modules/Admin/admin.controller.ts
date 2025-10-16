@@ -9,7 +9,7 @@ import AdminServices from "./admin.service";
 const getAdminDashboardStats = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AdminServices.getAdminDashboardStats(
-            req.query as any
+            req.query as any,
         );
 
         sendResponse(res, {
@@ -18,7 +18,7 @@ const getAdminDashboardStats = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Create new Admin

@@ -10,7 +10,7 @@ const router = Router();
 router.post(
     "/",
     validateRequest(StripeValidations.createClinicSchema),
-    StripeControllers.createCheckoutRequest
+    StripeControllers.createCheckoutRequest,
 );
 
 export const StripeRoutes = router;

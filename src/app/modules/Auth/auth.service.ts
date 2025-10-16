@@ -21,33 +21,33 @@ const loginUser = async (payload: { email: string; password: string }) => {
     if (!userData) {
         throw new ApiError(
             httpStatus.UNAUTHORIZED,
-            "Invalid Credentials Provided"
+            "Invalid Credentials Provided",
         );
     }
 
     if (!payload.password || !userData?.password) {
         throw new ApiError(
             httpStatus.UNAUTHORIZED,
-            "Invalid Credentials Provided"
+            "Invalid Credentials Provided",
         );
     }
 
     const isCorrectPassword = await comparePassword(
         payload.password,
-        userData.password
+        userData.password,
     );
 
     if (!isCorrectPassword) {
         throw new ApiError(
             httpStatus.UNAUTHORIZED,
-            "Invalid Credentials Provided"
+            "Invalid Credentials Provided",
         );
     }
 
     if (userData.status === "INACTIVE")
         throw new ApiError(
             httpStatus.UNAUTHORIZED,
-            "Your account has been Blocked. Contact Admin to Activate your Account."
+            "Your account has been Blocked. Contact Admin to Activate your Account.",
         );
 
     const jwtPayload = {
@@ -57,13 +57,13 @@ const loginUser = async (payload: { email: string; password: string }) => {
     const accessToken = jwtHelpers.generateToken(
         jwtPayload,
         config.jwt.jwt_secret as Secret,
-        config.jwt.expires_in as string
+        config.jwt.expires_in as string,
     );
 
     const refreshToken = jwtHelpers.generateToken(
         jwtPayload,
         config.jwt.refresh_token_secret as Secret,
-        config.jwt.refresh_token_expires_in as string
+        config.jwt.refresh_token_expires_in as string,
     );
 
     return {
@@ -79,7 +79,7 @@ const changePassword = async (
     payload: {
         oldPassword: string;
         newPassword: string;
-    }
+    },
 ) => {
     if (!payload.oldPassword || !payload.newPassword) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Body Provided");
@@ -95,7 +95,7 @@ const changePassword = async (
 
     const isPasswordValid = await bcrypt.compare(
         payload.oldPassword,
-        userInfo?.password
+        userInfo?.password,
     );
 
     if (!isPasswordValid) {
@@ -129,7 +129,7 @@ const forgotPassword = async (payload: { email: string }) => {
     const resetPassToken = jwtHelpers.generateToken(
         { email: userData.email, role: userData.role },
         config.jwt.reset_pass_secret as Secret,
-        config.jwt.reset_pass_token_expires_in as string
+        config.jwt.reset_pass_token_expires_in as string,
     );
 
     const resetPassLink =
@@ -139,7 +139,7 @@ const forgotPassword = async (payload: { email: string }) => {
     await emailSender(
         "Reset Your Password",
         userData.email,
-        GenerateForgetPasswordTemplate(resetPassLink)
+        GenerateForgetPasswordTemplate(resetPassLink),
     );
     return {
         message: "Reset password Instructions sent to your Email.",
@@ -158,12 +158,12 @@ const refreshToken = async (payload: { refreshToken: string }) => {
     try {
         decrypted = jwtHelpers.verifyToken(
             payload.refreshToken,
-            config.jwt.jwt_secret as string
+            config.jwt.jwt_secret as string,
         );
     } catch (error) {
         throw new ApiError(
             httpStatus.BAD_REQUEST,
-            "Refresh Token is Invalid or Expired"
+            "Refresh Token is Invalid or Expired",
         );
     }
 
@@ -183,7 +183,7 @@ const refreshToken = async (payload: { refreshToken: string }) => {
     const accessToken = jwtHelpers.generateToken(
         jwtPayload,
         config.jwt.jwt_secret as Secret,
-        config.jwt.expires_in as string
+        config.jwt.expires_in as string,
     );
 
     return {

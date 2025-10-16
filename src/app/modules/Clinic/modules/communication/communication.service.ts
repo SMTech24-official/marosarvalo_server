@@ -18,7 +18,7 @@ import ApiError from "../../../../../errors/ApiErrors";
 // Create Reminder Schedules - Only for Clinic Admin
 const createReminderSchedules = async (
     payload: CreateReminderScheduleInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const response = await prisma.reminderSchedule.create({
         data: { ...payload, clinicId: user.clinicId },
@@ -48,7 +48,7 @@ const getReminderSchedules = async (user: JwtPayload) => {
 const updateSchedule = async (
     scheduleId: string,
     payload: UpdateReminderScheduleInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const exists = await prisma.reminderSchedule.findUnique({
         where: {
@@ -119,7 +119,7 @@ const deleteSchedule = async (scheduleId: string, user: JwtPayload) => {
 const updateReminderStatus = async (
     scheduleId: string,
     status: ActivityStatus,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const exists = await prisma.reminderSchedule.findUnique({
         where: {
@@ -142,7 +142,7 @@ const updateReminderStatus = async (
     if (exists.status === status) {
         throw new ApiError(
             httpStatus.BAD_REQUEST,
-            "Schedule is already " + status
+            "Schedule is already " + status,
         );
     }
 
@@ -165,11 +165,11 @@ const updateReminderStatus = async (
 // Get History
 const getReminderScheduleHistory = async (
     query: Record<string, any>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(
         prisma.scheduledReminderHistory,
-        query
+        query,
     );
 
     const histories: (ScheduledReminderHistory & {

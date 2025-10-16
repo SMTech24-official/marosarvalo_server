@@ -8,7 +8,7 @@ const router = Router();
 router.post(
     "/send",
     validateRequest(ReminderValidations.sendReminderSchema),
-    ReminderControllers.sendReminder
+    ReminderControllers.sendReminder,
 );
 
 router.get("/", ReminderControllers.getReminders);
