@@ -11,7 +11,7 @@ import { JwtPayload } from "jsonwebtoken";
 import {
     CreateReminderScheduleInput,
     UpdateReminderScheduleInput,
-} from "./communication.validation";
+} from "./reminder.validation";
 import httpStatus from "http-status";
 import ApiError from "../../../../../errors/ApiErrors";
 

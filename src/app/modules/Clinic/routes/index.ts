@@ -4,7 +4,7 @@ import { StaffRoutes } from "../modules/staff/staff.route";
 import { PatientRoutes } from "../modules/patients/patients.route";
 import { AppointmentRoutes } from "../modules/appointments/appointments.route";
 import { ReceiptRoutes } from "../modules/receipts/receipts.route";
-import { CommunicationRoutes } from "../modules/communication/communication.route";
+import { ReminderRoutes } from "../modules/reminder/reminder.route";
 import { SettingsRoutes } from "../modules/settings/settings.route";
 import { ReportsRoutes } from "../modules/reports/reports.route";
 import auth from "../../../middlewares/auth";
@@ -35,8 +35,8 @@ const moduleRoutes = [
         handlers: [ReceiptRoutes],
     },
     {
-        path: "/communication",
-        handlers: [CommunicationRoutes],
+        path: "/reminder",
+        handlers: [ReminderRoutes],
     },
     {
         path: "/settings",
