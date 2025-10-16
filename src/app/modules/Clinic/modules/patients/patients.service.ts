@@ -2,7 +2,7 @@ import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment, Bond, Patient } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
-import { getDateRange, getUserClinicId } from "../../clinic.utils";
+import { getDateRange } from "../../clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreatePatientInput } from "./patients.validation";
@@ -15,11 +15,11 @@ const getNewPatientsCount = async (
     },
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const count = await prisma.patient.count({
         where: {
-            clinicId: clinicId,
+            clinicId: user.clinicId,
             createdAt: getDateRange(query.filterBy),
         },
     });
@@ -39,12 +39,12 @@ const createPatient = async (
     },
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const response = await prisma.patient.create({
         data: {
             ...payload,
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         },
     });
 
@@ -56,7 +56,7 @@ const createPatient = async (
 
 // Get Patients
 const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const queryBuilder = new QueryBuilder(prisma.patient, query);
 
@@ -72,7 +72,7 @@ const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
         .paginate()
         .filter(["status"])
         .rawFilter({
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         })
         .include({
             appointments: {
@@ -322,11 +322,11 @@ const searchPatient = async (
         throw new ApiError(httpStatus.BAD_REQUEST, "searchTerm is required");
     }
 
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const patients = await prisma.patient.findMany({
         where: {
-            clinicId: clinicId,
+            clinicId: user.clinicId,
             OR: [
                 {
                     firstName: {

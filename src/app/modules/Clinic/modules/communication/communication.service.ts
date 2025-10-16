@@ -7,7 +7,7 @@ import {
     ScheduledReminderHistory,
 } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
-import { getUserClinicId } from "../../clinic.utils";
+
 import {
     CreateReminderScheduleInput,
     UpdateReminderScheduleInput,
@@ -20,10 +20,8 @@ const createReminderSchedules = async (
     payload: CreateReminderScheduleInput,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const response = await prisma.reminderSchedule.create({
-        data: { ...payload, clinicId: clinicId },
+        data: { ...payload, clinicId: user.clinicId },
     });
 
     return {
@@ -34,11 +32,9 @@ const createReminderSchedules = async (
 
 // Get Reminder Schedules
 const getReminderSchedules = async (user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const reminders = await prisma.reminderSchedule.findMany({
         where: {
-            clinicId,
+            clinicId: user.clinicId,
         },
     });
 
@@ -54,8 +50,6 @@ const updateSchedule = async (
     payload: UpdateReminderScheduleInput,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const exists = await prisma.reminderSchedule.findUnique({
         where: {
             id: scheduleId,
@@ -69,14 +63,14 @@ const updateSchedule = async (
         throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
     }
 
-    if (exists.clinicId !== clinicId) {
+    if (exists.clinicId !== user.clinicId) {
         throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
     }
 
     const response = await prisma.reminderSchedule.update({
         where: {
             id: scheduleId,
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         },
         data: {
             ...payload,
@@ -91,8 +85,6 @@ const updateSchedule = async (
 
 // Delete Reminder Schedule
 const deleteSchedule = async (scheduleId: string, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const exists = await prisma.reminderSchedule.findUnique({
         where: {
             id: scheduleId,
@@ -106,14 +98,14 @@ const deleteSchedule = async (scheduleId: string, user: JwtPayload) => {
         throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
     }
 
-    if (exists.clinicId !== clinicId) {
+    if (exists.clinicId !== user.clinicId) {
         throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
     }
 
     const response = await prisma.reminderSchedule.delete({
         where: {
             id: scheduleId,
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         },
     });
 
@@ -129,8 +121,6 @@ const updateReminderStatus = async (
     status: ActivityStatus,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const exists = await prisma.reminderSchedule.findUnique({
         where: {
             id: scheduleId,
@@ -145,7 +135,7 @@ const updateReminderStatus = async (
         throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
     }
 
-    if (exists.clinicId !== clinicId) {
+    if (exists.clinicId !== user.clinicId) {
         throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
     }
 
@@ -159,7 +149,7 @@ const updateReminderStatus = async (
     const response = await prisma.reminderSchedule.update({
         where: {
             id: scheduleId,
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         },
         data: {
             status: status,
@@ -177,8 +167,6 @@ const getReminderScheduleHistory = async (
     query: Record<string, any>,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const queryBuilder = new QueryBuilder(
         prisma.scheduledReminderHistory,
         query
@@ -200,7 +188,7 @@ const getReminderScheduleHistory = async (
         .paginate()
         .rawFilter({
             patient: {
-                clinicId: clinicId,
+                clinicId: user.clinicId,
                 ...(query.searchTerm
                     ? {
                           OR: [

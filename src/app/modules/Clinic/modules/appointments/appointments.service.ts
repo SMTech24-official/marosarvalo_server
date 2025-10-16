@@ -1,11 +1,7 @@
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment, AppointmentStatus } from "@prisma/client";
-import {
-    getDateRange,
-    getUserClinicId,
-    parseTimeString,
-} from "../../clinic.utils";
+import { getDateRange, parseTimeString } from "../../clinic.utils";
 import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status";
 import { groupAppointment } from "./appointments.utils";
@@ -131,13 +127,11 @@ const getAppointments = async (
 
 // Get Appointment by Id
 const getAppointmentById = async (id: string, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const appointment = await prisma.appointment.findUnique({
         where: {
             id: id,
             patient: {
-                clinicId: clinicId,
+                clinicId: user.clinicId,
             },
         },
         include: {
@@ -188,13 +182,11 @@ const getAppointmentById = async (id: string, user: JwtPayload) => {
 
 // Delete Appointment
 const deleteAppointment = async (id: string, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const appointment = await prisma.appointment.findUnique({
         where: {
             id: id,
             patient: {
-                clinicId: clinicId,
+                clinicId: user.clinicId,
             },
         },
     });
@@ -224,13 +216,11 @@ const changeAppointmentStatus = async (
     payload: { reason?: string },
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const appointment = await prisma.appointment.findUnique({
         where: {
             id: id,
             patient: {
-                clinicId: clinicId,
+                clinicId: user.clinicId,
             },
         },
     });
@@ -264,12 +254,10 @@ const getAppointmentsCount = async (
     },
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const count = await prisma.appointment.count({
         where: {
             patient: {
-                clinicId: clinicId,
+                clinicId: user.clinicId,
             },
             status: {
                 not: "CANCELLED",
@@ -291,12 +279,10 @@ const getAppointmentsOverview = async (
     },
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const appointments = await prisma.appointment.findMany({
         where: {
             patient: {
-                clinicId: clinicId,
+                clinicId: user.clinicId,
             },
             status: {
                 not: "CANCELLED",
@@ -320,8 +306,6 @@ const getAppointmentsCalender = async (
     query: Record<string, any>,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
     const appointments: (Appointment & {
@@ -353,7 +337,7 @@ const getAppointmentsCalender = async (
             patient: {
                 contains: query.searchTerm,
                 mode: "insensitive",
-                clinicId: clinicId,
+                clinicId: user.clinicId,
             },
             specialistId: user.id,
             status: {

@@ -16,7 +16,9 @@ const generateToken = (
 };
 
 const verifyToken = (token: string, secret: Secret) => {
-    return jwt.verify(token, secret) as JwtPayload;
+    const [_, tokenValue] = token.split(" ");
+
+    return jwt.verify(tokenValue, secret) as JwtPayload;
 };
 
 export const jwtHelpers = {

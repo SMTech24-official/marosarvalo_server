@@ -9,47 +9,82 @@ import { jwtHelpers } from "../../helpers/jwtHelpers";
 import prisma from "../../shared/prisma";
 import { UserRole } from "@prisma/client";
 
-//  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN)
-
 const auth = (...roles: UserRole[]) => {
-  return async (
-    req: Request & { user?: any },
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const token = req.headers.authorization;
+    return async (
+        req: Request & { user?: any },
+        res: Response,
+        next: NextFunction
+    ) => {
+        try {
+            const token = req.headers.authorization;
 
-      if (!token) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized!");
-      }
+            if (!token) {
+                throw new ApiError(
+                    httpStatus.UNAUTHORIZED,
+                    "Unauthorized Request"
+                );
+            }
 
-      const verifiedUser = jwtHelpers.verifyToken(
-        token,
-        config.jwt.jwt_secret as Secret
-      );
+            const verifiedUser = jwtHelpers.verifyToken(
+                token,
+                config.jwt.jwt_secret as Secret
+            );
 
-      const user = await prisma.user.findUnique({
-        where: {
-          email: verifiedUser.email,
-        },
-      });
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: verifiedUser.id,
+                },
+                select: {
+                    id: true,
+                    clinicId: true,
+                    email: true,
+                    status: true,
+                    clinic: {
+                        select: { status: true },
+                    },
+                    role: true,
+                },
+            });
 
-      if (!user) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "You are not authorized!");
-      }
+            if (!user) {
+                throw new ApiError(
+                    httpStatus.UNAUTHORIZED,
+                    "Unauthorized Request"
+                );
+            }
+            if (user.status !== "ACTIVE") {
+                throw new ApiError(
+                    httpStatus.UNAUTHORIZED,
+                    "Your Account Status is Inactive. Contact Admin."
+                );
+            }
 
-      if (roles.length && !roles.includes(verifiedUser.role)) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Forbidden Request!");
-      }
+            if (
+                user.role !== "SUPER_ADMIN" &&
+                user.clinic?.status !== "ACTIVE"
+            ) {
+                throw new ApiError(
+                    httpStatus.FORBIDDEN,
+                    "Your Associated Clinic's Status is Inactive."
+                );
+            }
 
-      req.user = verifiedUser;
+            if (roles.length && !roles.includes(user.role)) {
+                throw new ApiError(httpStatus.FORBIDDEN, "Forbidden Request!");
+            }
 
-      next();
-    } catch (err) {
-      next(err);
-    }
-  };
+            req.user = {
+                id: user.id,
+                role: user.role,
+                email: user.email,
+                clinicId: user.clinicId,
+            };
+
+            next();
+        } catch (err) {
+            next(err);
+        }
+    };
 };
 
 export default auth;

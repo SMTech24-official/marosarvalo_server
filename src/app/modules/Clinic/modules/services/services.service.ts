@@ -2,18 +2,18 @@ import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Service } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
-import { getUserClinicId } from "../../clinic.utils";
+
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreateServiceInput, UpdateServiceInput } from "./services.validation";
 
 // Get Services Statistics
 const getServicesStatistics = async (user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const disciplines = await prisma.discipline.findMany({
         where: {
-            clinicId: clinicId!,
+            clinicId: user.clinicId!,
         },
         include: {
             services: {
@@ -49,7 +49,7 @@ const getServicesStatistics = async (user: JwtPayload) => {
 
 // Get Services list
 const getServices = async (query: Record<string, any>, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const queryBuilder = new QueryBuilder(prisma.service, query);
 
@@ -60,7 +60,7 @@ const getServices = async (query: Record<string, any>, user: JwtPayload) => {
         };
     })[] = await queryBuilder
         .rawFilter({
-            discipline: { clinicId: clinicId },
+            discipline: { clinicId: user.clinicId },
         })
         .search(["name"])
         .sort()

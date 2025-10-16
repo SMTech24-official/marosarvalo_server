@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { getDateRange, getUserClinicId } from "../../clinic.utils";
+import { getDateRange } from "../../clinic.utils";
 import prisma from "../../../../../shared/prisma";
 
 // Get Specialists Count
@@ -9,11 +9,9 @@ const getSpecialistsCount = async (
     },
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const count = await prisma.user.count({
         where: {
-            clinicId: clinicId,
+            clinicId: user.clinicId,
             role: "SPECIALIST",
             status: "ACTIVE",
             createdAt: getDateRange(query.filterBy),

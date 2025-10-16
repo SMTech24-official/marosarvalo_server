@@ -1,7 +1,7 @@
 import { JwtPayload } from "jsonwebtoken";
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
-import { getUserClinicId } from "../../clinic.utils";
+
 import {
     CreateDisciplineInput,
     UpdateDisciplineInput,
@@ -12,7 +12,7 @@ import { Discipline } from "@prisma/client";
 
 // Get disciplines
 const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const queryBuilder = new QueryBuilder(prisma.discipline, query);
 
@@ -24,7 +24,7 @@ const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
         }[];
     })[] = await queryBuilder
         .rawFilter({
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         })
         .search(["name"])
         .sort()
@@ -63,12 +63,12 @@ const createDiscipline = async (
     payload: CreateDisciplineInput,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const response = await prisma.discipline.create({
         data: {
             ...payload,
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         },
     });
 

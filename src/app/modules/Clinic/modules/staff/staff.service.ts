@@ -2,7 +2,6 @@ import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Staff, UserRole } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
-import { getUserClinicId } from "../.././clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreateStaffInput, UpdateStaffInput } from "./staff.validation";
@@ -12,13 +11,11 @@ import { toZonedTime } from "date-fns-tz";
 
 // Create new Staff
 const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const { password, ...rest } = payload;
 
     const staffData = {
         ...rest,
-        clinicId: clinicId,
+        clinicId: user.clinicId,
     };
     let response;
 
@@ -69,8 +66,6 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
 
 // Get All Staff
 const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const queryBuilder = new QueryBuilder(prisma.staff, query);
 
     const staffs: (Staff & {
@@ -80,7 +75,7 @@ const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
         };
     })[] = await queryBuilder
         .rawFilter({
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         })
         .search(["name"])
         .sort()
@@ -118,12 +113,10 @@ const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
 
 // Get Staff by Id
 const getStaffById = async (staffId: string, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const staff = await prisma.staff.findUnique({
         where: {
             id: staffId,
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         },
     });
 
@@ -140,12 +133,10 @@ const updateStaffData = async (
     payload: UpdateStaffInput,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
-
     const exists = await prisma.staff.findUnique({
         where: {
             id: staffId,
-            clinicId,
+            clinicId: user.clinicId,
         },
     });
 
@@ -170,12 +161,10 @@ const updateStaffData = async (
 
 // Delete Staff data
 const deleteStaffData = async (staffId: string, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const exists = await prisma.staff.findUnique({
         where: {
             id: staffId,
-            clinicId,
+            clinicId: user.clinicId,
         },
     });
 
@@ -200,8 +189,6 @@ const updateWorkingHours = async (staffId: string, payload: any) => {};
 
 // Get Staff Schedule
 const getStaffSchedules = async (clientTimezone: string, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
-
     const todayStart = startOfDay(new Date());
     const todayEnd = endOfDay(new Date());
 
@@ -221,7 +208,7 @@ const getStaffSchedules = async (clientTimezone: string, user: JwtPayload) => {
 
     const availableStaffs = await prisma.staff.findMany({
         where: {
-            clinicId,
+            clinicId: user.clinicId,
             holiday: {
                 date: {
                     not: {

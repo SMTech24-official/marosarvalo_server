@@ -66,17 +66,3 @@ export const applyTaxAndDiscount = (
     const afterDiscount = afterTax * (1 - discountPercent / 100);
     return afterDiscount;
 };
-
-// Get Clinic ID from user
-export const getUserClinicId = async (user: JwtPayload) => {
-    const userData = await prisma.user.findUnique({
-        where: {
-            id: user.id,
-        },
-        select: {
-            clinicId: true,
-        },
-    });
-
-    return userData?.clinicId ?? "";
-};

@@ -6,12 +6,12 @@ import {
     getAttendanceStats,
     getWeeklyStats,
 } from "./reports.utils";
-import { getUserClinicId } from "../../clinic.utils";
+
 import { JwtPayload } from "jsonwebtoken";
 
 // Get basic Report - w/o any change in request - This month
 const getClinicBasicReport = async (user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const now = new Date();
 
@@ -25,7 +25,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
         await Promise.all([
             prisma.receipt.findMany({
                 where: {
-                    clinicId: clinicId,
+                    clinicId: user.clinicId,
                     createdAt: {
                         gte: startOfMonth,
                         lt: startOfNextMonth,
@@ -39,7 +39,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
             prisma.appointment.findMany({
                 where: {
                     patient: {
-                        clinicId: clinicId,
+                        clinicId: user.clinicId,
                     },
                     date: {
                         gte: startOfMonth,
@@ -52,7 +52,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
             }),
             prisma.patient.findMany({
                 where: {
-                    clinicId: clinicId,
+                    clinicId: user.clinicId,
                 },
                 select: {
                     id: true,
@@ -61,7 +61,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
             prisma.appointment.findMany({
                 where: {
                     patient: {
-                        clinicId: clinicId,
+                        clinicId: user.clinicId,
                     },
                     createdAt: {
                         gte: startOfMonth,
@@ -112,7 +112,7 @@ const getCancellationInfo = async (
     query: Record<string, any>,
     user: JwtPayload
 ) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -134,7 +134,7 @@ const getCancellationInfo = async (
     })[] = await queryBuilder
         .rawFilter({
             patient: {
-                clinicId: clinicId,
+                clinicId: user.clinicId,
             },
             status: "CANCELLED",
         })

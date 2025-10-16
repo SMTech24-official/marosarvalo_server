@@ -2,19 +2,19 @@ import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { ProductType, Receipt } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
-import { getUserClinicId } from "../../clinic.utils";
+
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreateReceiptInput } from "./receipts.validation";
 
 // Create Receipt
 const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const response = await prisma.receipt.create({
         data: {
             ...payload,
-            clinicId: clinicId,
+            clinicId: user.clinicId,
             products: {
                 createMany: {
                     data: payload.products.map((product) => {
@@ -55,7 +55,7 @@ const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
 
 // Get Receipts
 const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
-    const clinicId = await getUserClinicId(user);
+    ;
 
     const queryBuilder = new QueryBuilder(prisma.receipt, query);
 
@@ -75,7 +75,7 @@ const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
         .sort()
         .paginate()
         .rawFilter({
-            clinicId: clinicId,
+            clinicId: user.clinicId,
         })
         .include({
             patient: {
