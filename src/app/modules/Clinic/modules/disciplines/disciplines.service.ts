@@ -16,12 +16,27 @@ const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
 
     const queryBuilder = new QueryBuilder(prisma.discipline, query);
 
-    const disciplines: Discipline[] = await queryBuilder
+    const disciplines: (Discipline & {
+        services: {
+            id: string;
+            name: string;
+            price: number;
+        }[];
+    })[] = await queryBuilder
         .rawFilter({
             clinicId: clinicId,
         })
         .search(["name"])
         .sort()
+        .include({
+            services: {
+                select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                },
+            },
+        })
         .paginate()
         .execute();
     const pagination = await queryBuilder.countTotal();
@@ -30,6 +45,7 @@ const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
         const data = {
             id: discipline.id,
             name: discipline.name,
+            services: discipline.services,
         };
 
         return data;
@@ -64,20 +80,17 @@ const createDiscipline = async (
 
 // Update Discipline
 const updateDiscipline = async (
-    serviceId: string,
+    disciplineId: string,
     payload: UpdateDisciplineInput,
     user: JwtPayload
 ) => {
     const discipline = await prisma.discipline.findUnique({
         where: {
-            id: serviceId,
+            id: disciplineId,
             clinic: {
                 specialists: {
                     some: {
                         id: user.id,
-                        role: {
-                            in: ["CLINIC_ADMIN", "RECEPTIONIST"],
-                        },
                     },
                 },
             },
@@ -88,7 +101,7 @@ const updateDiscipline = async (
     });
 
     if (!discipline) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Service Not Found!");
+        throw new ApiError(httpStatus.NOT_FOUND, "Discipline not found");
     }
 
     const response = await prisma.discipline.update({
@@ -97,7 +110,7 @@ const updateDiscipline = async (
     });
 
     return {
-        message: "Service Data updated",
+        message: "Discipline Data updated",
         data: response,
     };
 };
@@ -111,9 +124,6 @@ const deleteDiscipline = async (disciplineId: string, user: JwtPayload) => {
                 specialists: {
                     some: {
                         id: user.id,
-                        role: {
-                            in: ["CLINIC_ADMIN", "RECEPTIONIST"],
-                        },
                     },
                 },
             },

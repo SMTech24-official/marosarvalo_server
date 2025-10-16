@@ -5,6 +5,7 @@ import sendResponse from "../../../../../shared/sendResponse";
 import AppointmentServices from "./appointments.service";
 import ApiError from "../../../../../errors/ApiErrors";
 import config from "../../../../../config";
+import { AppointmentStatus } from "@prisma/client";
 
 // Create Appointment
 const createAppointment = catchAsync(async (req: Request, res: Response) => {
@@ -42,6 +43,62 @@ const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
         data: result.count,
     });
 });
+
+// Get Appointment by Id
+const getAppointmentById = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await AppointmentServices.getAppointmentById(id, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Delete Appointment
+const deleteAppointment = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await AppointmentServices.deleteAppointment(id, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Change Appointment Status
+const changeAppointmentStatus = catchAsync(
+    async (req: Request, res: Response) => {
+        const { id, status } = req.params;
+        if (
+            !Object.values(AppointmentStatus).includes(
+                status.toUpperCase() as any
+            )
+        ) {
+            throw new ApiError(
+                httpStatus.BAD_REQUEST,
+                `Invalid status value. Supported: ${Object.values(
+                    AppointmentStatus
+                ).join(", ")}`
+            );
+        }
+
+        const result = await AppointmentServices.changeAppointmentStatus(
+            id,
+            status as AppointmentStatus,
+            req.body,
+            req.user
+        );
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: result.message,
+            data: result.data,
+        });
+    }
+);
 
 // Get Appointments Overview
 const getAppointmentsOverview = catchAsync(
@@ -94,8 +151,11 @@ const getAppointments = catchAsync(async (req: Request, res: Response) => {
 // Export all functions
 export default {
     createAppointment,
+    getAppointments,
+    getAppointmentById,
+    deleteAppointment,
+    changeAppointmentStatus,
     getAppointmentsCount,
     getAppointmentsOverview,
     getAppointmentsCalender,
-    getAppointments,
 };

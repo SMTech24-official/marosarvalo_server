@@ -1,5 +1,5 @@
 {
-    "name": "backend-starter",
+    "name": "marcoservalo-backend",
     "version": "1.0.0",
     "main": "server.js",
     "scripts": {
@@ -12,7 +12,7 @@
         "update": "pnpm outdated && pnpm up --latest"
     },
     "keywords": [],
-    "author": "Israfil",
+    "author": "Modasser Hasan",
     "license": "ISC",
     "description": "",
     "devDependencies": {
@@ -26,6 +26,7 @@
         "@types/nodemailer": "^7.0.1",
         "@types/uuid": "^10.0.0",
         "prisma": "^6.15.0",
+        "prisma-dbml-generator": "^0.12.0",
         "ts-node": "^10.9.2",
         "ts-node-dev": "^2.0.0",
         "typescript": "^5.9.2"
@@ -50,7 +51,7 @@
         "nodemailer": "^7.0.6",
         "nodemon": "^3.1.10",
         "stripe": "^19.1.0",
-        "uuid": "^11.1.0",
+        "uuid": "^13.0.0",
         "zod": "^4.1.12"
     }
 }

@@ -100,42 +100,6 @@ const createNewAdmin = async (body: CreateAdminInput) => {
     };
 };
 
-// Get All Bookings - Status = Is it created yet?
-// const getAllBookingsBak = async (query: Record<string, any>) => {
-//     const queryBuilder = new QueryBuilder(prisma.clinicOrder, query);
-
-//     const bookings: (ClinicOrder & {
-//         subscription: {
-//             status: SubscriptionStatus;
-//         };
-//     })[] = await queryBuilder
-//         .search(["name", "email", "phone"])
-//         .sort()
-//         .paginate()
-//         .include({
-//             subscription: {
-//                 status: true,
-//             },
-//         })
-//         .execute();
-//     const pagination = await queryBuilder.countTotal();
-
-//     const formattedBookings = bookings.map((booking) => {
-//         const { subscription, ...data } = booking;
-
-//         return {
-//             ...data,
-//             status: subscription.status,
-//         };
-//     });
-
-//     return {
-//         message: "Bookings data fetched",
-//         data: formattedBookings,
-//         pagination,
-//     };
-// };
-
 // TODO:  Update subscription create with phone
 const getAllBookings = async (query: Record<string, any>) => {
     const queryBuilder = new QueryBuilder(prisma.subscription, query);

@@ -1,5 +1,6 @@
 import { ClinicRoutes } from "../../Clinic/clinic.route";
 import { PackageRoutes } from "../modules/package/package.route";
+import { ReminderRoutes } from "../modules/reminder/reminder.route";
 
 const moduleRoutes = [
     {
@@ -9,6 +10,10 @@ const moduleRoutes = [
     {
         path: "/packages",
         handlers: [PackageRoutes],
+    },
+    {
+        path: "/reminder",
+        handlers: [ReminderRoutes],
     },
 ] satisfies {
     path: string;

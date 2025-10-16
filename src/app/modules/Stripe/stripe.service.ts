@@ -1,9 +1,21 @@
+import ApiError from "../../../errors/ApiErrors";
 import prisma from "../../../shared/prisma";
+import httpStatus from "http-status";
 import { CreateClinicInput } from "./stripe.validation";
 
 // Create checkout request
 const createCheckoutRequest = async (payload: CreateClinicInput) => {
     const { clinic, user, package: packageId } = payload;
+
+    const packageData = await prisma.package.findUnique({
+        where: {
+            id: packageId,
+        },
+    });
+
+    if (!packageData) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Package Not Found");
+    }
 
     // TODO: Do what needs to be done
     // Create Stripe Instance

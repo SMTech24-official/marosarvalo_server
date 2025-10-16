@@ -7,6 +7,7 @@ import { ReceiptRoutes } from "../modules/receipts/receipts.route";
 import { CommunicationRoutes } from "../modules/communication/communication.route";
 import { SettingsRoutes } from "../modules/settings/settings.route";
 import { ReportsRoutes } from "../modules/reports/reports.route";
+import auth from "../../../middlewares/auth";
 
 const moduleRoutes = [
     {
@@ -43,7 +44,7 @@ const moduleRoutes = [
     },
     {
         path: "/reports",
-        handlers: [ReportsRoutes],
+        handlers: [auth("CLINIC_ADMIN"), ReportsRoutes],
     },
 ] satisfies {
     path: string;

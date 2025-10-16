@@ -41,4 +41,7 @@ router.get("/:id/appointments", PatientControllers.getPatientAppointments);
 // Get Patient Bonds
 router.get("/:id/bonds", PatientControllers.getPatientBonds);
 
+// Search Patient
+router.get("/search", PatientControllers.searchPatient);
+
 export const PatientRoutes = router;

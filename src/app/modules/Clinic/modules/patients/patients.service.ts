@@ -313,6 +313,76 @@ const getPatientBonds = async (
     };
 };
 
+// Search Patient
+const searchPatient = async (
+    query: { searchTerm?: string },
+    user: JwtPayload
+) => {
+    if (!query.searchTerm) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "searchTerm is required");
+    }
+
+    const clinicId = await getUserClinicId(user);
+
+    const patients = await prisma.patient.findMany({
+        where: {
+            clinicId: clinicId,
+            OR: [
+                {
+                    firstName: {
+                        contains: query.searchTerm,
+                        mode: "insensitive",
+                    },
+                },
+                {
+                    lastName: {
+                        contains: query.searchTerm,
+                        mode: "insensitive",
+                    },
+                },
+                {
+                    phone: {
+                        contains: query.searchTerm,
+                        mode: "insensitive",
+                    },
+                },
+                {
+                    email: {
+                        contains: query.searchTerm,
+                        mode: "insensitive",
+                    },
+                },
+            ],
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            email: true,
+            bonds: true,
+        },
+        take: 10, // Limit to 10 results for search suggestions
+    });
+
+    const formattedData = patients.map((patient) => {
+        return {
+            id: patient.id,
+            name: `${patient.firstName}${
+                patient.lastName ? " " + patient.lastName : ""
+            }`,
+            phone: patient.phone,
+            email: patient.email,
+            bonds: patient.bonds,
+        };
+    });
+
+    return {
+        message: "Patient search result",
+        data: formattedData,
+    };
+};
+
 export default {
     getNewPatientsCount,
     createPatient,
@@ -320,4 +390,5 @@ export default {
     getPatientById,
     getPatientAppointments,
     getPatientBonds,
+    searchPatient,
 };

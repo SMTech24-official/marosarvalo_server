@@ -2,6 +2,10 @@ generator client {
     provider = "prisma-client-js"
 }
 
+generator dbml {
+    provider = "prisma-dbml-generator"
+}
+
 datasource db {
     provider = "mongodb"
     url      = env("DATABASE_URL")
@@ -34,6 +38,20 @@ model User {
     @@map("users")
 }
 
+model AdminReminder {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    email String
+
+    subject String
+    message String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("admin_reminders")
+}
+
 // TODO: Exclude admin data when getting specialists
 model Clinic {
     id       String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -43,20 +61,20 @@ model Clinic {
     address1 String
     address2 String?
 
-    specialists User[]
-    staff       Staff[]
-    patients    Patient[]
-    disciplines Discipline[]
-    receipts    Receipt[]
+    specialists      User[]
+    staff            Staff[]
+    patients         Patient[]
+    disciplines      Discipline[]
+    receipts         Receipt[]
+    reminderSchedule ReminderSchedule[]
 
     subscription Subscription?
     status       ActivityStatus @default(INACTIVE)
 
     branding Branding?
 
-    createdAt        DateTime           @default(now())
-    updatedAt        DateTime           @updatedAt
-    ReminderSchedule ReminderSchedule[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@map("clinics")
 }
@@ -391,8 +409,8 @@ model Receipt {
 model DirectReminder {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
-    type     ReminderType
-    schedule DateTime
+    type     ReminderType @default(IMMEDIATE)
+    schedule DateTime?
 
     patientId String  @db.ObjectId
     patient   Patient @relation(fields: [patientId], references: [id])

@@ -23,6 +23,15 @@ router.post(
 // Get Appointments
 router.get("/", AppointmentControllers.getAppointments);
 
+// Get Appointment by Id
+router.get("/:id", AppointmentControllers.getAppointmentById);
+
+// Delete Appointment
+router.delete("/:id", AppointmentControllers.deleteAppointment);
+
+// Change Appointment Status
+router.patch("/:id/:status", AppointmentControllers.changeAppointmentStatus);
+
 // Get Appointments Count
 router.get("/count", AppointmentControllers.getAppointmentsCount);
 

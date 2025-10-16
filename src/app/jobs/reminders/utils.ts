@@ -1,6 +1,6 @@
-// Using date = Date obj and timeslot = String -`hh:mmam - hh:mmam` , take the from and join with date, return a Date with the time
-export const genStartTime = (date: Date, timeslot: string) => {
-    const [from, to] = timeslot.split(" - ");
+// Using date = Date obj and timeSlot = String -`hh:mmam - hh:mmam` , take the from and join with date, return a Date with the time
+export const genStartTime = (date: Date, timeSlot: string) => {
+    const [from, to] = timeSlot.split(" - ");
     const [fromHour, fromMinute] = from.slice(0, -2).split(":");
     const fromAmPm = from.slice(-2);
 

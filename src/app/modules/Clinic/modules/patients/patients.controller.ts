@@ -107,6 +107,17 @@ const getPatientBonds = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// Search Patient
+const searchPatient = catchAsync(async (req: Request, res: Response) => {
+    const result = await PatientServices.searchPatient(req.query, req.user);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
 
 // Export all functions
 export default {
@@ -116,4 +127,5 @@ export default {
     getPatientById,
     getPatientAppointments,
     getPatientBonds,
+    searchPatient,
 };
