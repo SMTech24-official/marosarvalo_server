@@ -7,14 +7,18 @@ import httpStatus from "http-status";
 import { groupAppointment } from "./appointments.utils";
 import { CreateAppointmentInput } from "./appointments.validation";
 import ApiError from "../../../../../errors/ApiErrors";
+import { getMaxSequence } from "../../../../../utils";
 
 // Create new Appointment - // TODO: Check availability of Specialist
 const createAppointment = async (
-    payload: CreateAppointmentInput & { documents: string[] },
+    payload: CreateAppointmentInput & { documents: string[] }
 ) => {
     const response = await prisma.appointment.create({
         data: {
             ...payload,
+            id:
+                (await getMaxSequence({ model: prisma.appointment, next: true })) ??
+                0,
         },
     });
 
@@ -27,7 +31,7 @@ const createAppointment = async (
 // Get Appointments
 const getAppointments = async (
     query: Record<string, any>,
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -126,7 +130,7 @@ const getAppointments = async (
 };
 
 // Get Appointment by Id
-const getAppointmentById = async (id: string, user: JwtPayload) => {
+const getAppointmentById = async (id: number, user: JwtPayload) => {
     const appointment = await prisma.appointment.findUnique({
         where: {
             id: id,
@@ -181,7 +185,7 @@ const getAppointmentById = async (id: string, user: JwtPayload) => {
 };
 
 // Delete Appointment
-const deleteAppointment = async (id: string, user: JwtPayload) => {
+const deleteAppointment = async (id: number, user: JwtPayload) => {
     const appointment = await prisma.appointment.findUnique({
         where: {
             id: id,
@@ -211,10 +215,10 @@ const deleteAppointment = async (id: string, user: JwtPayload) => {
 
 // Change Appointment Status
 const changeAppointmentStatus = async (
-    id: string,
+    id: number,
     status: AppointmentStatus,
     payload: { reason?: string },
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const appointment = await prisma.appointment.findUnique({
         where: {
@@ -252,7 +256,7 @@ const getAppointmentsCount = async (
     query: {
         filterBy: "day" | "week" | "month" | undefined;
     },
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const count = await prisma.appointment.count({
         where: {
@@ -277,7 +281,7 @@ const getAppointmentsOverview = async (
     query: {
         filterBy: "day" | "week" | "month" | "year" | undefined;
     },
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const appointments = await prisma.appointment.findMany({
         where: {
@@ -304,7 +308,7 @@ const getAppointmentsOverview = async (
 // Get Appointments Calendar
 const getAppointmentsCalender = async (
     query: Record<string, any>,
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 

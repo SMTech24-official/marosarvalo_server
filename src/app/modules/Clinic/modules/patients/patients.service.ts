@@ -7,13 +7,14 @@ import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreatePatientInput } from "./patients.validation";
 import { getNewestDate } from "./patients.utils";
+import { getMaxSequence } from "../../../../../utils";
 
 // Get New Patients Count
 const getNewPatientsCount = async (
     query: {
         filterBy: "day" | "week" | "month" | undefined;
     },
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const count = await prisma.patient.count({
         where: {
@@ -35,11 +36,14 @@ const createPatient = async (
         documents: string[];
         otherDocuments: string[];
     },
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const response = await prisma.patient.create({
         data: {
             ...payload,
+            id:
+                (await getMaxSequence({ model: prisma.patient, next: true })) ??
+                0,
             clinicId: user.clinicId,
         },
     });
@@ -105,7 +109,7 @@ const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
 };
 
 // Get Patient by Id - // TODO: Check which Id. _id or documentId
-const getPatientById = async (patientId: string) => {
+const getPatientById = async (patientId: number) => {
     const patient = await prisma.patient.findUnique({
         where: {
             id: patientId,
@@ -162,8 +166,8 @@ const getPatientById = async (patientId: string) => {
 
 // Get Patient Appointments - // TODO: Check which Id. _id or documentId
 const getPatientAppointments = async (
-    patientId: string,
-    query: Record<string, any>,
+    patientId: number,
+    query: Record<string, any>
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
@@ -237,8 +241,8 @@ const getPatientAppointments = async (
 
 // Get Patient Bonds - // TODO: Check which Id. _id or documentId
 const getPatientBonds = async (
-    patientId: string,
-    query: Record<string, any>,
+    patientId: number,
+    query: Record<string, any>
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
@@ -310,7 +314,7 @@ const getPatientBonds = async (
 // Search Patient
 const searchPatient = async (
     query: { searchTerm?: string },
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     if (!query.searchTerm) {
         throw new ApiError(httpStatus.BAD_REQUEST, "searchTerm is required");

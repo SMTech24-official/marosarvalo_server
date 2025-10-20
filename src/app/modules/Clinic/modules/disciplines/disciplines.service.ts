@@ -9,6 +9,7 @@ import {
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { Discipline } from "@prisma/client";
+import { getMaxSequence } from "../../../../../utils";
 
 // Get disciplines
 const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
@@ -59,11 +60,14 @@ const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
 // Create discipline
 const createDiscipline = async (
     payload: CreateDisciplineInput,
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const response = await prisma.discipline.create({
         data: {
             ...payload,
+            id:
+                (await getMaxSequence({ model: prisma.discipline, next: true })) ??
+                0,
             clinicId: user.clinicId,
         },
     });
@@ -76,9 +80,9 @@ const createDiscipline = async (
 
 // Update Discipline
 const updateDiscipline = async (
-    disciplineId: string,
+    disciplineId: number,
     payload: UpdateDisciplineInput,
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const discipline = await prisma.discipline.findUnique({
         where: {
@@ -112,7 +116,7 @@ const updateDiscipline = async (
 };
 
 // Delete Discipline
-const deleteDiscipline = async (disciplineId: string, user: JwtPayload) => {
+const deleteDiscipline = async (disciplineId: number, user: JwtPayload) => {
     const discipline = await prisma.discipline.findUnique({
         where: {
             id: disciplineId,

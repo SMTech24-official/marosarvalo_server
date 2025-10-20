@@ -8,6 +8,7 @@ import { CreateStaffInput, UpdateStaffInput } from "./staff.validation";
 import { hashPassword } from "../../../../../helpers/passwordHelpers";
 import { endOfDay, startOfDay } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { getMaxSequence } from "../../../../../utils";
 
 // Create new Staff
 const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
@@ -26,7 +27,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
         if (!password) {
             throw new ApiError(
                 httpStatus.BAD_REQUEST,
-                "Password required for Specialist and Receptionist",
+                "Password required for Specialist and Receptionist"
             );
         }
 
@@ -41,6 +42,11 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
                 staff: {
                     create: {
                         ...staffData,
+                        id:
+                            (await getMaxSequence({
+                                model: prisma.staff,
+                                next: true,
+                            })) ?? 0,
                     },
                 },
             },
@@ -54,6 +60,11 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
         response = await prisma.staff.create({
             data: {
                 ...staffData,
+                id:
+                    (await getMaxSequence({
+                        model: prisma.staff,
+                        next: true,
+                    })) ?? 0,
             },
         });
     }
@@ -112,7 +123,7 @@ const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
 };
 
 // Get Staff by Id
-const getStaffById = async (staffId: string, user: JwtPayload) => {
+const getStaffById = async (staffId: number, user: JwtPayload) => {
     const staff = await prisma.staff.findUnique({
         where: {
             id: staffId,
@@ -129,9 +140,9 @@ const getStaffById = async (staffId: string, user: JwtPayload) => {
 
 // Update Staff data
 const updateStaffData = async (
-    staffId: string,
+    staffId: number,
     payload: UpdateStaffInput,
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const exists = await prisma.staff.findUnique({
         where: {
@@ -160,7 +171,7 @@ const updateStaffData = async (
 };
 
 // Delete Staff data
-const deleteStaffData = async (staffId: string, user: JwtPayload) => {
+const deleteStaffData = async (staffId: number, user: JwtPayload) => {
     const exists = await prisma.staff.findUnique({
         where: {
             id: staffId,

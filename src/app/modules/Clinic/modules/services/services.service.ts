@@ -6,6 +6,7 @@ import { JwtPayload } from "jsonwebtoken";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreateServiceInput, UpdateServiceInput } from "./services.validation";
+import { getMaxSequence } from "../../../../../utils";
 
 // Get Services Statistics
 const getServicesStatistics = async (user: JwtPayload) => {
@@ -96,6 +97,9 @@ const createService = async (payload: CreateServiceInput) => {
     const response = await prisma.service.create({
         data: {
             ...payload,
+            id:
+                (await getMaxSequence({ model: prisma.service, next: true })) ??
+                0,
         },
         include: {
             discipline: {
@@ -116,9 +120,9 @@ const createService = async (payload: CreateServiceInput) => {
 
 // Update Service
 const updateService = async (
-    serviceId: string,
+    serviceId: number,
     payload: UpdateServiceInput,
-    user: JwtPayload,
+    user: JwtPayload
 ) => {
     const service = await prisma.service.findUnique({
         where: {
@@ -168,7 +172,7 @@ const updateService = async (
 };
 
 // Delete Service
-const deleteService = async (serviceId: string, user: JwtPayload) => {
+const deleteService = async (serviceId: number, user: JwtPayload) => {
     const service = await prisma.service.findUnique({
         where: {
             id: serviceId,

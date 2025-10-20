@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import ReceiptServices from "./receipts.service";
+import { getValidatedIntId } from "../../../../../utils";
 
 // Create Receipt
 const createReceipt = catchAsync(async (req: Request, res: Response) => {
@@ -30,21 +31,23 @@ const getReceipts = catchAsync(async (req: Request, res: Response) => {
 // Get Receipt Details by Id
 const getReceiptDetailsById = catchAsync(
     async (req: Request, res: Response) => {
-        const result = await ReceiptServices.getReceiptDetailsById(
-            req.params.id,
-        );
+        const id = getValidatedIntId(req.params.id);
+
+        const result = await ReceiptServices.getReceiptDetailsById(id);
         sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
             message: result.message,
             data: result.data,
         });
-    },
+    }
 );
 
 // Delete Receipt
 const deleteReceipt = catchAsync(async (req: Request, res: Response) => {
-    const result = await ReceiptServices.deleteReceipt(req.params.id);
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await ReceiptServices.deleteReceipt(id);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,

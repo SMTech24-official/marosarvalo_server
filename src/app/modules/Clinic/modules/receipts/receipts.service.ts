@@ -1,17 +1,21 @@
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
-import { ProductType, Receipt } from "@prisma/client";
+import { ProductType, Invoice } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreateReceiptInput } from "./receipts.validation";
+import { getMaxSequence } from "../../../../../utils";
 
 // Create Receipt
 const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
-    const response = await prisma.receipt.create({
+    const response = await prisma.invoice.create({
         data: {
             ...payload,
+            id:
+                (await getMaxSequence({ model: prisma.invoice, next: true })) ??
+                0,
             clinicId: user.clinicId,
             products: {
                 createMany: {
@@ -53,9 +57,9 @@ const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
 
 // Get Receipts
 const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
-    const queryBuilder = new QueryBuilder(prisma.receipt, query);
+    const queryBuilder = new QueryBuilder(prisma.invoice, query);
 
-    const receipts: (Receipt & {
+    const receipts: (Invoice & {
         patient: {
             firstName: string;
             lastName: string;
@@ -119,8 +123,8 @@ const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
 };
 
 // Get Receipt Details by Id
-const getReceiptDetailsById = async (id: string) => {
-    const receipt = await prisma.receipt.findUnique({
+const getReceiptDetailsById = async (id: number) => {
+    const receipt = await prisma.invoice.findUnique({
         where: {
             id,
         },
@@ -230,8 +234,8 @@ const getReceiptDetailsById = async (id: string) => {
 };
 
 // Delete Receipt
-const deleteReceipt = async (id: string) => {
-    const response = await prisma.receipt.delete({
+const deleteReceipt = async (id: number) => {
+    const response = await prisma.invoice.delete({
         where: {
             id,
         },

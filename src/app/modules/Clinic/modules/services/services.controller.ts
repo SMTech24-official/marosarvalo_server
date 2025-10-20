@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import ServiceServices from "./services.service";
+import { getValidatedIntId } from "../../../../../utils";
 
 // Get Services Statistics
 const getServicesStatistics = catchAsync(
@@ -14,7 +15,7 @@ const getServicesStatistics = catchAsync(
             message: result.message,
             data: result.data,
         });
-    },
+    }
 );
 
 // Get Services List
@@ -42,11 +43,9 @@ const createService = catchAsync(async (req: Request, res: Response) => {
 
 // Update Service
 const updateService = catchAsync(async (req: Request, res: Response) => {
-    const result = await ServiceServices.updateService(
-        req.params.id,
-        req.body,
-        req.user,
-    );
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await ServiceServices.updateService(id, req.body, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -57,7 +56,9 @@ const updateService = catchAsync(async (req: Request, res: Response) => {
 
 // Delete Service
 const deleteService = catchAsync(async (req: Request, res: Response) => {
-    const result = await ServiceServices.deleteService(req.params.id, req.user);
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await ServiceServices.deleteService(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,

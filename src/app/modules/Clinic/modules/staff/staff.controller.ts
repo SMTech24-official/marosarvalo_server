@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import StaffServices from "./staff.service";
+import { getValidatedIntId } from "../../../../../utils";
 
 // Create New Staff
 const createNewStaff = catchAsync(async (req: Request, res: Response) => {
@@ -29,7 +30,9 @@ const getAllStaff = catchAsync(async (req: Request, res: Response) => {
 
 // Get Staff by Id
 const getStaffById = catchAsync(async (req: Request, res: Response) => {
-    const result = await StaffServices.getStaffById(req.params.id, req.user);
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await StaffServices.getStaffById(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -40,11 +43,9 @@ const getStaffById = catchAsync(async (req: Request, res: Response) => {
 
 // Update Staff data
 const updateStaffData = catchAsync(async (req: Request, res: Response) => {
-    const result = await StaffServices.updateStaffData(
-        req.params.id,
-        req.body,
-        req.user,
-    );
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await StaffServices.updateStaffData(id, req.body, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -55,7 +56,9 @@ const updateStaffData = catchAsync(async (req: Request, res: Response) => {
 
 // Delete Staff data
 const deleteStaffData = catchAsync(async (req: Request, res: Response) => {
-    const result = await StaffServices.deleteStaffData(req.params.id, req.user);
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await StaffServices.deleteStaffData(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -70,7 +73,7 @@ const getStaffSchedules = catchAsync(async (req: Request, res: Response) => {
 
     const result = await StaffServices.getStaffSchedules(
         clientTimezone as string,
-        req.user,
+        req.user
     );
     sendResponse(res, {
         success: true,

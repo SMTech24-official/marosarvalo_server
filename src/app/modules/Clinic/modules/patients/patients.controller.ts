@@ -5,12 +5,13 @@ import sendResponse from "../../../../../shared/sendResponse";
 import PatientServices from "./patients.service";
 import ApiError from "../../../../../errors/ApiErrors";
 import config from "../../../../../config";
+import { getValidatedIntId } from "../../../../../utils";
 
 // Get new Patients Count
 const getNewPatientsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await PatientServices.getNewPatientsCount(
         req.query as any,
-        req.user,
+        req.user
     );
     sendResponse(res, {
         success: true,
@@ -32,13 +33,13 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
     }
 
     req.body.guardianDocuments = guardianDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`
     );
     req.body.documents = documents.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`
     );
     req.body.otherDocuments = otherDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`
     );
 
     const result = await PatientServices.createPatient(req.body, req.user);
@@ -66,7 +67,9 @@ const getPatients = catchAsync(async (req: Request, res: Response) => {
 
 // Get Patient by Id
 const getPatientById = catchAsync(async (req: Request, res: Response) => {
-    const result = await PatientServices.getPatientById(req.params.id);
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await PatientServices.getPatientById(id);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -78,9 +81,11 @@ const getPatientById = catchAsync(async (req: Request, res: Response) => {
 // Get Patient Appointments
 const getPatientAppointments = catchAsync(
     async (req: Request, res: Response) => {
+        const id = getValidatedIntId(req.params.id);
+
         const result = await PatientServices.getPatientAppointments(
-            req.params.id,
-            req.query,
+            id,
+            req.query
         );
         sendResponse(res, {
             success: true,
@@ -89,15 +94,14 @@ const getPatientAppointments = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    },
+    }
 );
 
 // Get Patient Bonds
 const getPatientBonds = catchAsync(async (req: Request, res: Response) => {
-    const result = await PatientServices.getPatientBonds(
-        req.params.id,
-        req.query,
-    );
+    const id = getValidatedIntId(req.params.id);
+    
+    const result = await PatientServices.getPatientBonds(id, req.query);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,

@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import DisciplineServices from "./disciplines.service";
+import { getValidatedIntId } from "../../../../../utils";
 
 // Get Disciplines
 const getDisciplines = catchAsync(async (req: Request, res: Response) => {
@@ -20,7 +21,7 @@ const getDisciplines = catchAsync(async (req: Request, res: Response) => {
 const createDiscipline = catchAsync(async (req: Request, res: Response) => {
     const result = await DisciplineServices.createDiscipline(
         req.body,
-        req.user,
+        req.user
     );
     sendResponse(res, {
         success: true,
@@ -32,10 +33,12 @@ const createDiscipline = catchAsync(async (req: Request, res: Response) => {
 
 // Update Discipline
 const updateDiscipline = catchAsync(async (req: Request, res: Response) => {
+    const id = getValidatedIntId(req.params.id);
+
     const result = await DisciplineServices.updateDiscipline(
-        req.params.id,
+        id,
         req.body,
-        req.user,
+        req.user
     );
     sendResponse(res, {
         success: true,
@@ -47,10 +50,9 @@ const updateDiscipline = catchAsync(async (req: Request, res: Response) => {
 
 // Delete Discipline
 const deleteDiscipline = catchAsync(async (req: Request, res: Response) => {
-    const result = await DisciplineServices.deleteDiscipline(
-        req.params.id,
-        req.user,
-    );
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await DisciplineServices.deleteDiscipline(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
