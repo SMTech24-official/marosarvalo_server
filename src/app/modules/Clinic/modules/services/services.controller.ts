@@ -43,7 +43,7 @@ const createService = catchAsync(async (req: Request, res: Response) => {
 
 // Update Service
 const updateService = catchAsync(async (req: Request, res: Response) => {
-    const id = getValidatedIntId(req.params.id);
+    const id = req.params.id;
 
     const result = await ServiceServices.updateService(id, req.body, req.user);
     sendResponse(res, {
@@ -56,7 +56,7 @@ const updateService = catchAsync(async (req: Request, res: Response) => {
 
 // Delete Service
 const deleteService = catchAsync(async (req: Request, res: Response) => {
-    const id = getValidatedIntId(req.params.id);
+    const id = req.params.id;
 
     const result = await ServiceServices.deleteService(id, req.user);
     sendResponse(res, {

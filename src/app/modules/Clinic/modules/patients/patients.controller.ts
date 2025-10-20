@@ -69,7 +69,7 @@ const getPatients = catchAsync(async (req: Request, res: Response) => {
 const getPatientById = catchAsync(async (req: Request, res: Response) => {
     const id = getValidatedIntId(req.params.id);
 
-    const result = await PatientServices.getPatientById(id);
+    const result = await PatientServices.getPatientById(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
@@ -85,7 +85,8 @@ const getPatientAppointments = catchAsync(
 
         const result = await PatientServices.getPatientAppointments(
             id,
-            req.query
+            req.query,
+            req.user
         );
         sendResponse(res, {
             success: true,
@@ -100,8 +101,12 @@ const getPatientAppointments = catchAsync(
 // Get Patient Bonds
 const getPatientBonds = catchAsync(async (req: Request, res: Response) => {
     const id = getValidatedIntId(req.params.id);
-    
-    const result = await PatientServices.getPatientBonds(id, req.query);
+
+    const result = await PatientServices.getPatientBonds(
+        id,
+        req.query,
+        req.user
+    );
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,

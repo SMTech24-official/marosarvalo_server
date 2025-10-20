@@ -21,7 +21,10 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
         (doc) => `${config.backend_url}/uploads/${doc.filename}`
     );
 
-    const result = await AppointmentServices.createAppointment(req.body);
+    const result = await AppointmentServices.createAppointment(
+        req.body,
+        req.user
+    );
 
     sendResponse(res, {
         success: true,
@@ -61,7 +64,7 @@ const getAppointmentById = catchAsync(async (req: Request, res: Response) => {
 // Delete Appointment
 const deleteAppointment = catchAsync(async (req: Request, res: Response) => {
     const id = getValidatedIntId(req.params.id);
-    
+
     const result = await AppointmentServices.deleteAppointment(id, req.user);
     sendResponse(res, {
         success: true,

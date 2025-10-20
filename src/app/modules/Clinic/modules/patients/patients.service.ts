@@ -42,8 +42,11 @@ const createPatient = async (
         data: {
             ...payload,
             id:
-                (await getMaxSequence({ model: prisma.patient, next: true })) ??
-                0,
+                (await getMaxSequence({
+                    model: prisma.patient,
+                    filter: { clinicId: user.clinicId },
+                    next: true,
+                })) ?? 0,
             clinicId: user.clinicId,
         },
     });
@@ -109,10 +112,13 @@ const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
 };
 
 // Get Patient by Id - // TODO: Check which Id. _id or documentId
-const getPatientById = async (patientId: number) => {
+const getPatientById = async (patientId: number, user: JwtPayload) => {
     const patient = await prisma.patient.findUnique({
         where: {
-            id: patientId,
+            id_clinicId: {
+                id: patientId,
+                clinicId: user.clinicId,
+            },
         },
         include: {
             appointments: {
@@ -167,11 +173,15 @@ const getPatientById = async (patientId: number) => {
 // Get Patient Appointments - // TODO: Check which Id. _id or documentId
 const getPatientAppointments = async (
     patientId: number,
-    query: Record<string, any>
+    query: Record<string, any>,
+    user: JwtPayload
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
-            id: patientId,
+            id_clinicId: {
+                id: patientId,
+                clinicId: user.clinicId,
+            },
         },
         select: {
             id: true,
@@ -242,11 +252,15 @@ const getPatientAppointments = async (
 // Get Patient Bonds - // TODO: Check which Id. _id or documentId
 const getPatientBonds = async (
     patientId: number,
-    query: Record<string, any>
+    query: Record<string, any>,
+    user: JwtPayload
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
-            id: patientId,
+            id_clinicId: {
+                id: patientId,
+                clinicId: user.clinicId,
+            },
         },
         select: {
             id: true,

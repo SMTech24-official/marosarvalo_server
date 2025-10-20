@@ -14,8 +14,11 @@ const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
         data: {
             ...payload,
             id:
-                (await getMaxSequence({ model: prisma.invoice, next: true })) ??
-                0,
+                (await getMaxSequence({
+                    model: prisma.invoice,
+                    filter: { clinicId: user.clinicId },
+                    next: true,
+                })) ?? 0,
             clinicId: user.clinicId,
             products: {
                 createMany: {
@@ -123,10 +126,13 @@ const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
 };
 
 // Get Receipt Details by Id
-const getReceiptDetailsById = async (id: number) => {
+const getReceiptDetailsById = async (id: number, user: JwtPayload) => {
     const receipt = await prisma.invoice.findUnique({
         where: {
-            id,
+            id_clinicId: {
+                id: id,
+                clinicId: user.clinicId,
+            },
         },
         include: {
             clinic: {
@@ -234,10 +240,13 @@ const getReceiptDetailsById = async (id: number) => {
 };
 
 // Delete Receipt
-const deleteReceipt = async (id: number) => {
+const deleteReceipt = async (id: number, user: JwtPayload) => {
     const response = await prisma.invoice.delete({
         where: {
-            id,
+            id_clinicId: {
+                id: id,
+                clinicId: user.clinicId,
+            },
         },
         select: {
             id: true,

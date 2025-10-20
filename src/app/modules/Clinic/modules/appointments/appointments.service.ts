@@ -11,14 +11,19 @@ import { getMaxSequence } from "../../../../../utils";
 
 // Create new Appointment - // TODO: Check availability of Specialist
 const createAppointment = async (
-    payload: CreateAppointmentInput & { documents: string[] }
+    payload: CreateAppointmentInput & { documents: string[] },
+    user: JwtPayload
 ) => {
     const response = await prisma.appointment.create({
         data: {
             ...payload,
+            clinicId: user.clinicId,
             id:
-                (await getMaxSequence({ model: prisma.appointment, next: true })) ??
-                0,
+                (await getMaxSequence({
+                    model: prisma.appointment,
+                    filter: { clinicId: user.clinicId },
+                    next: true,
+                })) ?? 0,
         },
     });
 
@@ -133,7 +138,10 @@ const getAppointments = async (
 const getAppointmentById = async (id: number, user: JwtPayload) => {
     const appointment = await prisma.appointment.findUnique({
         where: {
-            id: id,
+            id_clinicId: {
+                id: id,
+                clinicId: user.clinicId,
+            },
             patient: {
                 clinicId: user.clinicId,
             },
@@ -188,7 +196,10 @@ const getAppointmentById = async (id: number, user: JwtPayload) => {
 const deleteAppointment = async (id: number, user: JwtPayload) => {
     const appointment = await prisma.appointment.findUnique({
         where: {
-            id: id,
+            id_clinicId: {
+                id: id,
+                clinicId: user.clinicId,
+            },
             patient: {
                 clinicId: user.clinicId,
             },
@@ -201,7 +212,10 @@ const deleteAppointment = async (id: number, user: JwtPayload) => {
 
     await prisma.appointment.delete({
         where: {
-            id: id,
+            id_clinicId: {
+                id: id,
+                clinicId: user.clinicId,
+            },
         },
     });
 
@@ -222,7 +236,10 @@ const changeAppointmentStatus = async (
 ) => {
     const appointment = await prisma.appointment.findUnique({
         where: {
-            id: id,
+            id_clinicId: {
+                id: id,
+                clinicId: user.clinicId,
+            },
             patient: {
                 clinicId: user.clinicId,
             },
@@ -235,7 +252,10 @@ const changeAppointmentStatus = async (
 
     await prisma.appointment.update({
         where: {
-            id: id,
+            id_clinicId: {
+                id: id,
+                clinicId: user.clinicId,
+            },
         },
         data: {
             status: status,

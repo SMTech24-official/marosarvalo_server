@@ -45,6 +45,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
                         id:
                             (await getMaxSequence({
                                 model: prisma.staff,
+                                filter: { clinicId: user.clinicId },
                                 next: true,
                             })) ?? 0,
                     },
@@ -63,6 +64,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
                 id:
                     (await getMaxSequence({
                         model: prisma.staff,
+                        filter: { clinicId: user.clinicId },
                         next: true,
                     })) ?? 0,
             },
@@ -126,7 +128,10 @@ const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
 const getStaffById = async (staffId: number, user: JwtPayload) => {
     const staff = await prisma.staff.findUnique({
         where: {
-            id: staffId,
+            id_clinicId: {
+                id: staffId,
+                clinicId: user.clinicId,
+            },
             clinicId: user.clinicId,
         },
     });
@@ -146,7 +151,10 @@ const updateStaffData = async (
 ) => {
     const exists = await prisma.staff.findUnique({
         where: {
-            id: staffId,
+            id_clinicId: {
+                id: staffId,
+                clinicId: user.clinicId,
+            },
             clinicId: user.clinicId,
         },
     });
@@ -157,7 +165,10 @@ const updateStaffData = async (
 
     const response = await prisma.staff.update({
         where: {
-            id: exists.id,
+            id_clinicId: {
+                id: staffId,
+                clinicId: user.clinicId,
+            },
         },
         data: {
             ...payload,
@@ -174,7 +185,10 @@ const updateStaffData = async (
 const deleteStaffData = async (staffId: number, user: JwtPayload) => {
     const exists = await prisma.staff.findUnique({
         where: {
-            id: staffId,
+            id_clinicId: {
+                id: staffId,
+                clinicId: user.clinicId,
+            },
             clinicId: user.clinicId,
         },
     });
@@ -185,7 +199,10 @@ const deleteStaffData = async (staffId: number, user: JwtPayload) => {
 
     const response = await prisma.staff.delete({
         where: {
-            id: exists.id,
+            id_clinicId: {
+                id: staffId,
+                clinicId: user.clinicId,
+            },
         },
     });
 
@@ -196,7 +213,11 @@ const deleteStaffData = async (staffId: number, user: JwtPayload) => {
 };
 
 // Update Staff working hours
-const updateWorkingHours = async (staffId: string, payload: any) => {};
+const updateWorkingHours = async (
+    staffId: number,
+    payload: any,
+    user: JwtPayload
+) => {};
 
 // Get Staff Schedule
 const getStaffSchedules = async (clientTimezone: string, user: JwtPayload) => {

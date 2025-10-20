@@ -182,7 +182,7 @@ model Branding {
 // @IdMod
 model Staff {
     dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id   Int
 
     name           String
     phone          String
@@ -203,7 +203,7 @@ model Staff {
     user         User?         @relation(fields: [userId], references: [id])
 
     disciplineId String     @db.ObjectId
-    discipline   Discipline @relation(fields: [disciplineId], references: [dbId])
+    discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
     clinicId String @db.ObjectId
     clinic   Clinic @relation(fields: [clinicId], references: [id])
@@ -217,6 +217,7 @@ model Staff {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    @@unique([id, clinicId])
     @@map("staffs")
 }
 
@@ -247,7 +248,6 @@ model Holiday {
 
     date   DateTime @db.Date
     reason String
-    time   String? // Saveable to DB, but can't be calculated
 
     staffId String @unique @db.ObjectId
     staff   Staff  @relation(fields: [staffId], references: [dbId])
@@ -261,7 +261,7 @@ model Holiday {
 // @IdMod
 model Patient {
     dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id   Int
 
     firstName String
     lastName  String?
@@ -303,22 +303,25 @@ model Patient {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    @@unique([id, clinicId])
     @@map("patients")
 }
 
 // @IdMod
 model Appointment {
     dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id   Int
+
+    clinicId String @db.ObjectId
 
     patientId String  @db.ObjectId
     patient   Patient @relation(fields: [patientId], references: [dbId])
 
     disciplineId String     @db.ObjectId
-    discipline   Discipline @relation(fields: [disciplineId], references: [dbId])
+    discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
     serviceId String  @db.ObjectId
-    service   Service @relation(fields: [serviceId], references: [dbId])
+    service   Service @relation(fields: [serviceId], references: [id])
 
     specialistId String @db.ObjectId
     specialist   Staff  @relation(fields: [specialistId], references: [dbId])
@@ -335,13 +338,12 @@ model Appointment {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    @@unique([id, clinicId])
     @@map("appointments")
 }
 
-// @IdMod
 model Discipline {
-    dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id String @id @default(auto()) @map("_id") @db.ObjectId
 
     name String
 
@@ -359,10 +361,8 @@ model Discipline {
     @@map("disciplines")
 }
 
-// @IdMod
 model Service {
-    dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id String @id @default(auto()) @map("_id") @db.ObjectId
 
     name String
 
@@ -370,7 +370,7 @@ model Service {
     duration Int // In minutes
 
     disciplineId String     @db.ObjectId
-    discipline   Discipline @relation(fields: [disciplineId], references: [dbId])
+    discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
     bonds        Bond[]
     products     Product[]
@@ -385,11 +385,15 @@ model Service {
 // @IdMod
 model Voucher {
     dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id   Int
 
-    name String
-
+    name  String
     price Float
+
+    clinicId String @db.ObjectId
+
+    patientId String?  @db.ObjectId
+    patient   Patient? @relation(fields: [patientId], references: [dbId])
 
     expireDate DateTime
     status     ActivityStatus @default(ACTIVE)
@@ -398,27 +402,28 @@ model Voucher {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    Patient   Patient? @relation(fields: [patientId], references: [dbId])
-    patientId String?  @db.ObjectId
 
+    @@unique([id, clinicId])
     @@map("vouchers")
 }
 
 // @IdMod
 model Bond {
     dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id   Int
 
     name String
+
+    clinicId String @db.ObjectId
 
     patientId String  @db.ObjectId
     patient   Patient @relation(fields: [patientId], references: [dbId])
 
     disciplineId String     @db.ObjectId
-    discipline   Discipline @relation(fields: [disciplineId], references: [dbId])
+    discipline   Discipline @relation(fields: [disciplineId], references: [id])
 
     serviceId String  @db.ObjectId
-    service   Service @relation(fields: [serviceId], references: [dbId])
+    service   Service @relation(fields: [serviceId], references: [id])
     sessions  Int
 
     price Float
@@ -429,6 +434,7 @@ model Bond {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    @@unique([id, clinicId])
     @@map("bonds")
 }
 
@@ -448,7 +454,7 @@ model Product {
     bond   Bond?   @relation(fields: [bondId], references: [dbId])
 
     serviceId String?  @db.ObjectId
-    service   Service? @relation(fields: [serviceId], references: [dbId])
+    service   Service? @relation(fields: [serviceId], references: [id])
 
     otherId String?
     other   Json?
@@ -462,7 +468,7 @@ model Product {
 // @IdMod
 model Invoice {
     dbId String @id @default(auto()) @map("_id") @db.ObjectId
-    id   Int    @unique
+    id   Int
 
     clinicId String @db.ObjectId
     clinic   Clinic @relation(fields: [clinicId], references: [id])
@@ -484,6 +490,7 @@ model Invoice {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    @@unique([id, clinicId])
     @@map("receipts")
 }
 

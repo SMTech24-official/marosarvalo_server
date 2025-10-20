@@ -33,7 +33,10 @@ const getReceiptDetailsById = catchAsync(
     async (req: Request, res: Response) => {
         const id = getValidatedIntId(req.params.id);
 
-        const result = await ReceiptServices.getReceiptDetailsById(id);
+        const result = await ReceiptServices.getReceiptDetailsById(
+            id,
+            req.user
+        );
         sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
@@ -47,7 +50,7 @@ const getReceiptDetailsById = catchAsync(
 const deleteReceipt = catchAsync(async (req: Request, res: Response) => {
     const id = getValidatedIntId(req.params.id);
 
-    const result = await ReceiptServices.deleteReceipt(id);
+    const result = await ReceiptServices.deleteReceipt(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,

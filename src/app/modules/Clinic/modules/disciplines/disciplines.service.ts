@@ -65,9 +65,6 @@ const createDiscipline = async (
     const response = await prisma.discipline.create({
         data: {
             ...payload,
-            id:
-                (await getMaxSequence({ model: prisma.discipline, next: true })) ??
-                0,
             clinicId: user.clinicId,
         },
     });
@@ -80,7 +77,7 @@ const createDiscipline = async (
 
 // Update Discipline
 const updateDiscipline = async (
-    disciplineId: number,
+    disciplineId: string,
     payload: UpdateDisciplineInput,
     user: JwtPayload
 ) => {
@@ -116,7 +113,7 @@ const updateDiscipline = async (
 };
 
 // Delete Discipline
-const deleteDiscipline = async (disciplineId: number, user: JwtPayload) => {
+const deleteDiscipline = async (disciplineId: string, user: JwtPayload) => {
     const discipline = await prisma.discipline.findUnique({
         where: {
             id: disciplineId,

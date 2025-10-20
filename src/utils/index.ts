@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 
 interface GetMaxSequenceParams {
     model: any;
+    filter: Record<string, any>;
     target?: string;
     next?: boolean;
 }
@@ -13,10 +14,12 @@ interface GetMaxSequenceParams {
  */
 export async function getMaxSequence({
     model,
+    filter = {},
     target = "id",
     next = false,
 }: GetMaxSequenceParams): Promise<number | null> {
     const record = await model.findFirst({
+        where: { ...filter },
         orderBy: { [target]: "desc" },
         select: { [target]: true },
     });
