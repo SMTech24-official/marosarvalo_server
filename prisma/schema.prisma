@@ -211,8 +211,8 @@ model Staff {
     status ActivityStatus @default(ACTIVE)
 
     // Working Hours and Holiday
-    workingHour WorkingHour?
-    holiday     Holiday?
+    workingHour StaffWorkingHour?
+    holiday     StaffHoliday?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -221,7 +221,7 @@ model Staff {
     @@map("staffs")
 }
 
-model WorkingHour {
+model StaffWorkingHour {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
     // Times based on Days - Can be Empty
@@ -243,7 +243,7 @@ model WorkingHour {
     @@map("working_hours")
 }
 
-model Holiday {
+model StaffHoliday {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
     date   DateTime @db.Date

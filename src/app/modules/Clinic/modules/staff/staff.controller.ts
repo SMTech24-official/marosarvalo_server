@@ -67,6 +67,36 @@ const deleteStaffData = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// Update Staff Working Hours
+const updateWorkingHours = catchAsync(async (req: Request, res: Response) => {
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await StaffServices.updateWorkingHours(
+        id,
+        req.body,
+        req.user
+    );
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Insert Staff Holiday
+const insertHoliday = catchAsync(async (req: Request, res: Response) => {
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await StaffServices.insertHoliday(id, req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
 // Get Staff Schedules
 const getStaffSchedules = catchAsync(async (req: Request, res: Response) => {
     const clientTimezone = req.headers["x-client-timezone"] || "UTC";
@@ -90,5 +120,7 @@ export default {
     getStaffById,
     updateStaffData,
     deleteStaffData,
+    updateWorkingHours,
+    insertHoliday,
     getStaffSchedules,
 };

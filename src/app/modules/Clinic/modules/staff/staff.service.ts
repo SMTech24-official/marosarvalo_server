@@ -4,7 +4,12 @@ import { Staff, UserRole } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
-import { CreateStaffInput, UpdateStaffInput } from "./staff.validation";
+import {
+    CreateStaffInput,
+    InsertHolidayInput,
+    UpdateStaffInput,
+    UpdateWorkingHourInput,
+} from "./staff.validation";
 import { hashPassword } from "../../../../../helpers/passwordHelpers";
 import { endOfDay, startOfDay } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
@@ -215,9 +220,75 @@ const deleteStaffData = async (staffId: number, user: JwtPayload) => {
 // Update Staff working hours
 const updateWorkingHours = async (
     staffId: number,
-    payload: any,
+    payload: UpdateWorkingHourInput,
     user: JwtPayload
-) => {};
+) => {
+    const staffData = await prisma.staff.findUnique({
+        where: {
+            id_clinicId: {
+                id: staffId,
+                clinicId: user.clinicId,
+            },
+        },
+        select: {
+            dbId: true,
+            id: true,
+        },
+    });
+
+    if (!staffData) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+    }
+
+    const response = await prisma.staffWorkingHour.upsert({
+        where: {
+            staffId: staffData.dbId,
+        },
+        create: {
+            ...payload,
+            staffId: staffData.dbId,
+        },
+        update: {
+            ...payload,
+        },
+    });
+
+    return {
+        message: "Staff Working Hours updated",
+        data: response,
+    };
+};
+
+// Add staff Holiday
+const insertHoliday = async (
+    staffId: number,
+    payload: InsertHolidayInput,
+    user: JwtPayload
+) => {
+    const staffData = await prisma.staff.findUnique({
+        where: {
+            id_clinicId: {
+                id: staffId,
+                clinicId: user.clinicId,
+            },
+        },
+    });
+    if (!staffData) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+    }
+
+    const response = await prisma.staffHoliday.create({
+        data: {
+            ...payload,
+            staffId: staffData.dbId,
+        },
+    });
+
+    return {
+        message: "Staff Holiday inserted",
+        data: response,
+    };
+};
 
 // Get Staff Schedule
 const getStaffSchedules = async (clientTimezone: string, user: JwtPayload) => {
@@ -299,4 +370,6 @@ export default {
     updateStaffData,
     deleteStaffData,
     getStaffSchedules,
+    updateWorkingHours,
+    insertHoliday,
 };

@@ -9,7 +9,7 @@ const router = Router();
 router.post(
     "/",
     validateRequest(staffValidations.createStaffSchema),
-    StaffControllers.createNewStaff,
+    StaffControllers.createNewStaff
 );
 
 // Get All Staff
@@ -22,11 +22,25 @@ router.get("/:id", StaffControllers.getStaffById);
 router.patch(
     "/:id",
     validateRequest(staffValidations.updateStaffSchema),
-    StaffControllers.updateStaffData,
+    StaffControllers.updateStaffData
 );
 
 // Delete Staff data
 router.delete("/:id", StaffControllers.deleteStaffData);
+
+// Update Staff Working Hours
+router.patch(
+    "/:id/working-hours",
+    validateRequest(staffValidations.updateWorkingHoursSchema),
+    StaffControllers.updateWorkingHours
+);
+
+// Insert Staff Holiday
+router.post(
+    "/:id/holiday",
+    validateRequest(staffValidations.insertHolidayInput),
+    StaffControllers.insertHoliday
+);
 
 // Get Staff Schedules
 router.get("/schedules", StaffControllers.getStaffSchedules);

@@ -27,7 +27,61 @@ const updateStaffSchema = z.object({
 });
 export type UpdateStaffInput = z.infer<typeof updateStaffSchema>;
 
+const updateWorkingHoursSchema = z.object({
+    saturday: z
+        .object({
+            from: z.object({ h: z.string(), m: z.string() }),
+            to: z.object({ h: z.string(), m: z.string() }),
+        })
+        .optional(),
+    sunday: z
+        .object({
+            from: z.object({ h: z.string(), m: z.string() }),
+            to: z.object({ h: z.string(), m: z.string() }),
+        })
+        .optional(),
+    monday: z
+        .object({
+            from: z.object({ h: z.string(), m: z.string() }),
+            to: z.object({ h: z.string(), m: z.string() }),
+        })
+        .optional(),
+    tuesday: z
+        .object({
+            from: z.object({ h: z.string(), m: z.string() }),
+            to: z.object({ h: z.string(), m: z.string() }),
+        })
+        .optional(),
+    wednesday: z
+        .object({
+            from: z.object({ h: z.string(), m: z.string() }),
+            to: z.object({ h: z.string(), m: z.string() }),
+        })
+        .optional(),
+    thursday: z
+        .object({
+            from: z.object({ h: z.string(), m: z.string() }),
+            to: z.object({ h: z.string(), m: z.string() }),
+        })
+        .optional(),
+    friday: z
+        .object({
+            from: z.object({ h: z.string(), m: z.string() }),
+            to: z.object({ h: z.string(), m: z.string() }),
+        })
+        .optional(),
+});
+export type UpdateWorkingHourInput = z.infer<typeof updateWorkingHoursSchema>;
+
+const insertHolidayInput = z.object({
+    date: z.date(),
+    reason: z.string(),
+});
+export type InsertHolidayInput = z.infer<typeof insertHolidayInput>;
+
 export default {
     createStaffSchema,
     updateStaffSchema,
+    updateWorkingHoursSchema,
+    insertHolidayInput,
 };

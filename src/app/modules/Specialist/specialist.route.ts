@@ -1,33 +1,12 @@
 import { Router } from "express";
 import SpecialistControllers from "./specialist.controller";
+import moduleRoutes from "./routes";
 
 const router = Router();
 
-// Get Appointments Count
-router.get("/appointments/count", SpecialistControllers.getAppointmentsCount);
+moduleRoutes.forEach((route) => router.use(route.path, ...route.handlers));
 
-// Get Doctors Count
-router.get("/doctors/count", SpecialistControllers.getDoctorsCount);
-
-// Get New Customers Count
-router.get("/customers/count", SpecialistControllers.getNewCustomersCount);
-
-// Get Appointments Overview
-router.get(
-    "/appointments/overview",
-    SpecialistControllers.getAppointmentsOverview,
-);
-
-// Get Upcoming Appointments
-router.get(
-    "/appointments/upcoming",
-    SpecialistControllers.getUpcomingAppointments,
-);
-
-// Get Appointments Calendar
-router.get(
-    "/appointments/calendar",
-    SpecialistControllers.getAppointmentsCalender,
-);
+// Get Specialists Count
+router.get("/count", SpecialistControllers.getDoctorsCount);
 
 export const SpecialistRoutes = router;
