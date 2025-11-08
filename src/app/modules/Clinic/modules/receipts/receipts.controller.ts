@@ -35,7 +35,7 @@ const getReceiptDetailsById = catchAsync(
 
         const result = await ReceiptServices.getReceiptDetailsById(
             id,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -43,7 +43,7 @@ const getReceiptDetailsById = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Delete Receipt

@@ -20,7 +20,7 @@ const getDisciplines = catchAsync(async (req: Request, res: Response) => {
 const createDiscipline = catchAsync(async (req: Request, res: Response) => {
     const result = await DisciplineServices.createDiscipline(
         req.body,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -37,7 +37,7 @@ const updateDiscipline = catchAsync(async (req: Request, res: Response) => {
     const result = await DisciplineServices.updateDiscipline(
         id,
         req.body,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -75,12 +75,11 @@ const getAppointmentDisciplines = catchAsync(
     },
 );
 
-
 // Export all functions
 export default {
     getDisciplines,
     createDiscipline,
     updateDiscipline,
     deleteDiscipline,
-    getAppointmentDisciplines
+    getAppointmentDisciplines,
 };

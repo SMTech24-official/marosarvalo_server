@@ -4,18 +4,13 @@ import ApiError from "../../../errors/ApiErrors";
 import bcrypt from "bcrypt";
 import { type CreateAdminInput } from "./admin.validation";
 import QueryBuilder from "../../../utils/queryBuilder";
-import {
-    Clinic,
-    Subscription,
-} from "@prisma/client";
+import { Clinic, Subscription } from "@prisma/client";
 import { groupRevenue, Payment } from "./admin.utils";
 
-export type FilterBy = "day" | "week" | "month" | "year" | undefined
+export type FilterBy = "day" | "week" | "month" | "year" | undefined;
 
 // Get Admin Dashboard Stats
-const getAdminDashboardStats = async (query: {
-    filterBy: FilterBy;
-}) => {
+const getAdminDashboardStats = async (query: { filterBy: FilterBy }) => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 

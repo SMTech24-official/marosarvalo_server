@@ -22,9 +22,9 @@ const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
 
 // Get Specialists Count
 const getSpecialistsCount = catchAsync(async (req: Request, res: Response) => {
-    const result = await AppointmentsServices.getSpecialistsCount(
-        { filterBy: req.query.filterBy as Exclude<FilterBy, "year"> },
-    );
+    const result = await AppointmentsServices.getSpecialistsCount({
+        filterBy: req.query.filterBy as Exclude<FilterBy, "year">,
+    });
 
     sendResponse(res, {
         success: true,

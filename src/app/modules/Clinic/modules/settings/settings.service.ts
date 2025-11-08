@@ -16,7 +16,7 @@ const getBasicInfo = async (user: JwtPayload) => {
         },
     });
 
-    const clinic = userData?.clinic
+    const clinic = userData?.clinic;
 
     const formattedData = {
         name: clinic?.name,

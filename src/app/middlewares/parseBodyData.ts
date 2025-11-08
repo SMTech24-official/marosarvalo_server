@@ -9,7 +9,7 @@ export const parseBodyData = async (
         try {
             req.body = JSON.parse(req.body.bodyData);
         } catch (err) {
-            console.log(err)
+            console.log(err);
             return res.status(400).json({
                 success: false,
                 message: "Invalid JSON format in bodyData",

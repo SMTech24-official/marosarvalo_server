@@ -206,19 +206,22 @@ const getReceiptDetailsById = async (id: number, user: JwtPayload) => {
             };
             switch (product.type) {
                 case "BOND":
-                    data["name"] = product.bond?.name
-                    data["price"] = product.bond?.price
-                    data["total"] = (product.bond?.price ?? 0) * product.quantity;
+                    data["name"] = product.bond?.name;
+                    data["price"] = product.bond?.price;
+                    data["total"] =
+                        (product.bond?.price ?? 0) * product.quantity;
                     break;
                 case "SERVICE":
-                    data["name"] = product.service?.name
-                    data["price"] = product.service?.price
-                    data["total"] = (product.service?.price ?? 0) * product.quantity;
+                    data["name"] = product.service?.name;
+                    data["price"] = product.service?.price;
+                    data["total"] =
+                        (product.service?.price ?? 0) * product.quantity;
                     break;
                 case "VOUCHER":
-                    data["name"] = product.voucher?.name
-                    data["price"] = product.voucher?.price
-                    data["total"] = (product.voucher?.price ?? 0) * product.quantity;
+                    data["name"] = product.voucher?.name;
+                    data["price"] = product.voucher?.price;
+                    data["total"] =
+                        (product.voucher?.price ?? 0) * product.quantity;
                     break;
                 case "OTHER":
                     break;

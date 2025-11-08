@@ -14,7 +14,7 @@ const getServicesStatistics = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Services List

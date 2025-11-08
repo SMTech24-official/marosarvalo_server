@@ -199,5 +199,5 @@ export default {
     createDiscipline,
     updateDiscipline,
     deleteDiscipline,
-    getAppointmentDisciplines
+    getAppointmentDisciplines,
 };

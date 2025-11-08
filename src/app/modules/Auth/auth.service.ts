@@ -161,7 +161,7 @@ const refreshToken = async (payload: { refreshToken: string }) => {
             config.jwt.jwt_secret as string,
         );
     } catch (err) {
-        console.log(err)
+        console.log(err);
         throw new ApiError(
             httpStatus.BAD_REQUEST,
             "Refresh Token is Invalid or Expired",

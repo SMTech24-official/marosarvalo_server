@@ -3,7 +3,7 @@ import { format, getWeek, getYear } from "date-fns";
 type FilterBy = "day" | "week" | "month" | "year" | undefined;
 
 export interface Payment {
-    paidAt: Date
+    paidAt: Date;
     package: { price: number };
 }
 

@@ -58,7 +58,7 @@ export const getAttendanceStats = (
 
 type ServiceItem = {
     service: {
-        id: string | number
+        id: string | number;
         name: string;
     };
 };

@@ -5,9 +5,9 @@ import { FilterBy, getDateRange } from "../../specialist.utils";
 // Get Appointments Count
 const getNewCustomersCount = async (
     query: {
-        filterBy: Exclude<FilterBy, "year">
+        filterBy: Exclude<FilterBy, "year">;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const userData = await prisma.user.findUnique({
         where: {

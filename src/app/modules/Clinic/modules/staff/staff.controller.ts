@@ -74,7 +74,7 @@ const updateWorkingHours = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.updateWorkingHours(
         id,
         req.body,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -103,7 +103,7 @@ const getStaffSchedules = catchAsync(async (req: Request, res: Response) => {
 
     const result = await StaffServices.getStaffSchedules(
         clientTimezone as string,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

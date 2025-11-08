@@ -46,7 +46,10 @@ const getServicesStatistics = async (user: JwtPayload) => {
 };
 
 // Get Services list
-const getServices = async (query: Record<string, unknown>, user: JwtPayload) => {
+const getServices = async (
+    query: Record<string, unknown>,
+    user: JwtPayload,
+) => {
     const queryBuilder = new QueryBuilder(prisma.service, query);
 
     const services: (Service & {
@@ -118,7 +121,7 @@ const createService = async (payload: CreateServiceInput) => {
 const updateService = async (
     serviceId: string,
     payload: UpdateServiceInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const service = await prisma.service.findUnique({
         where: {

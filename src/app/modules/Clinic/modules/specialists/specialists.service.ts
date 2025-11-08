@@ -6,7 +6,7 @@ import { FilterBy } from "../../../Admin/admin.service";
 // Get Specialists Count
 const getSpecialistsCount = async (
     query: {
-        filterBy: Exclude<FilterBy, "year">
+        filterBy: Exclude<FilterBy, "year">;
     },
     user: JwtPayload,
 ) => {

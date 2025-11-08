@@ -92,7 +92,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
                 appointments.length === 0
                     ? 0
                     : (appointments.filter(
-                          (item) => item.status === "CANCELLED"
+                          (item) => item.status === "CANCELLED",
                       ).length /
                           appointments.length) *
                       100,
@@ -108,7 +108,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
 // Get cancellation Info
 const getCancellationInfo = async (
     query: Record<string, unknown>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 

@@ -9,7 +9,7 @@ const router = Router();
 router.post(
     "/",
     validateRequest(reminderValidations.createReminderScheduleSchema),
-    ReminderControllers.createReminderSchedules
+    ReminderControllers.createReminderSchedules,
 );
 
 // Get Reminder Schedules
@@ -19,7 +19,7 @@ router.get("/", ReminderControllers.getReminderSchedules);
 router.patch(
     "/:id",
     validateRequest(reminderValidations.updateReminderScheduleSchema),
-    ReminderControllers.updateSchedule
+    ReminderControllers.updateSchedule,
 );
 
 // Delete Reminder Schedule

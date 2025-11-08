@@ -6,7 +6,7 @@ import { FilterBy, getDateRange } from "./specialist.utils";
 
 // Get Specialists Count
 const getSpecialistsCount = async (query: {
-    filterBy: Exclude<FilterBy, "year">
+    filterBy: Exclude<FilterBy, "year">;
 }) => {
     const count = await prisma.user.count({
         where: {

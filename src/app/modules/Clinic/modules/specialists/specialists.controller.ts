@@ -9,7 +9,7 @@ import { FilterBy } from "../../../Admin/admin.service";
 // Get Doctors Count
 const getSpecialistsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await SpecialistsService.getSpecialistsCount(
-        {filterBy: req.query.filterBy as Exclude<FilterBy, "year">},
+        { filterBy: req.query.filterBy as Exclude<FilterBy, "year"> },
         req.user,
     );
     sendResponse(res, {
