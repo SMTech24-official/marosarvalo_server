@@ -16,14 +16,14 @@ const getBasicInfo = async (user: JwtPayload) => {
         },
     });
 
-    const clinic = userData?.clinic!;
+    const clinic = userData?.clinic
 
     const formattedData = {
-        name: clinic.name,
-        phone: clinic.phone,
-        email: clinic.email,
-        address1: clinic.address1,
-        address2: clinic.address2,
+        name: clinic?.name,
+        phone: clinic?.phone,
+        email: clinic?.email,
+        address1: clinic?.address1,
+        address2: clinic?.address2,
     };
 
     return {
@@ -133,9 +133,7 @@ const updateBrandingInfo = async (
 };
 
 // Get Subscription data
-const getSubscriptionData = async (user: JwtPayload) => {
-    // const subscription = await prisma.subscription.
-};
+// const getSubscriptionData = async (user: JwtPayload) => {};
 
 // Export functions
 export default {

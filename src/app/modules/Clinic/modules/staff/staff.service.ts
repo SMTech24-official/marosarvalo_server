@@ -83,7 +83,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
 };
 
 // Get All Staff
-const getAllStaff = async (query: Record<string, any>, user: JwtPayload) => {
+const getAllStaff = async (query: Record<string, unknown>, user: JwtPayload) => {
     const queryBuilder = new QueryBuilder(prisma.staff, query);
 
     const staffs: (Staff & {
@@ -339,7 +339,7 @@ const getStaffSchedules = async (clientTimezone: string, user: JwtPayload) => {
             to: { h: string; m: string };
         } | null = null;
         if (staff.workingHour) {
-            todaySch = (staff.workingHour as Record<typeof today, any>)[
+            todaySch = (staff.workingHour as Record<typeof today, unknown>)[
                 today
             ] as {
                 from: { h: string; m: string };

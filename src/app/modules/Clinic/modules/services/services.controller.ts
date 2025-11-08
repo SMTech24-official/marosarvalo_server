@@ -3,7 +3,6 @@ import httpStatus from "http-status";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import ServiceServices from "./services.service";
-import { getValidatedIntId } from "../../../../../utils";
 
 // Get Services Statistics
 const getServicesStatistics = catchAsync(

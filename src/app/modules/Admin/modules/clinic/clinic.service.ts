@@ -71,7 +71,7 @@ const createNewClinic = async (body: CreateClinicInput) => {
 };
 
 // Get All Clinics
-const getAllClinic = async (query: Record<string, any>) => {
+const getAllClinic = async (query: Record<string, unknown>) => {
     const queryBuilder = new QueryBuilder(prisma.clinic, query);
 
     const clinics: (Clinic & {

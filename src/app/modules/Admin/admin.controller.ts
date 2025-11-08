@@ -3,16 +3,16 @@ import type { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import AdminServices from "./admin.service";
+import AdminServices, { FilterBy } from "./admin.service";
 
 // Get Admin Dashboard Stats
 const getAdminDashboardStats = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AdminServices.getAdminDashboardStats(
-            req.query as any,
+            {filterBy: req.query.filterBy as FilterBy},
         );
 
-        sendResponse(res, {
+        sendResponse(res, { 
             success: true,
             statusCode: httpStatus.OK,
             message: result.message,

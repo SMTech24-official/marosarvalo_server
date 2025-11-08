@@ -1,4 +1,4 @@
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import httpStatus from "http-status";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -40,7 +40,7 @@ app.use("/api/v1", router);
 app.use(GlobalErrorHandler);
 
 // 404 Not Found handler
-app.use((req: Request, res: Response, next: NextFunction) => {
+app.use((req: Request, res: Response) => {
     res.status(httpStatus.NOT_FOUND).json({
         success: false,
         message: "API NOT FOUND!",

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 class QueryBuilder {
     private model: any;
     private query: Record<string, unknown>;

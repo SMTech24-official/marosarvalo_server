@@ -8,12 +8,59 @@ import { groupAppointment } from "./appointments.utils";
 import { CreateAppointmentInput } from "./appointments.validation";
 import ApiError from "../../../../../errors/ApiErrors";
 import { getMaxSequence } from "../../../../../utils";
+import { FilterBy } from "../../../Admin/admin.service";
 
 // Create new Appointment - // TODO: Check availability of Specialist
 const createAppointment = async (
     payload: CreateAppointmentInput & { documents: string[] },
     user: JwtPayload
 ) => {
+    const appointmentExists = await prisma.appointment.findFirst({
+        where: {
+            OR: [
+                {
+                    specialistId: payload.specialistId,
+                },
+                {
+                    patientId: payload.patientId,
+                },
+            ],
+            timeSlot: payload.timeSlot,
+            date: payload.date,
+            clinicId: user.clinicId,
+        },
+        select: {
+            id: true,
+            specialistId: true,
+            patientId: true
+        },
+    });
+
+    if (appointmentExists) {
+        throw new ApiError(
+            httpStatus.CONFLICT,
+            appointmentExists.specialistId === payload.specialistId ? "Specialist is not available in this timeslot" : "Patient already has Appointment in this timeslot"
+        );
+    }
+
+    const holiday = await prisma.staffHoliday.findMany({
+        where: {
+            staffId: payload.specialistId,
+        },
+    });
+
+    // Check if the Appointment day is same as specialist's any holiday
+    const isHoliday = holiday.some(
+        (h) => h.date.toDateString() === new Date(payload.date).toDateString()
+    );
+
+    if (isHoliday) {
+        throw new ApiError(
+            httpStatus.CONFLICT,
+            "Specialist is on holiday on this date"
+        );
+    }
+
     const response = await prisma.appointment.create({
         data: {
             ...payload,
@@ -35,7 +82,7 @@ const createAppointment = async (
 
 // Get Appointments
 const getAppointments = async (
-    query: Record<string, any>,
+    query: Record<string, unknown>,
     user: JwtPayload
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
@@ -274,7 +321,7 @@ const changeAppointmentStatus = async (
 // Get Appointments Count
 const getAppointmentsCount = async (
     query: {
-        filterBy: "day" | "week" | "month" | undefined;
+        filterBy: Exclude<FilterBy, "year">;
     },
     user: JwtPayload
 ) => {
@@ -299,7 +346,7 @@ const getAppointmentsCount = async (
 // Get Appointments Overview
 const getAppointmentsOverview = async (
     query: {
-        filterBy: "day" | "week" | "month" | "year" | undefined;
+        filterBy: FilterBy
     },
     user: JwtPayload
 ) => {
@@ -327,7 +374,7 @@ const getAppointmentsOverview = async (
 
 // Get Appointments Calendar
 const getAppointmentsCalender = async (
-    query: Record<string, any>,
+    query: Record<string, unknown>,
     user: JwtPayload
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);

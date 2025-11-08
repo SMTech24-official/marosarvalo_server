@@ -1,3 +1,6 @@
+/* eslint-disable prefer-const */
+
+
 type Slot = { date: Date; timeSlot: string };
 
 export const getNewestDate = (slots: Slot[]): Slot | null => {

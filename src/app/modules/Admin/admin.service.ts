@@ -6,15 +6,15 @@ import { type CreateAdminInput } from "./admin.validation";
 import QueryBuilder from "../../../utils/queryBuilder";
 import {
     Clinic,
-    ClinicOrder,
     Subscription,
-    SubscriptionStatus,
 } from "@prisma/client";
-import { groupRevenue } from "./admin.utils";
+import { groupRevenue, Payment } from "./admin.utils";
+
+export type FilterBy = "day" | "week" | "month" | "year" | undefined
 
 // Get Admin Dashboard Stats
 const getAdminDashboardStats = async (query: {
-    filterBy: "day" | "week" | "month" | "year" | undefined;
+    filterBy: FilterBy;
 }) => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -50,7 +50,7 @@ const getAdminDashboardStats = async (query: {
         0,
     );
 
-    const totalRevenue = groupRevenue(total as any, query.filterBy);
+    const totalRevenue = groupRevenue(total as Payment[], query.filterBy);
 
     return {
         message: "Dashboard Stats parsed successfully",
@@ -101,7 +101,7 @@ const createNewAdmin = async (body: CreateAdminInput) => {
 };
 
 // TODO:  Update subscription create with phone
-const getAllBookings = async (query: Record<string, any>) => {
+const getAllBookings = async (query: Record<string, unknown>) => {
     const queryBuilder = new QueryBuilder(prisma.subscription, query);
 
     const subscriptions: (Subscription & {
@@ -143,7 +143,7 @@ const getAllBookings = async (query: Record<string, any>) => {
 };
 
 // Get All Payments
-const getAllPaymentHistory = async (query: Record<string, any>) => {
+const getAllPaymentHistory = async (query: Record<string, unknown>) => {
     const queryBuilder = new QueryBuilder(prisma.subscription, query);
 
     const subscriptions: (Subscription & {

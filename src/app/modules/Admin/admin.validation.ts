@@ -9,7 +9,7 @@ const createAdminSchema = z.object({
 });
 export type CreateAdminInput = z.infer<typeof createAdminSchema>;
 
-const updateAdminSchema = z.object({});
+// const updateAdminSchema = z.object({});
 
 export default {
     createAdminSchema,

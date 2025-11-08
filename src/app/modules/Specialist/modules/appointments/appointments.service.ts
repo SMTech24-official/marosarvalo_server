@@ -3,14 +3,14 @@ import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { groupAppointment, parseTimeString } from "./appointments.utils";
-import { getDateRange } from "../../specialist.utils";
+import { FilterBy, getDateRange } from "../../specialist.utils";
 
 // Get Appointments Count
 const getAppointmentsCount = async (
     query: {
-        filterBy: "day" | "week" | "month" | undefined;
+        filterBy: Exclude<FilterBy, "year">;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const count = await prisma.appointment.count({
         where: {
@@ -29,7 +29,7 @@ const getAppointmentsCount = async (
 };
 // Get Appointments Count
 const getSpecialistsCount = async (query: {
-    filterBy: "day" | "week" | "month" | undefined;
+    filterBy: Exclude<FilterBy, "year">;
 }) => {
     const count = await prisma.user.count({
         where: {
@@ -48,9 +48,9 @@ const getSpecialistsCount = async (query: {
 // Get Appointment Overview
 const getAppointmentsOverview = async (
     query: {
-        filterBy: "day" | "week" | "month" | "year" | undefined;
+        filterBy: FilterBy;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const appointments = await prisma.appointment.findMany({
         where: {
@@ -74,8 +74,8 @@ const getAppointmentsOverview = async (
 
 // Get upcoming Appointments
 const getUpcomingAppointments = async (
-    query: Record<string, any>,
-    user: JwtPayload
+    query: Record<string, unknown>,
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -152,8 +152,8 @@ const getUpcomingAppointments = async (
 };
 
 const getAppointmentsCalender = async (
-    query: Record<string, any>,
-    user: JwtPayload
+    query: Record<string, unknown>,
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -242,7 +242,7 @@ const getAppointmentsCalender = async (
 // Set Appointment is Completed
 const setAppointmentCompleted = async (
     appointmentId: number,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const response = await prisma.appointment.update({
         where: {

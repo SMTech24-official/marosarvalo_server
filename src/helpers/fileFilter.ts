@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const fileFilter = (req: any, file: any, cb: any) => {
     const allowedMimeTypes = [
         "image/jpeg",

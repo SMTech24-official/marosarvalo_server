@@ -7,6 +7,7 @@ import ApiError from "../../../../../errors/ApiErrors";
 import config from "../../../../../config";
 import { AppointmentStatus } from "@prisma/client";
 import { getValidatedIntId } from "../../../../../utils";
+import { FilterBy } from "../../../Admin/admin.service";
 
 // Create Appointment
 const createAppointment = catchAsync(async (req: Request, res: Response) => {
@@ -37,7 +38,7 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
 // Get Appointments Count
 const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.getAppointmentsCount(
-        req.query as any,
+        {filterBy: req.query.filterBy as Exclude<FilterBy, "year">},
         req.user
     );
     sendResponse(res, {
@@ -81,7 +82,7 @@ const changeAppointmentStatus = catchAsync(
         const { status } = req.params;
         if (
             !Object.values(AppointmentStatus).includes(
-                status.toUpperCase() as any
+                status.toUpperCase() as AppointmentStatus
             )
         ) {
             throw new ApiError(
@@ -111,7 +112,7 @@ const changeAppointmentStatus = catchAsync(
 const getAppointmentsOverview = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentServices.getAppointmentsOverview(
-            req.query as any,
+            {filterBy: req.query.filterBy as FilterBy},
             req.user
         );
         sendResponse(res, {
@@ -127,7 +128,7 @@ const getAppointmentsOverview = catchAsync(
 const getAppointmentsCalender = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentServices.getAppointmentsCalender(
-            req.query as any,
+            req.query,
             req.user
         );
         sendResponse(res, {
@@ -143,7 +144,7 @@ const getAppointmentsCalender = catchAsync(
 // Get Appointments
 const getAppointments = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.getAppointments(
-        req.query as any,
+        req.query,
         req.user
     );
     sendResponse(res, {

@@ -1,11 +1,12 @@
 import { JwtPayload } from "jsonwebtoken";
 import { getDateRange } from "../../clinic.utils";
 import prisma from "../../../../../shared/prisma";
+import { FilterBy } from "../../../Admin/admin.service";
 
 // Get Specialists Count
 const getSpecialistsCount = async (
     query: {
-        filterBy: "day" | "week" | "month" | undefined;
+        filterBy: Exclude<FilterBy, "year">
     },
     user: JwtPayload,
 ) => {

@@ -94,7 +94,7 @@ export const parseTimeString = (timeStr: string) => {
     const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i);
     if (!match) throw new Error("Invalid time format");
 
-    let [_, hours, minutes, meridiem] = match;
+    const [, hours, minutes, meridiem] = match;
     let h = parseInt(hours, 10);
     const m = parseInt(minutes, 10);
 

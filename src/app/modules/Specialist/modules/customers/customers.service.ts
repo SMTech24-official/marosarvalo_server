@@ -1,11 +1,11 @@
 import prisma from "../../../../../shared/prisma";
 import { JwtPayload } from "jsonwebtoken";
-import { getDateRange } from "../../specialist.utils";
+import { FilterBy, getDateRange } from "../../specialist.utils";
 
 // Get Appointments Count
 const getNewCustomersCount = async (
     query: {
-        filterBy: "day" | "week" | "month" | undefined;
+        filterBy: Exclude<FilterBy, "year">
     },
     user: JwtPayload
 ) => {
@@ -22,7 +22,7 @@ const getNewCustomersCount = async (
                     specialistId: userData?.id,
                 },
             },
-            clinicId: userData?.clinicId!,
+            clinicId: userData?.clinicId as string,
             createdAt: getDateRange(query.filterBy),
         },
     });

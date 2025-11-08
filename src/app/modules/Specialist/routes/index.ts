@@ -1,6 +1,5 @@
 import { AppointmentsRoutes } from "../modules/appointments/appointments.route";
 import { CustomersRoutes } from "../modules/customers/customers.route";
-import auth from "../../../middlewares/auth";
 
 const moduleRoutes = [
     {
@@ -13,7 +12,7 @@ const moduleRoutes = [
     },
 ] satisfies {
     path: string;
-    handlers: any[];
+    handlers: unknown[];
 }[];
 
 export default moduleRoutes;

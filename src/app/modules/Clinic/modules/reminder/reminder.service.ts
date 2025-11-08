@@ -164,7 +164,7 @@ const updateReminderStatus = async (
 
 // Get History
 const getReminderScheduleHistory = async (
-    query: Record<string, any>,
+    query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(

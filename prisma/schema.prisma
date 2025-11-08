@@ -189,7 +189,7 @@ model Staff {
     email          String?
     profilePicture String?
 
-    dateOfBirth DateTime? @db.Date
+    dateOfBirth DateTime?
 
     employeeId String
     gender     Gender
@@ -246,7 +246,7 @@ model StaffWorkingHour {
 model StaffHoliday {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
-    date   DateTime @db.Date
+    date   DateTime
     reason String
 
     staffId String @unique @db.ObjectId

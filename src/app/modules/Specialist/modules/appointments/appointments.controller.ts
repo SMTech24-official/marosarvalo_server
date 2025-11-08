@@ -4,12 +4,13 @@ import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import AppointmentsServices from "./appointments.service";
 import { getValidatedIntId } from "../../../../../utils";
+import { FilterBy } from "../../specialist.utils";
 
 // Get Appointments Count
 const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentsServices.getAppointmentsCount(
-        req.query as any,
-        req.user
+        { filterBy: req.query.filterBy as Exclude<FilterBy, "year"> },
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -22,7 +23,7 @@ const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
 // Get Specialists Count
 const getSpecialistsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentsServices.getSpecialistsCount(
-        req.query as any
+        { filterBy: req.query.filterBy as Exclude<FilterBy, "year"> },
     );
 
     sendResponse(res, {
@@ -37,8 +38,8 @@ const getSpecialistsCount = catchAsync(async (req: Request, res: Response) => {
 const getAppointmentsOverview = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentsServices.getAppointmentsOverview(
-            req.query as any,
-            req.user
+            { filterBy: req.query.filterBy as FilterBy },
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -46,15 +47,15 @@ const getAppointmentsOverview = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Upcoming Appointments
 const getUpcomingAppointments = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentsServices.getUpcomingAppointments(
-            req.query as any,
-            req.user
+            req.query as Record<string, unknown>,
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -63,15 +64,15 @@ const getUpcomingAppointments = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Get Appointments Calendar
 const getAppointmentsCalender = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentsServices.getAppointmentsCalender(
-            req.query as any,
-            req.user
+            req.query as Record<string, unknown>,
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -80,7 +81,7 @@ const getAppointmentsCalender = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Set Appointment Completed
@@ -90,7 +91,7 @@ const setAppointmentCompleted = catchAsync(
 
         const result = await AppointmentsServices.setAppointmentCompleted(
             id,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -98,7 +99,7 @@ const setAppointmentCompleted = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 export default {

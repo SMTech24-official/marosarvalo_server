@@ -9,10 +9,9 @@ import {
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { Discipline } from "@prisma/client";
-import { getMaxSequence } from "../../../../../utils";
 
 // Get disciplines
-const getDisciplines = async (query: Record<string, any>, user: JwtPayload) => {
+const getDisciplines = async (query: Record<string, unknown>, user: JwtPayload) => {
     const queryBuilder = new QueryBuilder(prisma.discipline, query);
 
     const disciplines: (Discipline & {

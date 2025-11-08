@@ -23,7 +23,14 @@ const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
             products: {
                 createMany: {
                     data: payload.products.map((product) => {
-                        const data: any = {
+                        const data: {
+                            type: ProductType;
+                            quantity: number;
+                            bondId?: string;
+                            serviceId?: string;
+                            voucherId?: string;
+                            otherId?: string;
+                        } = {
                             type: product.type,
                             quantity: product.quantity,
                         };
@@ -59,7 +66,10 @@ const createReceipt = async (payload: CreateReceiptInput, user: JwtPayload) => {
 };
 
 // Get Receipts
-const getReceipts = async (query: Record<string, any>, user: JwtPayload) => {
+const getReceipts = async (
+    query: Record<string, unknown>,
+    user: JwtPayload,
+) => {
     const queryBuilder = new QueryBuilder(prisma.invoice, query);
 
     const receipts: (Invoice & {
@@ -187,31 +197,28 @@ const getReceiptDetailsById = async (id: number, user: JwtPayload) => {
             const data: {
                 type: typeof product.type;
                 quantity: number;
-                name: string | null;
-                price: number | null;
-                total: number | null;
+                name?: string;
+                price?: number;
+                total?: number;
             } = {
                 type: product.type,
                 quantity: product.quantity,
-                name: null,
-                price: null,
-                total: null,
             };
             switch (product.type) {
                 case "BOND":
-                    data["name"] = product.bond?.name!;
-                    data["price"] = product.bond?.price!;
-                    data["total"] = product.bond?.price! * product.quantity;
+                    data["name"] = product.bond?.name
+                    data["price"] = product.bond?.price
+                    data["total"] = (product.bond?.price ?? 0) * product.quantity;
                     break;
                 case "SERVICE":
-                    data["name"] = product.service?.name!;
-                    data["price"] = product.service?.price!;
-                    data["total"] = product.service?.price! * product.quantity;
+                    data["name"] = product.service?.name
+                    data["price"] = product.service?.price
+                    data["total"] = (product.service?.price ?? 0) * product.quantity;
                     break;
                 case "VOUCHER":
-                    data["name"] = product.voucher?.name!;
-                    data["price"] = product.voucher?.price!;
-                    data["total"] = product.voucher?.price! * product.quantity;
+                    data["name"] = product.voucher?.name
+                    data["price"] = product.voucher?.price
+                    data["total"] = (product.voucher?.price ?? 0) * product.quantity;
                     break;
                 case "OTHER":
                     break;

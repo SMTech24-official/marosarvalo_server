@@ -6,12 +6,13 @@ import PatientServices from "./patients.service";
 import ApiError from "../../../../../errors/ApiErrors";
 import config from "../../../../../config";
 import { getValidatedIntId } from "../../../../../utils";
+import { FilterBy } from "../../../Admin/admin.service";
 
 // Get new Patients Count
 const getNewPatientsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await PatientServices.getNewPatientsCount(
-        req.query as any,
-        req.user
+        { filterBy: req.query.filterBy as Exclude<FilterBy, "year"> },
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -33,13 +34,13 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
     }
 
     req.body.guardianDocuments = guardianDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
     req.body.documents = documents.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
     req.body.otherDocuments = otherDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
 
     const result = await PatientServices.createPatient(req.body, req.user);
@@ -86,7 +87,7 @@ const getPatientAppointments = catchAsync(
         const result = await PatientServices.getPatientAppointments(
             id,
             req.query,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -95,7 +96,7 @@ const getPatientAppointments = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Get Patient Bonds
@@ -105,7 +106,7 @@ const getPatientBonds = catchAsync(async (req: Request, res: Response) => {
     const result = await PatientServices.getPatientBonds(
         id,
         req.query,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,

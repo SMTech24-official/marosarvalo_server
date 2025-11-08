@@ -2,8 +2,8 @@ import { format, getWeek, getYear } from "date-fns";
 
 type FilterBy = "day" | "week" | "month" | "year" | undefined;
 
-interface Payment {
-    paidAt: Date;
+export interface Payment {
+    paidAt: Date
     package: { price: number };
 }
 

@@ -20,7 +20,7 @@ const sendReminder = async (payload: SendReminderInput) => {
 };
 
 // Get all Reminders
-const getReminders = async (query: Record<string, any>) => {
+const getReminders = async (query: Record<string, unknown>) => {
     const queryBuilder = new QueryBuilder(prisma.adminReminder, query);
 
     const reminders = await queryBuilder

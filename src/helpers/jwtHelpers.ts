@@ -5,9 +5,7 @@ const generateToken = (
     secret: Secret,
     expiresIn: string,
 ): string => {
-    let token: string;
-
-    token = jwt.sign(payload, secret, {
+    const token = jwt.sign(payload, secret, {
         algorithm: "HS256",
         expiresIn,
     } as SignOptions);
@@ -16,7 +14,7 @@ const generateToken = (
 };
 
 const verifyToken = (token: string, secret: Secret) => {
-    const [_, tokenValue] = token.split(" ");
+    const [, tokenValue] = token.split(" ");
 
     return jwt.verify(tokenValue, secret) as JwtPayload;
 };

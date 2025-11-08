@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import ApiError from "../errors/ApiErrors";
 import httpStatus from "http-status";
 
 interface GetMaxSequenceParams {
     model: any;
-    filter: Record<string, any>;
+    filter: Record<string, unknown>;
     target?: string;
     next?: boolean;
 }

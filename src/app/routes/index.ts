@@ -37,7 +37,7 @@ const moduleRoutes = [
     },
 ] satisfies {
     path: string;
-    handlers: any[];
+    handlers: unknown[];
 }[];
 
 moduleRoutes.forEach((route) => router.use(route.path, ...route.handlers));

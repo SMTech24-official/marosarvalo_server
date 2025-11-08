@@ -7,7 +7,7 @@ import {
     endOfMonth,
 } from "date-fns";
 
-type FilterBy = "day" | "week" | "month" | "year" | undefined;
+export type FilterBy = "day" | "week" | "month" | "year" | undefined;
 
 export const getDateRange = (filterBy: FilterBy) => {
     const now = new Date();

@@ -11,7 +11,7 @@ import { UserRole } from "@prisma/client";
 
 const auth = (...roles: UserRole[]) => {
     return async (
-        req: Request & { user?: any },
+        req: Request & { user?: unknown },
         res: Response,
         next: NextFunction,
     ) => {

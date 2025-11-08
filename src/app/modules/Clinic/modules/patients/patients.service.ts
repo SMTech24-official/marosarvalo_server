@@ -8,11 +8,12 @@ import httpStatus from "http-status";
 import { CreatePatientInput } from "./patients.validation";
 import { getNewestDate } from "./patients.utils";
 import { getMaxSequence } from "../../../../../utils";
+import { FilterBy } from "../../../Admin/admin.service";
 
 // Get New Patients Count
 const getNewPatientsCount = async (
     query: {
-        filterBy: "day" | "week" | "month" | undefined;
+        filterBy: Exclude<FilterBy, "year">
     },
     user: JwtPayload
 ) => {
@@ -58,7 +59,7 @@ const createPatient = async (
 };
 
 // Get Patients
-const getPatients = async (query: Record<string, any>, user: JwtPayload) => {
+const getPatients = async (query: Record<string, unknown>, user: JwtPayload) => {
     const queryBuilder = new QueryBuilder(prisma.patient, query);
 
     const patients: (Patient & {
@@ -173,7 +174,7 @@ const getPatientById = async (patientId: number, user: JwtPayload) => {
 // Get Patient Appointments - // TODO: Check which Id. _id or documentId
 const getPatientAppointments = async (
     patientId: number,
-    query: Record<string, any>,
+    query: Record<string, unknown>,
     user: JwtPayload
 ) => {
     const patient = await prisma.patient.findUnique({
@@ -252,7 +253,7 @@ const getPatientAppointments = async (
 // Get Patient Bonds - // TODO: Check which Id. _id or documentId
 const getPatientBonds = async (
     patientId: number,
-    query: Record<string, any>,
+    query: Record<string, unknown>,
     user: JwtPayload
 ) => {
     const patient = await prisma.patient.findUnique({

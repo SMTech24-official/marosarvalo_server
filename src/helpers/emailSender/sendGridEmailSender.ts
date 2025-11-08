@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import sgMail from "@sendgrid/mail";
 import config from "../../config";
 
@@ -17,7 +19,7 @@ const sendGridEmailSender = async (
 
     try {
         const response = await sgMail.send(msg);
-        // console.log("Email sent: " + response);
+        console.log("Email sent: " + response);
     } catch (error: any) {
         console.error("Error sending email:", error?.response?.body);
     }

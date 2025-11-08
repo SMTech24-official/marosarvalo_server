@@ -107,7 +107,7 @@ const getClinicBasicReport = async (user: JwtPayload) => {
 
 // Get cancellation Info
 const getCancellationInfo = async (
-    query: Record<string, any>,
+    query: Record<string, unknown>,
     user: JwtPayload
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);

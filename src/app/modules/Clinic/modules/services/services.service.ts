@@ -6,7 +6,6 @@ import { JwtPayload } from "jsonwebtoken";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
 import { CreateServiceInput, UpdateServiceInput } from "./services.validation";
-import { getMaxSequence } from "../../../../../utils";
 
 // Get Services Statistics
 const getServicesStatistics = async (user: JwtPayload) => {
@@ -47,7 +46,7 @@ const getServicesStatistics = async (user: JwtPayload) => {
 };
 
 // Get Services list
-const getServices = async (query: Record<string, any>, user: JwtPayload) => {
+const getServices = async (query: Record<string, unknown>, user: JwtPayload) => {
     const queryBuilder = new QueryBuilder(prisma.service, query);
 
     const services: (Service & {
@@ -73,7 +72,7 @@ const getServices = async (query: Record<string, any>, user: JwtPayload) => {
         .execute();
     const pagination = await queryBuilder.countTotal();
 
-    const formattedData: Record<string, any>[] = [];
+    const formattedData: Record<string, unknown>[] = [];
 
     services.forEach((service) => {
         formattedData.push({

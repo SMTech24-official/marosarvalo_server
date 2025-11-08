@@ -3,7 +3,6 @@ import httpStatus from "http-status";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import DisciplineServices from "./disciplines.service";
-import { getValidatedIntId } from "../../../../../utils";
 
 // Get Disciplines
 const getDisciplines = catchAsync(async (req: Request, res: Response) => {

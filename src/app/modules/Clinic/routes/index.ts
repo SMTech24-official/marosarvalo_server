@@ -48,7 +48,7 @@ const moduleRoutes = [
     },
 ] satisfies {
     path: string;
-    handlers: any[];
+    handlers: unknown[];
 }[];
 
 export default moduleRoutes;
