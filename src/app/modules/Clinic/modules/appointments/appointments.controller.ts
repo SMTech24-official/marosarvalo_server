@@ -18,13 +18,16 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
         throw new ApiError(httpStatus.BAD_REQUEST, "`documents` are mandatory");
     }
 
+    const clientTimezone = req.headers["x-client-timezone"] || "UTC";
+
     req.body.documents = documents.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`
+        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
     );
 
     const result = await AppointmentServices.createAppointment(
         req.body,
-        req.user
+        clientTimezone as string,
+        req.user,
     );
 
     sendResponse(res, {
@@ -38,8 +41,8 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
 // Get Appointments Count
 const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.getAppointmentsCount(
-        {filterBy: req.query.filterBy as Exclude<FilterBy, "year">},
-        req.user
+        { filterBy: req.query.filterBy as Exclude<FilterBy, "year"> },
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -82,14 +85,14 @@ const changeAppointmentStatus = catchAsync(
         const { status } = req.params;
         if (
             !Object.values(AppointmentStatus).includes(
-                status.toUpperCase() as AppointmentStatus
+                status.toUpperCase() as AppointmentStatus,
             )
         ) {
             throw new ApiError(
                 httpStatus.BAD_REQUEST,
                 `Invalid status value. Supported: ${Object.values(
-                    AppointmentStatus
-                ).join(", ")}`
+                    AppointmentStatus,
+                ).join(", ")}`,
             );
         }
 
@@ -97,7 +100,7 @@ const changeAppointmentStatus = catchAsync(
             id,
             status as AppointmentStatus,
             req.body,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -105,15 +108,15 @@ const changeAppointmentStatus = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Appointments Overview
 const getAppointmentsOverview = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentServices.getAppointmentsOverview(
-            {filterBy: req.query.filterBy as FilterBy},
-            req.user
+            { filterBy: req.query.filterBy as FilterBy },
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -121,7 +124,7 @@ const getAppointmentsOverview = catchAsync(
             message: result.message,
             data: result.data,
         });
-    }
+    },
 );
 
 // Get Appointments Calendar
@@ -129,7 +132,7 @@ const getAppointmentsCalender = catchAsync(
     async (req: Request, res: Response) => {
         const result = await AppointmentServices.getAppointmentsCalender(
             req.query,
-            req.user
+            req.user,
         );
         sendResponse(res, {
             success: true,
@@ -138,14 +141,14 @@ const getAppointmentsCalender = catchAsync(
             data: result.data,
             pagination: result.pagination,
         });
-    }
+    },
 );
 
 // Get Appointments
 const getAppointments = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.getAppointments(
         req.query,
-        req.user
+        req.user,
     );
     sendResponse(res, {
         success: true,
@@ -155,6 +158,35 @@ const getAppointments = catchAsync(async (req: Request, res: Response) => {
         pagination: result.pagination,
     });
 });
+
+// Get Appointment Available time
+const getAvailableAppointmentSchedules = catchAsync(
+    async (req: Request, res: Response) => {
+        const { specialistId, date } = req.query;
+
+        if (!specialistId || !date) {
+            throw new ApiError(
+                httpStatus.BAD_REQUEST,
+                "Specialist ID and Date are required!",
+            );
+        }
+
+        const clientTimezone = req.headers["x-client-timezone"] || "UTC";
+
+        const result =
+            await AppointmentServices.getAvailableAppointmentSchedules(
+                { specialistId: specialistId as string, date: date as string },
+                clientTimezone as string,
+                req.user,
+            );
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Available Appointment Schedules parsed!",
+            data: result,
+        });
+    },
+);
 
 // Export all functions
 export default {
@@ -166,4 +198,5 @@ export default {
     getAppointmentsCount,
     getAppointmentsOverview,
     getAppointmentsCalender,
+    getAvailableAppointmentSchedules,
 };

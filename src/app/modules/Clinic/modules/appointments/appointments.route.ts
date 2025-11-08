@@ -41,4 +41,10 @@ router.get("/overview", AppointmentControllers.getAppointmentsOverview);
 // Get Appointments Calendar
 router.get("/calendar", AppointmentControllers.getAppointmentsCalender);
 
+// Get Available Appointment Schedules
+router.get(
+    "/available-slots",
+    AppointmentControllers.getAvailableAppointmentSchedules,
+);
+
 export const AppointmentRoutes = router;

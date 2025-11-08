@@ -25,4 +25,10 @@ router.patch(
 // Delete Discipline
 router.delete("/:id", DisciplineControllers.deleteDiscipline);
 
+// Get Disciplines for Appointment
+router.get(
+    "/appointments",
+    DisciplineControllers.getAppointmentDisciplines,
+);
+
 export const DisciplineRoutes = router;

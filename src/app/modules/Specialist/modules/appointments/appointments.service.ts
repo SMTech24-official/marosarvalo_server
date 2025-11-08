@@ -2,7 +2,7 @@ import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
-import { groupAppointment, parseTimeString } from "./appointments.utils";
+import { groupAppointment } from "./appointments.utils";
 import { FilterBy, getDateRange } from "../../specialist.utils";
 
 // Get Appointments Count
@@ -123,11 +123,6 @@ const getUpcomingAppointments = async (
     const pagination = await queryBuilder.countTotal();
 
     const formattedAppointments = appointments.map((appointment) => {
-        const startTime = parseTimeString(appointment.timeSlot.split("-")[0]);
-
-        const dateTime = new Date(appointment.date);
-        dateTime.setHours(startTime.hours, startTime.minutes);
-
         const data = {
             id: appointment.id,
             patientName: `${appointment.patient.firstName}${
@@ -138,7 +133,9 @@ const getUpcomingAppointments = async (
             discipline: appointment.discipline.name,
             service: appointment.service.name,
             specialist: appointment.specialist.name,
-            dateTime: dateTime.toJSON(),
+            date: appointment.date,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
         };
 
         return data;
@@ -223,7 +220,8 @@ const getAppointmentsCalender = async (
             service: appointment.service.name,
             specialist: { ...appointment.specialist },
             date: appointment.date,
-            timeSlot: appointment.timeSlot,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
             status: appointment.status,
             note: appointment.note,
             documents: appointment.documents,

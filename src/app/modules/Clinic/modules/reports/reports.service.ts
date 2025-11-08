@@ -165,7 +165,8 @@ const getCancellationInfo = async (
         const data = {
             id: appointment.id,
             date: appointment.date,
-            timeSlot: appointment.timeSlot,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
             service: appointment.service,
             specialist: appointment.specialist,
             patient: appointment.patient,

@@ -11,7 +11,10 @@ import httpStatus from "http-status";
 import { Discipline } from "@prisma/client";
 
 // Get disciplines
-const getDisciplines = async (query: Record<string, unknown>, user: JwtPayload) => {
+const getDisciplines = async (
+    query: Record<string, unknown>,
+    user: JwtPayload,
+) => {
     const queryBuilder = new QueryBuilder(prisma.discipline, query);
 
     const disciplines: (Discipline & {
@@ -59,7 +62,7 @@ const getDisciplines = async (query: Record<string, unknown>, user: JwtPayload) 
 // Create discipline
 const createDiscipline = async (
     payload: CreateDisciplineInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const response = await prisma.discipline.create({
         data: {
@@ -78,7 +81,7 @@ const createDiscipline = async (
 const updateDiscipline = async (
     disciplineId: string,
     payload: UpdateDisciplineInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const discipline = await prisma.discipline.findUnique({
         where: {
@@ -146,9 +149,55 @@ const deleteDiscipline = async (disciplineId: string, user: JwtPayload) => {
     };
 };
 
+// Get Disciplines for Appointment
+const getAppointmentDisciplines = async (user: JwtPayload) => {
+    const disciplines = await prisma.discipline.findMany({
+        where: {
+            clinicId: user.clinicId,
+        },
+        select: {
+            id: true,
+            name: true,
+            services: {
+                select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                },
+            },
+            staff: {
+                where: {
+                    role: "SPECIALIST",
+                },
+                select: {
+                    id: true,
+                    name: true,
+                },
+            },
+        },
+    });
+
+    const formattedData = disciplines.map((discipline) => {
+        const data = {
+            id: discipline.id,
+            name: discipline.name,
+            services: discipline.services,
+            specialists: discipline.staff,
+        };
+
+        return data;
+    });
+
+    return {
+        message: "Disciplines Data parsed",
+        data: formattedData,
+    };
+};
+
 export default {
     getDisciplines,
     createDiscipline,
     updateDiscipline,
     deleteDiscipline,
+    getAppointmentDisciplines
 };

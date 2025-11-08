@@ -49,3 +49,23 @@ export const groupAppointment = (
             (a, b) => new Date(a.label).getTime() - new Date(b.label).getTime(),
         );
 };
+
+export const createSlots = (startTime: Date, endTime: Date, length: number) => {
+    const slots: { start: Date; end: Date; available: boolean }[] = [];
+    let slotStart = new Date(startTime);
+
+    while (slotStart < endTime) {
+        const slotEnd = new Date(slotStart.getTime() + length * 60 * 1000);
+        if (slotEnd > endTime) break;
+
+        slots.push({
+            start: new Date(slotStart),
+            end: new Date(slotEnd),
+            available: true,
+        });
+
+        slotStart = slotEnd;
+    }
+
+    return slots;
+};

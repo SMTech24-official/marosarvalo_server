@@ -11,6 +11,10 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+/**
+ * @IdMod - Shows which models uses `dbId` as as the og id and use `id` as custom, but main id
+ */
+
 // ---------------- MODELS START HERE ----------------
 // -------------- User and Admin Models ---------------
 
@@ -179,6 +183,13 @@ model Branding {
 }
 
 // TODO: Add profile picture to Staff
+
+enum StaffRoles {
+    SPECIALIST
+    RECEPTIONIST
+    OTHERS
+}
+
 // @IdMod
 model Staff {
     dbId String @id @default(auto()) @map("_id") @db.ObjectId
@@ -194,7 +205,7 @@ model Staff {
     employeeId String
     gender     Gender
     address    String?
-    role       String
+    role       StaffRoles
     profession String?
 
     // One-to-many: User → Appointments
@@ -225,7 +236,7 @@ model StaffWorkingHour {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
     // Times based on Days - Can be Empty
-    // { from: { h: "HH", m: "MM" }, to: { h: "HH", m: "MM" }  }
+    // { from: Date, to: Date }
     saturday  Json?
     sunday    Json?
     monday    Json?
@@ -326,8 +337,9 @@ model Appointment {
     specialistId String @db.ObjectId
     specialist   Staff  @relation(fields: [specialistId], references: [dbId])
 
-    date     DateTime
-    timeSlot String // 10:30am - 11:00am
+    date      DateTime
+    startTime DateTime
+    endTime   DateTime
 
     status    AppointmentStatus @default(PENDING)
     documents String[]

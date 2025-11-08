@@ -13,9 +13,9 @@ import { FilterBy } from "../../../Admin/admin.service";
 // Get New Patients Count
 const getNewPatientsCount = async (
     query: {
-        filterBy: Exclude<FilterBy, "year">
+        filterBy: Exclude<FilterBy, "year">;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const count = await prisma.patient.count({
         where: {
@@ -37,7 +37,7 @@ const createPatient = async (
         documents: string[];
         otherDocuments: string[];
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const response = await prisma.patient.create({
         data: {
@@ -59,13 +59,17 @@ const createPatient = async (
 };
 
 // Get Patients
-const getPatients = async (query: Record<string, unknown>, user: JwtPayload) => {
+const getPatients = async (
+    query: Record<string, unknown>,
+    user: JwtPayload,
+) => {
     const queryBuilder = new QueryBuilder(prisma.patient, query);
 
     const patients: (Patient & {
         appointments: {
             date: Date;
-            timeSlot: string;
+            startTime: Date;
+            endTime: Date;
         }[];
     })[] = await queryBuilder
         .search(["firstName", "lastName", "phone", "email"])
@@ -80,7 +84,8 @@ const getPatients = async (query: Record<string, unknown>, user: JwtPayload) => 
             appointments: {
                 select: {
                     date: true,
-                    timeSlot: true,
+                    startTime: true,
+                    endTime: true,
                 },
             },
         })
@@ -125,7 +130,8 @@ const getPatientById = async (patientId: number, user: JwtPayload) => {
             appointments: {
                 select: {
                     date: true,
-                    timeSlot: true,
+                    startTime: true,
+                    endTime: true,
                 },
             },
         },
@@ -175,7 +181,7 @@ const getPatientById = async (patientId: number, user: JwtPayload) => {
 const getPatientAppointments = async (
     patientId: number,
     query: Record<string, unknown>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
@@ -234,7 +240,8 @@ const getPatientAppointments = async (
         const data = {
             id: appointment.id,
             date: appointment.date,
-            timeSlot: appointment.timeSlot,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
             patient: appointment.patient,
             specialist: appointment.specialist,
             status: appointment.status,
@@ -254,7 +261,7 @@ const getPatientAppointments = async (
 const getPatientBonds = async (
     patientId: number,
     query: Record<string, unknown>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const patient = await prisma.patient.findUnique({
         where: {
@@ -329,7 +336,7 @@ const getPatientBonds = async (
 // Search Patient
 const searchPatient = async (
     query: { searchTerm?: string },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     if (!query.searchTerm) {
         throw new ApiError(httpStatus.BAD_REQUEST, "searchTerm is required");
@@ -371,7 +378,6 @@ const searchPatient = async (
             lastName: true,
             phone: true,
             email: true,
-            bonds: true,
         },
         take: 10, // Limit to 10 results for search suggestions
     });
@@ -384,7 +390,6 @@ const searchPatient = async (
             }`,
             phone: patient.phone,
             email: patient.email,
-            bonds: patient.bonds,
         };
     });
 

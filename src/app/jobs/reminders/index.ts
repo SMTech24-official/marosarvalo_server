@@ -7,7 +7,6 @@ import {
     format,
     startOfDay,
 } from "date-fns";
-import { genStartTime } from "./utils";
 
 // Run the Timed Schedules, e.g. prior to x min of appointments
 const runTimedSchedules = async (schedule: ReminderSchedule, delay: number) => {
@@ -42,7 +41,7 @@ const runTimedSchedules = async (schedule: ReminderSchedule, delay: number) => {
     });
 
     appointments.forEach((appointment) => {
-        const startTime = genStartTime(appointment.date, appointment.timeSlot);
+        const startTime = appointment.startTime;
         const now = new Date();
 
         const diff = differenceInMinutes(startTime, now);
@@ -105,10 +104,7 @@ const runUntimedSchedules = async (
         });
 
         appointments.forEach((appointment) => {
-            const startTime = genStartTime(
-                appointment.date,
-                appointment.timeSlot,
-            );
+            const startTime = appointment.startTime;
 
             // Send Mail and Stuff!
             console.log(`

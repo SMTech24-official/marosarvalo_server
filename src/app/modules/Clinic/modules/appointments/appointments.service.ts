@@ -1,19 +1,25 @@
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilder";
 import { Appointment, AppointmentStatus } from "@prisma/client";
-import { getDateRange, parseTimeString } from "../../clinic.utils";
+import { getDateRange } from "../../clinic.utils";
 import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status";
-import { groupAppointment } from "./appointments.utils";
+import { createSlots, groupAppointment } from "./appointments.utils";
 import { CreateAppointmentInput } from "./appointments.validation";
 import ApiError from "../../../../../errors/ApiErrors";
 import { getMaxSequence } from "../../../../../utils";
 import { FilterBy } from "../../../Admin/admin.service";
 
-// Create new Appointment - // TODO: Check availability of Specialist
+import { endOfDay, startOfDay } from "date-fns";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { format } from "date-fns";
+import config from "../../../../../config";
+
+// Create new Appointment
 const createAppointment = async (
     payload: CreateAppointmentInput & { documents: string[] },
-    user: JwtPayload
+    timezone: string,
+    user: JwtPayload,
 ) => {
     const appointmentExists = await prisma.appointment.findFirst({
         where: {
@@ -25,21 +31,24 @@ const createAppointment = async (
                     patientId: payload.patientId,
                 },
             ],
-            timeSlot: payload.timeSlot,
+            startTime: { lt: fromZonedTime(payload.endTime, timezone) },
+            endTime: { gt: fromZonedTime(payload.startTime, timezone) },
             date: payload.date,
             clinicId: user.clinicId,
         },
         select: {
             id: true,
             specialistId: true,
-            patientId: true
+            patientId: true,
         },
     });
 
     if (appointmentExists) {
         throw new ApiError(
             httpStatus.CONFLICT,
-            appointmentExists.specialistId === payload.specialistId ? "Specialist is not available in this timeslot" : "Patient already has Appointment in this timeslot"
+            appointmentExists.specialistId === payload.specialistId
+                ? "Specialist is not available in this time slot"
+                : "Patient already has Appointment in this time slot",
         );
     }
 
@@ -51,13 +60,13 @@ const createAppointment = async (
 
     // Check if the Appointment day is same as specialist's any holiday
     const isHoliday = holiday.some(
-        (h) => h.date.toDateString() === new Date(payload.date).toDateString()
+        (h) => h.date.toDateString() === new Date(payload.date).toDateString(),
     );
 
     if (isHoliday) {
         throw new ApiError(
             httpStatus.CONFLICT,
-            "Specialist is on holiday on this date"
+            "Specialist is on holiday on this date",
         );
     }
 
@@ -83,7 +92,7 @@ const createAppointment = async (
 // Get Appointments
 const getAppointments = async (
     query: Record<string, unknown>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -157,18 +166,15 @@ const getAppointments = async (
     const pagination = await queryBuilder.countTotal();
 
     const formattedData = appointments.map((appointment) => {
-        const startTime = parseTimeString(appointment.timeSlot.split("-")[0]);
-
-        const dateTime = new Date(appointment.date);
-        dateTime.setHours(startTime.hours, startTime.minutes);
-
         const data = {
             id: appointment.id,
             patient: appointment.patient,
             discipline: appointment.discipline.name,
             service: appointment.service.name,
             specialist: appointment.specialist,
-            dateTime: dateTime.toJSON(),
+            date: appointment.date,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
         };
 
         return data;
@@ -227,7 +233,8 @@ const getAppointmentById = async (id: number, user: JwtPayload) => {
         service: appointment.service.name,
         specialist: { ...appointment.specialist },
         date: appointment.date,
-        timeSlot: appointment.timeSlot,
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
         status: appointment.status,
         note: appointment.note,
         documents: appointment.documents,
@@ -279,7 +286,7 @@ const changeAppointmentStatus = async (
     id: number,
     status: AppointmentStatus,
     payload: { reason?: string },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const appointment = await prisma.appointment.findUnique({
         where: {
@@ -323,7 +330,7 @@ const getAppointmentsCount = async (
     query: {
         filterBy: Exclude<FilterBy, "year">;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const count = await prisma.appointment.count({
         where: {
@@ -346,9 +353,9 @@ const getAppointmentsCount = async (
 // Get Appointments Overview
 const getAppointmentsOverview = async (
     query: {
-        filterBy: FilterBy
+        filterBy: FilterBy;
     },
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const appointments = await prisma.appointment.findMany({
         where: {
@@ -375,7 +382,7 @@ const getAppointmentsOverview = async (
 // Get Appointments Calendar
 const getAppointmentsCalender = async (
     query: Record<string, unknown>,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const queryBuilder = new QueryBuilder(prisma.appointment, query);
 
@@ -449,7 +456,8 @@ const getAppointmentsCalender = async (
             service: appointment.service.name,
             specialist: { ...appointment.specialist },
             date: appointment.date,
-            timeSlot: appointment.timeSlot,
+            startTime: appointment.startTime,
+            endTime: appointment.endTime,
             status: appointment.status,
             note: appointment.note,
             documents: appointment.documents,
@@ -465,6 +473,100 @@ const getAppointmentsCalender = async (
     };
 };
 
+// Get Appointment Available time
+const getAvailableAppointmentSchedules = async (
+    payload: { specialistId: string; date: string },
+    timezone: string,
+    user: JwtPayload,
+) => {
+    const zoned = fromZonedTime(payload.date, timezone);
+    const startTime = startOfDay(zoned);
+    const endTime = endOfDay(zoned);
+
+    const now = new Date();
+
+    const day = format(toZonedTime(now, timezone), "EEEE").toLowerCase();
+
+    const specialist = await prisma.staff.findUnique({
+        where: {
+            id_clinicId: {
+                id: parseInt(payload.specialistId),
+                clinicId: user.clinicId,
+            },
+        },
+        select: {
+            id: true,
+            dbId: true,
+            workingHour: true,
+            holiday: true,
+        },
+    });
+
+    if (!specialist) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Specialist not found");
+    }
+
+    const specialistWorkTime = (
+        specialist.workingHour as Record<string, unknown>
+    )[day] as
+        | {
+              from: string;
+              to: string;
+          }
+        | undefined;
+
+    if (!specialistWorkTime) {
+        return [];
+    }
+
+    // Unavailable appointments for this day
+    const appointments = await prisma.appointment.findMany({
+        where: {
+            status: {
+                notIn: ["CANCELLED"],
+            },
+            startTime: { lte: endTime },
+            endTime: { gte: startTime },
+            specialistId: specialist.dbId,
+        },
+        select: {
+            date: true,
+            startTime: true,
+            endTime: true,
+        },
+    });
+
+    const dayAppointmentStart = fromZonedTime(
+        new Date(specialistWorkTime["from"]),
+        timezone,
+    );
+    const dayAppointmentEnd = fromZonedTime(
+        new Date(specialistWorkTime["to"]),
+        timezone,
+    );
+
+    const slots = createSlots(
+        dayAppointmentStart,
+        dayAppointmentEnd,
+        Number(config.appointment_length),
+    );
+
+    const modifiedSlots = slots.map((slot) => {
+        const booked = appointments.some(
+            (appointment) =>
+                appointment.startTime < slot.end &&
+                appointment.endTime > slot.start,
+        );
+
+        return {
+            ...slot,
+            available: !booked,
+        };
+    });
+
+    return modifiedSlots;
+};
+
 // Export all in default
 export default {
     createAppointment,
@@ -475,4 +577,5 @@ export default {
     getAppointmentsCount,
     getAppointmentsOverview,
     getAppointmentsCalender,
+    getAvailableAppointmentSchedules,
 };

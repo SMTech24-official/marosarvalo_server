@@ -11,6 +11,7 @@ export default {
     stripe_client_id: process.env.STRIPE_CLIENT_ID,
     port: process.env.PORT || 5000,
     backend_url: process.env.BACKEND_URL,
+    appointment_length: process.env.APPOINTMENT_LENGTH ?? 30,
     jwt: {
         jwt_secret: process.env.JWT_SECRET,
         expires_in: process.env.EXPIRES_IN,

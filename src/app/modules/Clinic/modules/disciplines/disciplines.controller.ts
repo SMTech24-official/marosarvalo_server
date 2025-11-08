@@ -60,10 +60,27 @@ const deleteDiscipline = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// Get Disciplines for Appointment
+const getAppointmentDisciplines = catchAsync(
+    async (req: Request, res: Response) => {
+        const result = await DisciplineServices.getAppointmentDisciplines(
+            req.user,
+        );
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: result.message,
+            data: result.data,
+        });
+    },
+);
+
+
 // Export all functions
 export default {
     getDisciplines,
     createDiscipline,
     updateDiscipline,
     deleteDiscipline,
+    getAppointmentDisciplines
 };

@@ -32,7 +32,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
         if (!password) {
             throw new ApiError(
                 httpStatus.BAD_REQUEST,
-                "Password required for Specialist and Receptionist"
+                "Password required for Specialist and Receptionist",
             );
         }
 
@@ -44,28 +44,47 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
                 email: payload.email,
                 role: payload.role as UserRole,
                 password: hashedPass,
-                staff: {
-                    create: {
-                        ...staffData,
-                        id:
-                            (await getMaxSequence({
-                                model: prisma.staff,
-                                filter: { clinicId: user.clinicId },
-                                next: true,
-                            })) ?? 0,
-                    },
-                },
+                ...(staffData.role !== "ADMIN"
+                    ? {
+                          staff: {
+                              create: {
+                                  ...staffData,
+                                  role:
+                                      staffData.role === "RECEPTIONIST"
+                                          ? "RECEPTIONIST"
+                                          : "SPECIALIST",
+                                  id:
+                                      (await getMaxSequence({
+                                          model: prisma.staff,
+                                          filter: { clinicId: user.clinicId },
+                                          next: true,
+                                      })) ?? 0,
+                              },
+                          },
+                      }
+                    : {
+                          clinic: {
+                              create: {
+                                  name: staffData.name,
+                                  email: staffData.email,
+                                  phone: staffData.phone,
+                                  address1: staffData.address,
+                              },
+                          },
+                      }),
             },
             select: {
                 staff: true,
+                clinic: true,
             },
         });
 
-        response = res.staff;
+        response = staffData.role !== "ADMIN" ? res.staff : res.clinic;
     } else {
         response = await prisma.staff.create({
             data: {
                 ...staffData,
+                role: staffData.role !== "ADMIN" ? staffData.role : "OTHERS",
                 id:
                     (await getMaxSequence({
                         model: prisma.staff,
@@ -83,7 +102,10 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
 };
 
 // Get All Staff
-const getAllStaff = async (query: Record<string, unknown>, user: JwtPayload) => {
+const getAllStaff = async (
+    query: Record<string, unknown>,
+    user: JwtPayload,
+) => {
     const queryBuilder = new QueryBuilder(prisma.staff, query);
 
     const staffs: (Staff & {
@@ -152,7 +174,7 @@ const getStaffById = async (staffId: number, user: JwtPayload) => {
 const updateStaffData = async (
     staffId: number,
     payload: UpdateStaffInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const exists = await prisma.staff.findUnique({
         where: {
@@ -221,7 +243,7 @@ const deleteStaffData = async (staffId: number, user: JwtPayload) => {
 const updateWorkingHours = async (
     staffId: number,
     payload: UpdateWorkingHourInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const staffData = await prisma.staff.findUnique({
         where: {
@@ -263,7 +285,7 @@ const updateWorkingHours = async (
 const insertHoliday = async (
     staffId: number,
     payload: InsertHolidayInput,
-    user: JwtPayload
+    user: JwtPayload,
 ) => {
     const staffData = await prisma.staff.findUnique({
         where: {
@@ -335,15 +357,15 @@ const getStaffSchedules = async (clientTimezone: string, user: JwtPayload) => {
 
     const formattedData = availableStaffs.map((staff) => {
         let todaySch: {
-            from: { h: string; m: string };
-            to: { h: string; m: string };
+            from: string;
+            to: string;
         } | null = null;
         if (staff.workingHour) {
             todaySch = (staff.workingHour as Record<typeof today, unknown>)[
                 today
             ] as {
-                from: { h: string; m: string };
-                to: { h: string; m: string };
+                from: string;
+                to: string;
             };
         }
 
