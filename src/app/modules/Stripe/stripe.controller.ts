@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import StripeServices from "./stripe.service";
@@ -11,7 +11,7 @@ const createCheckoutRequest = catchAsync(
 
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.CREATED,
+            statusCode: StatusCodes.CREATED,
             message: result.message,
             data: result.data,
         });

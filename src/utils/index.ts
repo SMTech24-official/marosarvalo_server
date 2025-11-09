@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import ApiError from "../errors/ApiErrors";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 
 interface GetMaxSequenceParams {
     model: any;
@@ -44,7 +44,7 @@ export const getValidatedIntId = (idParam: string): number => {
     const id = Number(idParam);
 
     if (isNaN(id)) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Item not Found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Item not Found!");
     }
     return id;
 };

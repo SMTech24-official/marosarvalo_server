@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import AppointmentServices from "./appointments.service";
@@ -15,7 +15,10 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
     const documents = files?.documents;
 
     if (documents.length === 0) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "`documents` are mandatory");
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            "`documents` are mandatory",
+        );
     }
 
     const clientTimezone = req.headers["x-client-timezone"] || "UTC";
@@ -32,7 +35,7 @@ const createAppointment = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
+        statusCode: StatusCodes.CREATED,
         message: result.message,
         data: result.data,
     });
@@ -46,7 +49,7 @@ const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.count,
     });
@@ -59,7 +62,7 @@ const getAppointmentById = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.getAppointmentById(id, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -72,7 +75,7 @@ const deleteAppointment = catchAsync(async (req: Request, res: Response) => {
     const result = await AppointmentServices.deleteAppointment(id, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -89,7 +92,7 @@ const changeAppointmentStatus = catchAsync(
             )
         ) {
             throw new ApiError(
-                httpStatus.BAD_REQUEST,
+                StatusCodes.BAD_REQUEST,
                 `Invalid status value. Supported: ${Object.values(
                     AppointmentStatus,
                 ).join(", ")}`,
@@ -104,7 +107,7 @@ const changeAppointmentStatus = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
         });
@@ -120,7 +123,7 @@ const getAppointmentsOverview = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
         });
@@ -136,7 +139,7 @@ const getAppointmentsCalender = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
             pagination: result.pagination,
@@ -152,7 +155,7 @@ const getAppointments = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
         pagination: result.pagination,
@@ -166,7 +169,7 @@ const getAvailableAppointmentSchedules = catchAsync(
 
         if (!specialistId || !date) {
             throw new ApiError(
-                httpStatus.BAD_REQUEST,
+                StatusCodes.BAD_REQUEST,
                 "Specialist ID and Date are required!",
             );
         }
@@ -181,7 +184,7 @@ const getAvailableAppointmentSchedules = catchAsync(
             );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: "Available Appointment Schedules parsed!",
             data: result,
         });

@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import UserServices from "./me.service";
@@ -12,7 +12,7 @@ const getUserInfo = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -25,7 +25,7 @@ const updateUserInfo = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });

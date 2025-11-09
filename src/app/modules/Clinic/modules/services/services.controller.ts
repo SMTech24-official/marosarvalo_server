@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import ServiceServices from "./services.service";
@@ -10,7 +10,7 @@ const getServicesStatistics = catchAsync(
         const result = await ServiceServices.getServicesStatistics(req.user);
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
         });
@@ -22,7 +22,7 @@ const getServices = catchAsync(async (req: Request, res: Response) => {
     const result = await ServiceServices.getServices(req.query, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
         pagination: result.pagination,
@@ -34,7 +34,7 @@ const createService = catchAsync(async (req: Request, res: Response) => {
     const result = await ServiceServices.createService(req.body);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
+        statusCode: StatusCodes.CREATED,
         message: result.message,
         data: result.data,
     });
@@ -47,7 +47,7 @@ const updateService = catchAsync(async (req: Request, res: Response) => {
     const result = await ServiceServices.updateService(id, req.body, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -60,7 +60,7 @@ const deleteService = catchAsync(async (req: Request, res: Response) => {
     const result = await ServiceServices.deleteService(id, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });

@@ -7,7 +7,7 @@ import {
     UpdateDisciplineInput,
 } from "./disciplines.validation";
 import ApiError from "../../../../../errors/ApiErrors";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { Prisma } from "@prisma/client";
 
 // Get disciplines
@@ -97,7 +97,7 @@ const updateDiscipline = async (
     });
 
     if (!discipline) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Discipline not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Discipline not found");
     }
 
     const response = await prisma.discipline.update({
@@ -130,7 +130,7 @@ const deleteDiscipline = async (disciplineId: string, user: JwtPayload) => {
     });
 
     if (!discipline) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Discipline Not Found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Discipline Not Found!");
     }
 
     const response = await prisma.discipline.delete({

@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
@@ -14,7 +14,7 @@ const getSpecialistsCount = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.count,
     });

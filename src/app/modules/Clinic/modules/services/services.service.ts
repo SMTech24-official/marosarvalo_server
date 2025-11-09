@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 
 import ApiError from "../../../../../errors/ApiErrors";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { CreateServiceInput, UpdateServiceInput } from "./services.validation";
 
 // Get Services Statistics
@@ -143,7 +143,7 @@ const updateService = async (
     });
 
     if (!service) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Service Not Found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Service Not Found!");
     }
 
     const response = await prisma.service.update({
@@ -192,7 +192,7 @@ const deleteService = async (serviceId: string, user: JwtPayload) => {
     });
 
     if (!service) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Service Not Found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Service Not Found!");
     }
 
     const response = await prisma.service.delete({

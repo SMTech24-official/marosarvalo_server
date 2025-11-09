@@ -1,7 +1,7 @@
 import ApiError from "../../../../../errors/ApiErrors";
 import { hashPassword } from "../../../../../helpers/passwordHelpers";
 import prisma from "../../../../../shared/prisma";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { CreateClinicInput, UpdateClinicInput } from "./clinic.validation";
 import QueryBuilder from "../../../../../utils/queryBuilderV2";
 import { Prisma } from "@prisma/client";
@@ -27,14 +27,14 @@ const createNewClinic = async (body: CreateClinicInput) => {
 
     if (userExists) {
         throw new ApiError(
-            httpStatus.BAD_REQUEST,
+            StatusCodes.BAD_REQUEST,
             "User with Email already Exists",
         );
     }
 
     if (clinicExists) {
         throw new ApiError(
-            httpStatus.BAD_REQUEST,
+            StatusCodes.BAD_REQUEST,
             "Clinic with Email already Exists",
         );
     }
@@ -131,7 +131,7 @@ const getSingleClinic = async (id: string) => {
     });
 
     if (!clinic) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Clinic not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Clinic not found");
     }
 
     const endDate = clinic.subscription?.endDate;
@@ -193,7 +193,7 @@ const updateClinic = async (id: string, payload: UpdateClinicInput) => {
     });
 
     if (!updatedClinic) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Clinic not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Clinic not found");
     }
 
     return {
@@ -209,7 +209,7 @@ const deleteClinic = async (id: string) => {
     });
 
     if (!clinic) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Clinic not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Clinic not found");
     }
 
     await prisma.clinic.delete({

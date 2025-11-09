@@ -1,6 +1,6 @@
 import ApiError from "../../../errors/ApiErrors";
 import prisma from "../../../shared/prisma";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { CreateClinicInput } from "./stripe.validation";
 
 // Create checkout request
@@ -14,7 +14,7 @@ const createCheckoutRequest = async (payload: CreateClinicInput) => {
     });
 
     if (!packageData) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Package Not Found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Package Not Found");
     }
 
     // TODO: Do what needs to be done

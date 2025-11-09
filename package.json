@@ -9,7 +9,8 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "cModule": "node scripts/generateModule.js",
         "postinstall": "npx prisma generate",
-        "update": "pnpm outdated && pnpm up --latest"
+        "update": "pnpm outdated && pnpm up --latest",
+        "check": "eslint src && npx prettier --write src"
     },
     "keywords": [],
     "author": "Modasser Hasan",
@@ -50,6 +51,7 @@
         "dotenv": "^17.2.3",
         "express": "^5.1.0",
         "http-status": "^2.1.0",
+        "http-status-codes": "^2.3.0",
         "jsonwebtoken": "^9.0.2",
         "multer": "^2.0.2",
         "node-cron": "^4.2.1",

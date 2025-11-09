@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import PackageServices from "./package.service";
 
 // Create Package
@@ -9,7 +9,7 @@ const createPackage = catchAsync(async (req: Request, res: Response) => {
     const result = await PackageServices.createPackage(req.body);
 
     sendResponse(res, {
-        statusCode: httpStatus.CREATED,
+        statusCode: StatusCodes.CREATED,
         success: true,
         message: result.message,
         data: result.data,
@@ -21,7 +21,7 @@ const getAllPackages = catchAsync(async (req: Request, res: Response) => {
     const result = await PackageServices.getAllPackages();
 
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         success: true,
         message: result.message,
         data: result.data,
@@ -33,7 +33,7 @@ const getSinglePackage = catchAsync(async (req: Request, res: Response) => {
     const result = await PackageServices.getSinglePackage(req.params.id);
 
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         success: true,
         message: result.message,
         data: result.data,
@@ -45,7 +45,7 @@ const updatePackage = catchAsync(async (req: Request, res: Response) => {
     const result = await PackageServices.updatePackage(req.params.id, req.body);
 
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         success: true,
         message: result.message,
         data: result.data,
@@ -57,7 +57,7 @@ const deletePackage = catchAsync(async (req: Request, res: Response) => {
     const result = await PackageServices.deletePackage(req.params.id);
 
     sendResponse(res, {
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         success: true,
         message: result.message,
         data: result.data,

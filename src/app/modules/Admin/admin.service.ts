@@ -1,5 +1,5 @@
 import prisma from "../../../shared/prisma";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import bcrypt from "bcrypt";
 import { type CreateAdminInput } from "./admin.validation";
@@ -67,7 +67,7 @@ const createNewAdmin = async (body: CreateAdminInput) => {
     });
 
     if (existing) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Email already Exists");
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Email already Exists");
     }
 
     const response = await prisma.user.create({

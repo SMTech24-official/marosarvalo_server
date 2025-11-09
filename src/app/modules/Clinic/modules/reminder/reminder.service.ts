@@ -7,7 +7,7 @@ import {
     CreateReminderScheduleInput,
     UpdateReminderScheduleInput,
 } from "./reminder.validation";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../../../errors/ApiErrors";
 
 // Create Reminder Schedules - Only for Clinic Admin
@@ -55,11 +55,11 @@ const updateSchedule = async (
     });
 
     if (!exists) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Reminder not found!");
     }
 
     if (exists.clinicId !== user.clinicId) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
+        throw new ApiError(StatusCodes.FORBIDDEN, "Unauthorized request");
     }
 
     const response = await prisma.reminderSchedule.update({
@@ -90,11 +90,11 @@ const deleteSchedule = async (scheduleId: string, user: JwtPayload) => {
     });
 
     if (!exists) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Reminder not found!");
     }
 
     if (exists.clinicId !== user.clinicId) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
+        throw new ApiError(StatusCodes.FORBIDDEN, "Unauthorized request");
     }
 
     const response = await prisma.reminderSchedule.delete({
@@ -127,16 +127,16 @@ const updateReminderStatus = async (
     });
 
     if (!exists) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Reminder not found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Reminder not found!");
     }
 
     if (exists.clinicId !== user.clinicId) {
-        throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized request");
+        throw new ApiError(StatusCodes.FORBIDDEN, "Unauthorized request");
     }
 
     if (exists.status === status) {
         throw new ApiError(
-            httpStatus.BAD_REQUEST,
+            StatusCodes.BAD_REQUEST,
             "Schedule is already " + status,
         );
     }

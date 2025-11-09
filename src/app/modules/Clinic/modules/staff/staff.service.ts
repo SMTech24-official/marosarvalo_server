@@ -3,7 +3,7 @@ import QueryBuilder from "../../../../../utils/queryBuilderV2";
 import { Prisma, UserRole } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import ApiError from "../../../../../errors/ApiErrors";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import {
     CreateStaffInput,
     InsertHolidayInput,
@@ -31,7 +31,7 @@ const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
     ) {
         if (!password) {
             throw new ApiError(
-                httpStatus.BAD_REQUEST,
+                StatusCodes.BAD_REQUEST,
                 "Password required for Specialist and Receptionist",
             );
         }
@@ -162,7 +162,7 @@ const getStaffById = async (staffId: number, user: JwtPayload) => {
     });
 
     if (!staff) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Staff not found!");
     }
 
     return { message: "Staff Data parsed", data: staff };
@@ -185,7 +185,7 @@ const updateStaffData = async (
     });
 
     if (!exists) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Staff not found!");
     }
 
     const response = await prisma.staff.update({
@@ -219,7 +219,7 @@ const deleteStaffData = async (staffId: number, user: JwtPayload) => {
     });
 
     if (!exists) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Staff not found!");
     }
 
     const response = await prisma.staff.delete({
@@ -257,7 +257,7 @@ const updateWorkingHours = async (
     });
 
     if (!staffData) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Staff not found");
     }
 
     const response = await prisma.staffWorkingHour.upsert({
@@ -294,7 +294,7 @@ const insertHoliday = async (
         },
     });
     if (!staffData) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Staff not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Staff not found");
     }
 
     const response = await prisma.staffHoliday.create({

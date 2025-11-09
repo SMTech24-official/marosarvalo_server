@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import PatientServices from "./patients.service";
@@ -16,7 +16,7 @@ const getNewPatientsCount = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.count,
     });
@@ -30,7 +30,10 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
     const otherDocuments = files?.otherDocuments;
 
     if (documents.length === 0) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "`documents` are mandatory");
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            "`documents` are mandatory",
+        );
     }
 
     req.body.guardianDocuments = guardianDocuments.map(
@@ -46,7 +49,7 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
     const result = await PatientServices.createPatient(req.body, req.user);
 
     sendResponse(res, {
-        statusCode: httpStatus.CREATED,
+        statusCode: StatusCodes.CREATED,
         success: true,
         message: result.message,
         data: result.data,
@@ -59,7 +62,7 @@ const getPatients = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
         pagination: result.pagination,
@@ -73,7 +76,7 @@ const getPatientById = catchAsync(async (req: Request, res: Response) => {
     const result = await PatientServices.getPatientById(id, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -91,7 +94,7 @@ const getPatientAppointments = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
             pagination: result.pagination,
@@ -110,7 +113,7 @@ const getPatientBonds = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
         pagination: result.pagination,
@@ -123,7 +126,7 @@ const searchPatient = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });

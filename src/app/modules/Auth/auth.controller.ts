@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import AuthServices from "./auth.service";
@@ -17,7 +17,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: {
             accessToken: result.accessToken,
@@ -37,7 +37,7 @@ const logoutUser = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: "User Successfully logged out",
     });
 });
@@ -50,7 +50,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
     });
 });
@@ -61,7 +61,7 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
     });
 });
@@ -72,7 +72,7 @@ const refreshToken = catchAsync(async (req, res) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: { accessToken: result.accessToken },
     });

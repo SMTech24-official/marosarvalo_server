@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import ReceiptServices from "./receipts.service";
@@ -10,7 +10,7 @@ const createReceipt = catchAsync(async (req: Request, res: Response) => {
     const result = await ReceiptServices.createReceipt(req.body, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
+        statusCode: StatusCodes.CREATED,
         message: result.message,
         data: result.data,
     });
@@ -21,7 +21,7 @@ const getReceipts = catchAsync(async (req: Request, res: Response) => {
     const result = await ReceiptServices.getReceipts(req.query, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
         pagination: result.pagination,
@@ -39,7 +39,7 @@ const getReceiptDetailsById = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
         });
@@ -53,7 +53,7 @@ const deleteReceipt = catchAsync(async (req: Request, res: Response) => {
     const result = await ReceiptServices.deleteReceipt(id, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });

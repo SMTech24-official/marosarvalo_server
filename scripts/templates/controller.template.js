@@ -3,7 +3,7 @@ const template = ({
     camel,
     subdir = false,
 }) => `import type { Request, Response } from "express"
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes"
 import catchAsync from "${subdir ? "../../" : ""}../../../shared/catchAsync";
 import sendResponse from "${
     subdir ? "../../" : ""

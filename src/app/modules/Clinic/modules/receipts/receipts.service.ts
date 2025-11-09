@@ -4,7 +4,7 @@ import { ProductType, Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 
 import ApiError from "../../../../../errors/ApiErrors";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { CreateReceiptInput } from "./receipts.validation";
 import { getMaxSequence } from "../../../../../utils";
 
@@ -158,7 +158,7 @@ const getReceiptDetailsById = async (id: number, user: JwtPayload) => {
     });
 
     if (!receipt) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Receipt not Found!");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Receipt not Found!");
     }
 
     const formattedData = {

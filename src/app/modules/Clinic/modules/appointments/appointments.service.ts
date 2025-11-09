@@ -3,14 +3,14 @@ import QueryBuilder from "../../../../../utils/queryBuilderV2";
 import { AppointmentStatus, Prisma } from "@prisma/client";
 import { getDateRange } from "../../clinic.utils";
 import { JwtPayload } from "jsonwebtoken";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { createSlots, groupAppointment } from "./appointments.utils";
 import { CreateAppointmentInput } from "./appointments.validation";
 import ApiError from "../../../../../errors/ApiErrors";
 import { getMaxSequence } from "../../../../../utils";
 import { FilterBy } from "../../../Admin/admin.service";
 
-import { endOfDay, startOfDay } from "date-fns";
+import { endOfDay, isSameDay, startOfDay } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
 import config from "../../../../../config";
@@ -45,7 +45,7 @@ const createAppointment = async (
 
     if (appointmentExists) {
         throw new ApiError(
-            httpStatus.CONFLICT,
+            StatusCodes.CONFLICT,
             appointmentExists.specialistId === payload.specialistId
                 ? "Specialist is not available in this time slot"
                 : "Patient already has Appointment in this time slot",
@@ -65,7 +65,7 @@ const createAppointment = async (
 
     if (isHoliday) {
         throw new ApiError(
-            httpStatus.CONFLICT,
+            StatusCodes.CONFLICT,
             "Specialist is on holiday on this date",
         );
     }
@@ -186,7 +186,7 @@ const getAppointmentById = async (id: number, user: JwtPayload) => {
     });
 
     if (!appointment) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Appointment not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Appointment not found");
     }
 
     const data = {
@@ -231,7 +231,7 @@ const deleteAppointment = async (id: number, user: JwtPayload) => {
     });
 
     if (!appointment) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Appointment not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Appointment not found");
     }
 
     await prisma.appointment.delete({
@@ -271,7 +271,7 @@ const changeAppointmentStatus = async (
     });
 
     if (!appointment) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Appointment not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Appointment not found");
     }
 
     await prisma.appointment.update({
@@ -448,12 +448,23 @@ const getAvailableAppointmentSchedules = async (
             id: true,
             dbId: true,
             workingHour: true,
-            holiday: true,
+            holiday: {
+                where: {
+                    date: {
+                        gte: startTime,
+                        lte: endTime,
+                    },
+                },
+            },
         },
     });
 
     if (!specialist) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Specialist not found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Specialist not found");
+    }
+
+    if (specialist.holiday && isSameDay(specialist.holiday.date, zoned)) {
+        throw new ApiError(StatusCodes.NO_CONTENT, "Specialist is in Holiday");
     }
 
     const specialistWorkTime = (

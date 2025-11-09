@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import AppointmentsServices from "./appointments.service";
@@ -14,7 +14,7 @@ const getAppointmentsCount = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.count,
     });
@@ -28,7 +28,7 @@ const getSpecialistsCount = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.count,
     });
@@ -43,7 +43,7 @@ const getAppointmentsOverview = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
         });
@@ -59,7 +59,7 @@ const getUpcomingAppointments = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
             pagination: result.pagination,
@@ -76,7 +76,7 @@ const getAppointmentsCalender = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
             pagination: result.pagination,
@@ -95,7 +95,7 @@ const setAppointmentCompleted = catchAsync(
         );
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
         });

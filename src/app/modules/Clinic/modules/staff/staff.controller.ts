@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import StaffServices from "./staff.service";
@@ -10,7 +10,7 @@ const createNewStaff = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.createNewStaff(req.body, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
+        statusCode: StatusCodes.CREATED,
         message: result.message,
         data: result.data,
     });
@@ -21,7 +21,7 @@ const getAllStaff = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.getAllStaff(req.query, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
         pagination: result.pagination,
@@ -35,7 +35,7 @@ const getStaffById = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.getStaffById(id, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -48,7 +48,7 @@ const updateStaffData = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.updateStaffData(id, req.body, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -61,7 +61,7 @@ const deleteStaffData = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.deleteStaffData(id, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -78,7 +78,7 @@ const updateWorkingHours = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -91,7 +91,7 @@ const insertHoliday = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.insertHoliday(id, req.body, req.user);
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -107,7 +107,7 @@ const getStaffSchedules = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });

@@ -1,6 +1,6 @@
 import prisma from "../../../shared/prisma";
 
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import ApiError from "../../../errors/ApiErrors";
 import { JwtPayload } from "jsonwebtoken";
 import { UserRole } from "@prisma/client";
@@ -32,7 +32,10 @@ const getUserInfo = async (user: JwtPayload) => {
     });
 
     if (!userProfile) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthenticated Request.");
+        throw new ApiError(
+            StatusCodes.UNAUTHORIZED,
+            "Unauthenticated Request.",
+        );
     }
 
     // User profile with profession but without staff

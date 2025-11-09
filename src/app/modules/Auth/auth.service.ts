@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 
 import config from "../../../config";
 import ApiError from "../../../errors/ApiErrors";
@@ -20,14 +20,14 @@ const loginUser = async (payload: { email: string; password: string }) => {
     });
     if (!userData) {
         throw new ApiError(
-            httpStatus.UNAUTHORIZED,
+            StatusCodes.UNAUTHORIZED,
             "Invalid Credentials Provided",
         );
     }
 
     if (!payload.password || !userData?.password) {
         throw new ApiError(
-            httpStatus.UNAUTHORIZED,
+            StatusCodes.UNAUTHORIZED,
             "Invalid Credentials Provided",
         );
     }
@@ -39,14 +39,14 @@ const loginUser = async (payload: { email: string; password: string }) => {
 
     if (!isCorrectPassword) {
         throw new ApiError(
-            httpStatus.UNAUTHORIZED,
+            StatusCodes.UNAUTHORIZED,
             "Invalid Credentials Provided",
         );
     }
 
     if (userData.status === "INACTIVE")
         throw new ApiError(
-            httpStatus.UNAUTHORIZED,
+            StatusCodes.UNAUTHORIZED,
             "Your account has been Blocked. Contact Admin to Activate your Account.",
         );
 
@@ -82,7 +82,7 @@ const changePassword = async (
     },
 ) => {
     if (!payload.oldPassword || !payload.newPassword) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid Body Provided");
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Body Provided");
     }
 
     const userInfo = await prisma.user.findUnique({
@@ -90,7 +90,10 @@ const changePassword = async (
     });
 
     if (!userInfo || !userInfo?.password) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthenticated Request!");
+        throw new ApiError(
+            StatusCodes.UNAUTHORIZED,
+            "Unauthenticated Request!",
+        );
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -99,7 +102,7 @@ const changePassword = async (
     );
 
     if (!isPasswordValid) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "Password is Incorrect");
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "Password is Incorrect");
     }
 
     const hashedPassword = await bcrypt.hash(payload.newPassword, 12);
@@ -150,7 +153,7 @@ const forgotPassword = async (payload: { email: string }) => {
 // Refresh Token
 const refreshToken = async (payload: { refreshToken: string }) => {
     if (!payload.refreshToken) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "refreshToken is required");
+        throw new ApiError(StatusCodes.BAD_REQUEST, "refreshToken is required");
     }
 
     let decrypted;
@@ -163,7 +166,7 @@ const refreshToken = async (payload: { refreshToken: string }) => {
     } catch (err) {
         console.log(err);
         throw new ApiError(
-            httpStatus.BAD_REQUEST,
+            StatusCodes.BAD_REQUEST,
             "Refresh Token is Invalid or Expired",
         );
     }
@@ -174,7 +177,7 @@ const refreshToken = async (payload: { refreshToken: string }) => {
     });
 
     if (!userData) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthenticated Request");
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "Unauthenticated Request");
     }
 
     const jwtPayload = {

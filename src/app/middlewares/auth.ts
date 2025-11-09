@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { Secret } from "jsonwebtoken";
 import config from "../../config";
 
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiErrors";
 import { jwtHelpers } from "../../helpers/jwtHelpers";
 import prisma from "../../shared/prisma";
@@ -20,7 +20,7 @@ const auth = (...roles: UserRole[]) => {
 
             if (!token) {
                 throw new ApiError(
-                    httpStatus.UNAUTHORIZED,
+                    StatusCodes.UNAUTHORIZED,
                     "Unauthorized Request",
                 );
             }
@@ -48,13 +48,13 @@ const auth = (...roles: UserRole[]) => {
 
             if (!user) {
                 throw new ApiError(
-                    httpStatus.UNAUTHORIZED,
+                    StatusCodes.UNAUTHORIZED,
                     "Unauthorized Request",
                 );
             }
             if (user.status !== "ACTIVE") {
                 throw new ApiError(
-                    httpStatus.UNAUTHORIZED,
+                    StatusCodes.UNAUTHORIZED,
                     "Your Account Status is Inactive. Contact Admin.",
                 );
             }
@@ -64,13 +64,13 @@ const auth = (...roles: UserRole[]) => {
                 user.clinic?.status !== "ACTIVE"
             ) {
                 throw new ApiError(
-                    httpStatus.FORBIDDEN,
+                    StatusCodes.FORBIDDEN,
                     "Your Associated Clinic's Status is Inactive.",
                 );
             }
 
             if (roles.length && !roles.includes(user.role)) {
-                throw new ApiError(httpStatus.FORBIDDEN, "Forbidden Request!");
+                throw new ApiError(StatusCodes.FORBIDDEN, "Forbidden Request!");
             }
 
             req.user = {

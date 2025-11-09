@@ -3,7 +3,7 @@ import catchAsync from "../../../../../shared/catchAsync";
 import sendResponse from "../../../../../shared/sendResponse";
 import ReminderServices from "./reminder.service";
 import { ActivityStatus } from "@prisma/client";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 
 // Create Reminder Schedules
 const createReminderSchedules = catchAsync(
@@ -15,7 +15,7 @@ const createReminderSchedules = catchAsync(
 
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.CREATED,
+            statusCode: StatusCodes.CREATED,
             message: result.message,
             data: result.data,
         });
@@ -28,7 +28,7 @@ const getReminderSchedules = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -45,7 +45,7 @@ const updateSchedule = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -58,7 +58,7 @@ const deleteSchedule = catchAsync(async (req: Request, res: Response) => {
 
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -74,7 +74,7 @@ const updateReminderStatus = catchAsync(async (req: Request, res: Response) => {
             status?.toUpperCase() as ActivityStatus,
         )
     ) {
-        res.status(httpStatus.NOT_FOUND);
+        res.status(StatusCodes.NOT_FOUND);
     }
 
     const result = await ReminderServices.updateReminderStatus(
@@ -84,7 +84,7 @@ const updateReminderStatus = catchAsync(async (req: Request, res: Response) => {
     );
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.OK,
+        statusCode: StatusCodes.OK,
         message: result.message,
         data: result.data,
     });
@@ -100,7 +100,7 @@ const getReminderScheduleHistory = catchAsync(
 
         sendResponse(res, {
             success: true,
-            statusCode: httpStatus.OK,
+            statusCode: StatusCodes.OK,
             message: result.message,
             data: result.data,
             pagination: result.pagination,

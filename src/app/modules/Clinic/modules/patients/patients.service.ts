@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { getDateRange } from "../../clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { CreatePatientInput } from "./patients.validation";
 import { getNewestDate } from "./patients.utils";
 import { getMaxSequence } from "../../../../../utils";
@@ -135,7 +135,7 @@ const getPatientById = async (patientId: number, user: JwtPayload) => {
     });
 
     if (!patient) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Patient not Found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Patient not Found");
     }
 
     const formattedData = {
@@ -192,7 +192,7 @@ const getPatientAppointments = async (
         },
     });
     if (!patient) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Patient not Found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Patient not Found");
     }
 
     const queryBuilder = new QueryBuilder<
@@ -265,7 +265,7 @@ const getPatientBonds = async (
         },
     });
     if (!patient) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Patient not Found");
+        throw new ApiError(StatusCodes.NOT_FOUND, "Patient not Found");
     }
 
     const queryBuilder = new QueryBuilder<
@@ -323,7 +323,7 @@ const searchPatient = async (
     user: JwtPayload,
 ) => {
     if (!query.searchTerm) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "searchTerm is required");
+        throw new ApiError(StatusCodes.BAD_REQUEST, "searchTerm is required");
     }
 
     const patients = await prisma.patient.findMany({

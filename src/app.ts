@@ -1,5 +1,5 @@
 import express, { Application, Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -41,7 +41,7 @@ app.use(GlobalErrorHandler);
 
 // 404 Not Found handler
 app.use((req: Request, res: Response) => {
-    res.status(httpStatus.NOT_FOUND).json({
+    res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: "API NOT FOUND!",
         error: {

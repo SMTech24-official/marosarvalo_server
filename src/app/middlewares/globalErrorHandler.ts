@@ -2,7 +2,7 @@
 
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
-import httpStatus from "http-status";
+import { StatusCodes } from "http-status-codes";
 import { ZodError } from "zod";
 import ApiError from "../../errors/ApiErrors";
 import handleClientError from "../../errors/handleClientError";
@@ -12,7 +12,7 @@ import { IGenericErrorMessage } from "../../interfaces/error";
 import config from "../../config";
 
 const GlobalErrorHandler = (error: any, req: Request, res: Response) => {
-    let statusCode: number = httpStatus.INTERNAL_SERVER_ERROR;
+    let statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR;
     let message = error.message || "Something went wrong!";
     let errorMessages: IGenericErrorMessage[] = [];
 
@@ -70,7 +70,7 @@ const GlobalErrorHandler = (error: any, req: Request, res: Response) => {
 
     // Prisma Client Initialization Error
     else if (error instanceof Prisma.PrismaClientInitializationError) {
-        statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+        statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
         message =
             "Failed to initialize Prisma Client. Check your database connection or Prisma configuration.";
         errorMessages = [
@@ -83,7 +83,7 @@ const GlobalErrorHandler = (error: any, req: Request, res: Response) => {
 
     // Prisma Client Rust Panic Error
     else if (error instanceof Prisma.PrismaClientRustPanicError) {
-        statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+        statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
         message =
             "A critical error occurred in the Prisma engine. Please try again later.";
         errorMessages = [
@@ -96,7 +96,7 @@ const GlobalErrorHandler = (error: any, req: Request, res: Response) => {
 
     // Prisma Client Unknown Request Error
     else if (error instanceof Prisma.PrismaClientUnknownRequestError) {
-        statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+        statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
         message = "An unknown error occurred while processing the request.";
         errorMessages = [
             {
@@ -108,7 +108,7 @@ const GlobalErrorHandler = (error: any, req: Request, res: Response) => {
 
     // Generic Error Handling (e.g., JavaScript Errors)
     else if (error instanceof SyntaxError) {
-        statusCode = httpStatus.BAD_REQUEST;
+        statusCode = StatusCodes.BAD_REQUEST;
         message = "Syntax error in the request. Please verify your input.";
         errorMessages = [
             {
@@ -117,7 +117,7 @@ const GlobalErrorHandler = (error: any, req: Request, res: Response) => {
             },
         ];
     } else if (error instanceof TypeError) {
-        statusCode = httpStatus.BAD_REQUEST;
+        statusCode = StatusCodes.BAD_REQUEST;
         message = "Type error in the application. Please verify your input.";
         errorMessages = [
             {
@@ -126,7 +126,7 @@ const GlobalErrorHandler = (error: any, req: Request, res: Response) => {
             },
         ];
     } else if (error instanceof ReferenceError) {
-        statusCode = httpStatus.BAD_REQUEST;
+        statusCode = StatusCodes.BAD_REQUEST;
         message =
             "Reference error in the application. Please verify your input.";
         errorMessages = [
