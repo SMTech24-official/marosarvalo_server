@@ -1,6 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { Appointment, Bond, Patient } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { getDateRange } from "../../clinic.utils";
 import ApiError from "../../../../../errors/ApiErrors";
@@ -63,15 +63,12 @@ const getPatients = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.patient, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.patient,
+        Prisma.$PatientPayload
+    >(prisma.patient, query);
 
-    const patients: (Patient & {
-        appointments: {
-            date: Date;
-            startTime: Date;
-            endTime: Date;
-        }[];
-    })[] = await queryBuilder
+    const patients = await queryBuilder
         .search(["firstName", "lastName", "phone", "email"])
         .sort()
         .range()
@@ -198,20 +195,12 @@ const getPatientAppointments = async (
         throw new ApiError(httpStatus.NOT_FOUND, "Patient not Found");
     }
 
-    const queryBuilder = new QueryBuilder(prisma.appointment, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.appointment,
+        Prisma.$AppointmentPayload
+    >(prisma.appointment, query);
 
-    const appointments: (Appointment & {
-        specialist: {
-            id: string;
-            name: string;
-        };
-        patient: {
-            id: true;
-            firstName: true;
-            lastName: true;
-            phone: true;
-        };
-    })[] = await queryBuilder
+    const appointments = await queryBuilder
         .sort()
         .paginate()
         .include({
@@ -239,6 +228,7 @@ const getPatientAppointments = async (
     const formattedData = appointments.map((appointment) => {
         const data = {
             id: appointment.id,
+            dbId: appointment.dbId,
             date: appointment.date,
             startTime: appointment.startTime,
             endTime: appointment.endTime,
@@ -278,18 +268,12 @@ const getPatientBonds = async (
         throw new ApiError(httpStatus.NOT_FOUND, "Patient not Found");
     }
 
-    const queryBuilder = new QueryBuilder(prisma.bond, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.bond,
+        Prisma.$BondPayload
+    >(prisma.bond, query);
 
-    const bonds: (Bond & {
-        discipline: {
-            id: string;
-            name: string;
-        };
-        service: {
-            id: string;
-            name: string;
-        };
-    })[] = await queryBuilder
+    const bonds = await queryBuilder
         .sort()
         .paginate()
         .include({

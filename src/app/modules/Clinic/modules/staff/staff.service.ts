@@ -1,6 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { Staff, UserRole } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { Prisma, UserRole } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
@@ -106,14 +106,12 @@ const getAllStaff = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.staff, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.staff,
+        Prisma.$StaffPayload
+    >(prisma.staff, query);
 
-    const staffs: (Staff & {
-        discipline: {
-            id: string;
-            name: string;
-        };
-    })[] = await queryBuilder
+    const staffs = await queryBuilder
         .rawFilter({
             clinicId: user.clinicId,
         })

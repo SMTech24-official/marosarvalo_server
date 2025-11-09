@@ -1,11 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import {
-    ActivityStatus,
-    CommunicationMethod,
-    ReminderScheduleType,
-    ScheduledReminderHistory,
-} from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { ActivityStatus, Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 
 import {
@@ -167,46 +162,18 @@ const getReminderScheduleHistory = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(
-        prisma.scheduledReminderHistory,
-        query,
-    );
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.scheduledReminderHistory,
+        Prisma.$ScheduledReminderHistoryPayload
+    >(prisma.scheduledReminderHistory, query);
 
-    const histories: (ScheduledReminderHistory & {
-        patient: {
-            firstName: true;
-            lastName: true;
-            email: true;
-        };
-        schedule: {
-            type: ReminderScheduleType;
-            subject: string;
-            communicationMethods: CommunicationMethod;
-        };
-    })[] = await queryBuilder
+    const histories = await queryBuilder
+        .search(["patient.firstName", "patient.lastName"])
         .sort()
         .paginate()
         .rawFilter({
             patient: {
                 clinicId: user.clinicId,
-                ...(query.searchTerm
-                    ? {
-                          OR: [
-                              {
-                                  firstName: {
-                                      contains: query.searchTerm,
-                                      mode: "insensitive",
-                                  },
-                              },
-                              {
-                                  lastName: {
-                                      contains: query.searchTerm,
-                                      mode: "insensitive",
-                                  },
-                              },
-                          ],
-                      }
-                    : {}),
             },
         })
         .include({

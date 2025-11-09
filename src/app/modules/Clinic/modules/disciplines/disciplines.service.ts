@@ -1,6 +1,6 @@
 import { JwtPayload } from "jsonwebtoken";
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
 
 import {
     CreateDisciplineInput,
@@ -8,22 +8,19 @@ import {
 } from "./disciplines.validation";
 import ApiError from "../../../../../errors/ApiErrors";
 import httpStatus from "http-status";
-import { Discipline } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 // Get disciplines
 const getDisciplines = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.discipline, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.discipline,
+        Prisma.$DisciplinePayload
+    >(prisma.discipline, query);
 
-    const disciplines: (Discipline & {
-        services: {
-            id: string;
-            name: string;
-            price: number;
-        }[];
-    })[] = await queryBuilder
+    const disciplines = await queryBuilder
         .rawFilter({
             clinicId: user.clinicId,
         })

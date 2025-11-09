@@ -1,5 +1,5 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
 import { SendReminderInput } from "./reminder.validation";
 import emailSender from "../../../../../helpers/emailSender/emailSender";
 

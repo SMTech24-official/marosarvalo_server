@@ -3,8 +3,8 @@ import { hashPassword } from "../../../../../helpers/passwordHelpers";
 import prisma from "../../../../../shared/prisma";
 import httpStatus from "http-status";
 import { CreateClinicInput, UpdateClinicInput } from "./clinic.validation";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { Clinic } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { Prisma } from "@prisma/client";
 import { getCountdown } from "./clinic.utils";
 
 // Create new Clinic // TODO: Add Clinic to Subscription
@@ -72,11 +72,12 @@ const createNewClinic = async (body: CreateClinicInput) => {
 
 // Get All Clinics
 const getAllClinic = async (query: Record<string, unknown>) => {
-    const queryBuilder = new QueryBuilder(prisma.clinic, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.clinic,
+        Prisma.$ClinicPayload
+    >(prisma.clinic, query);
 
-    const clinics: (Clinic & {
-        subscription: { startDate: Date; endDate: Date };
-    })[] = await queryBuilder
+    const clinics = await queryBuilder
         .search(["name", "email", "phone"])
         .sort()
         .paginate()
@@ -90,8 +91,8 @@ const getAllClinic = async (query: Record<string, unknown>) => {
     const pagination = await queryBuilder.countTotal();
 
     const formattedClinics = clinics.map((clinic) => {
-        const endDate = clinic.subscription.endDate;
-        const countdown = getCountdown(new Date(endDate));
+        const endDate = clinic.subscription?.endDate;
+        const countdown = endDate ? getCountdown(new Date(endDate)) : null;
 
         const data = {
             id: clinic.id,
@@ -100,8 +101,8 @@ const getAllClinic = async (query: Record<string, unknown>) => {
             email: clinic.email,
             status: clinic.status, // TODO: Add Nodecron Checker to check if subscription has ended. If so, update status
             subscription: {
-                startDate: clinic.subscription.startDate,
-                endDate: clinic.subscription.endDate,
+                startDate: clinic.subscription?.startDate,
+                endDate: clinic.subscription?.endDate,
                 countdown,
             },
         };

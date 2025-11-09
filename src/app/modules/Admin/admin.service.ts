@@ -3,8 +3,8 @@ import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiErrors";
 import bcrypt from "bcrypt";
 import { type CreateAdminInput } from "./admin.validation";
-import QueryBuilder from "../../../utils/queryBuilder";
-import { Clinic, Subscription } from "@prisma/client";
+import QueryBuilder from "../../../utils/queryBuilderV2";
+import { Prisma } from "@prisma/client";
 import { groupRevenue, Payment } from "./admin.utils";
 
 export type FilterBy = "day" | "week" | "month" | "year" | undefined;
@@ -97,23 +97,23 @@ const createNewAdmin = async (body: CreateAdminInput) => {
 
 // TODO:  Update subscription create with phone
 const getAllBookings = async (query: Record<string, unknown>) => {
-    const queryBuilder = new QueryBuilder(prisma.subscription, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.subscription,
+        Prisma.$SubscriptionPayload
+    >(prisma.subscription, query);
 
-    const subscriptions: (Subscription & {
-        clinic?: Clinic;
-    })[] = await queryBuilder
+    const subscriptions = await queryBuilder
         .search(["name", "email"])
         .sort()
         .paginate()
-        .execute({
-            select: {
-                clinic: {
-                    select: {
-                        id: true,
-                    },
+        .include({
+            clinic: {
+                select: {
+                    id: true,
                 },
             },
-        });
+        })
+        .execute();
 
     const pagination = await queryBuilder.countTotal();
 
@@ -139,23 +139,21 @@ const getAllBookings = async (query: Record<string, unknown>) => {
 
 // Get All Payments
 const getAllPaymentHistory = async (query: Record<string, unknown>) => {
-    const queryBuilder = new QueryBuilder(prisma.subscription, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.subscription,
+        Prisma.$SubscriptionPayload
+    >(prisma.subscription, query);
 
-    const subscriptions: (Subscription & {
-        package: {
-            price: number;
-        };
-    })[] = await queryBuilder
+    const subscriptions = await queryBuilder
         .search(["name", "email"])
         .sort()
         .paginate()
-        .execute({
-            select: {
-                package: {
-                    select: { price: true },
-                },
+        .include({
+            package: {
+                select: { price: true },
             },
-        });
+        })
+        .execute();
 
     const pagination = await queryBuilder.countTotal();
 

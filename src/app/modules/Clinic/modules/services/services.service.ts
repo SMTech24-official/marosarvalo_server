@@ -1,6 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { Service } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 
 import ApiError from "../../../../../errors/ApiErrors";
@@ -50,14 +50,12 @@ const getServices = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.service, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.service,
+        Prisma.$ServicePayload
+    >(prisma.service, query);
 
-    const services: (Service & {
-        discipline: {
-            name: string;
-            id: string;
-        };
-    })[] = await queryBuilder
+    const services = await queryBuilder
         .rawFilter({
             discipline: { clinicId: user.clinicId },
         })

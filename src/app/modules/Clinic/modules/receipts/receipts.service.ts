@@ -1,6 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { ProductType, Invoice } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { ProductType, Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 
 import ApiError from "../../../../../errors/ApiErrors";
@@ -70,21 +70,12 @@ const getReceipts = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.invoice, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.invoice,
+        Prisma.$InvoicePayload
+    >(prisma.invoice, query);
 
-    const receipts: (Invoice & {
-        patient: {
-            firstName: string;
-            lastName: string;
-            email: string;
-        };
-        products: {
-            type: ProductType;
-            service: {
-                name: string;
-            };
-        }[];
-    })[] = await queryBuilder
+    const receipts = await queryBuilder
         .sort()
         .paginate()
         .rawFilter({

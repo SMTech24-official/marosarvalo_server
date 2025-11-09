@@ -1,6 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { Appointment } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { Prisma } from "@prisma/client";
 import {
     countServices,
     getAttendanceStats,
@@ -110,24 +110,12 @@ const getCancellationInfo = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.appointment, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.appointment,
+        Prisma.$AppointmentPayload
+    >(prisma.appointment, query);
 
-    const appointments: (Appointment & {
-        patient: {
-            id: string;
-            firstName: string;
-            lastName: string;
-            email: string;
-        };
-        service: {
-            id: string;
-            name: string;
-        };
-        specialist: {
-            id: string;
-            name: string;
-        };
-    })[] = await queryBuilder
+    const appointments = await queryBuilder
         .rawFilter({
             patient: {
                 clinicId: user.clinicId,

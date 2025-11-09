@@ -1,6 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { Appointment } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { Prisma } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { groupAppointment } from "./appointments.utils";
 import { FilterBy, getDateRange } from "../../specialist.utils";
@@ -77,26 +77,15 @@ const getUpcomingAppointments = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.appointment, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.appointment,
+        Prisma.$AppointmentPayload
+    >(prisma.appointment, query);
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    const appointments: (Appointment & {
-        specialist: {
-            name: string;
-        };
-        discipline: {
-            name: string;
-        };
-        service: {
-            name: string;
-        };
-        patient: {
-            firstName: string;
-            lastName: string;
-        };
-    })[] = await queryBuilder
+    const appointments = await queryBuilder
         .sort()
         .paginate()
         .rawFilter({
@@ -152,29 +141,12 @@ const getAppointmentsCalender = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.appointment, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.appointment,
+        Prisma.$AppointmentPayload
+    >(prisma.appointment, query);
 
-    const appointments: (Appointment & {
-        specialist: {
-            id: string;
-            name: string;
-            profilePicture: string;
-        };
-
-        discipline: {
-            name: string;
-        };
-
-        service: {
-            name: string;
-        };
-
-        patient: {
-            firstName: string;
-            lastName: string;
-            phone: string;
-        };
-    })[] = await queryBuilder
+    const appointments = await queryBuilder
         .filter(["status"])
         .sort()
         .paginate()

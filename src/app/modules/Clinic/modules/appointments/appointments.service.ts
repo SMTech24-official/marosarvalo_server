@@ -1,6 +1,6 @@
 import prisma from "../../../../../shared/prisma";
-import QueryBuilder from "../../../../../utils/queryBuilder";
-import { Appointment, AppointmentStatus } from "@prisma/client";
+import QueryBuilder from "../../../../../utils/queryBuilderV2";
+import { AppointmentStatus, Prisma } from "@prisma/client";
 import { getDateRange } from "../../clinic.utils";
 import { JwtPayload } from "jsonwebtoken";
 import httpStatus from "http-status";
@@ -94,50 +94,20 @@ const getAppointments = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.appointment, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.appointment,
+        Prisma.$AppointmentPayload
+    >(prisma.appointment, query);
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    const appointments: (Appointment & {
-        specialist: {
-            name: string;
-        };
-        discipline: {
-            name: string;
-        };
-        service: {
-            name: string;
-        };
-        patient: {
-            id: string;
-            firstName: string;
-            lastName: string;
-            phone: string;
-        };
-    })[] = await queryBuilder
+    const appointments = await queryBuilder
+        .search(["patient.firstName", "patient.lastName"])
         .sort()
         .paginate()
         .filter(["status"])
         .rawFilter({
-            patient: query.searchTerm
-                ? {
-                      OR: [
-                          {
-                              firstName: {
-                                  contains: query.searchTerm,
-                                  mode: "insensitive",
-                              },
-                          },
-                          {
-                              lastName: {
-                                  contains: query.searchTerm,
-                                  mode: "insensitive",
-                              },
-                          },
-                      ],
-                  }
-                : undefined,
             specialistId: user.id,
             date: {
                 gte: startOfToday,
@@ -384,39 +354,19 @@ const getAppointmentsCalender = async (
     query: Record<string, unknown>,
     user: JwtPayload,
 ) => {
-    const queryBuilder = new QueryBuilder(prisma.appointment, query);
+    const queryBuilder = new QueryBuilder<
+        typeof prisma.appointment,
+        Prisma.$AppointmentPayload
+    >(prisma.appointment, query);
 
-    const appointments: (Appointment & {
-        specialist: {
-            id: string;
-            name: string;
-            profilePicture: string;
-        };
-
-        discipline: {
-            name: string;
-        };
-
-        service: {
-            name: string;
-        };
-
-        patient: {
-            firstName: string;
-            lastName: string;
-            phone: string;
-        };
-    })[] = await queryBuilder
+    const appointments = await queryBuilder
+        .search(["patient.firstName", "patient.lastName"])
         .filter(["status"])
         .sort()
         .paginate()
         .range()
         .rawFilter({
-            patient: {
-                contains: query.searchTerm,
-                mode: "insensitive",
-                clinicId: user.clinicId,
-            },
+            clinicId: user.clinicId,
             specialistId: user.id,
             status: {
                 not: "CANCELLED",
