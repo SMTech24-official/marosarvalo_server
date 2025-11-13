@@ -22,6 +22,6 @@ router.post(
 router.get("/bookings", AdminControllers.getAllBookings);
 
 // Get All Payment history
-router.get("/payment", AdminControllers.getAllPaymentHistory);
+router.get("/payments", AdminControllers.getAllPaymentHistory);
 
 export const AdminRoutes = router;

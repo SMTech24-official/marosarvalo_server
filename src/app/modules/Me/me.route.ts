@@ -5,10 +5,10 @@ import auth from "../../middlewares/auth";
 const router = Router();
 
 // Get Current User Information
-router.get("/", auth(), UserController.getUserInfo);
+router.get("/", UserController.getUserInfo);
 
 // Update Current User Info
-router.put(
+router.patch(
     "/",
     auth("SUPER_ADMIN", "RECEPTIONIST"),
     UserController.updateUserInfo,

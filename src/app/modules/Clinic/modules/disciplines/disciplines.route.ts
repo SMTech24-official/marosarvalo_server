@@ -5,15 +5,15 @@ import disciplineValidations from "./disciplines.validation";
 
 const router = Router();
 
-// Get Disciplines
-router.get("/", DisciplineControllers.getDisciplines);
-
 // Create Discipline
 router.post(
     "/",
     validateRequest(disciplineValidations.createDisciplineSchema),
     DisciplineControllers.createDiscipline,
 );
+
+// Get Disciplines
+router.get("/", DisciplineControllers.getDisciplines);
 
 // Update Discipline
 router.patch(

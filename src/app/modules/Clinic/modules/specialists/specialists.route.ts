@@ -3,6 +3,6 @@ import SpecialistController from "./specialists.controller";
 
 const router = Router();
 
-router.get("/specialists/count", SpecialistController.getSpecialistsCount);
+router.get("/count", SpecialistController.getSpecialistsCount);
 
 export const SpecialistRoutes = router;

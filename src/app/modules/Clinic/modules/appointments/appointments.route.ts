@@ -23,9 +23,6 @@ router.post(
 // Get Appointments
 router.get("/", AppointmentControllers.getAppointments);
 
-// Get Appointment by Id
-router.get("/:id", AppointmentControllers.getAppointmentById);
-
 // Delete Appointment
 router.delete("/:id", AppointmentControllers.deleteAppointment);
 
@@ -46,5 +43,8 @@ router.get(
     "/available-slots",
     AppointmentControllers.getAvailableAppointmentSchedules,
 );
+
+// Get Appointment by Id
+router.get("/:id", AppointmentControllers.getAppointmentById);
 
 export const AppointmentRoutes = router;

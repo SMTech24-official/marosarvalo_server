@@ -1,11 +1,17 @@
 import express from "express";
 import auth from "../../middlewares/auth";
 import AuthController from "./auth.controller";
+import authValidations from "./auth.validation";
+import validateRequest from "../../middlewares/validateRequest";
 
 const router = express.Router();
 
 // Login User
-router.post("/login", AuthController.loginUser);
+router.post(
+    "/login",
+    validateRequest(authValidations.loginSchema),
+    AuthController.loginUser,
+);
 
 // Logout User
 router.post("/logout", auth(), AuthController.logoutUser);
@@ -14,12 +20,25 @@ router.post("/logout", auth(), AuthController.logoutUser);
 // router.get("/me", auth(), AuthController.getUserInfo);
 
 // Change Password
-router.put("/change-password", auth(), AuthController.changePassword);
+router.patch(
+    "/change-password",
+    auth(),
+    validateRequest(authValidations.changePasswordSchema),
+    AuthController.changePassword,
+);
 
 // Forgot Password
-router.post("/forgot-password", AuthController.forgotPassword);
+router.post(
+    "/forgot-password",
+    validateRequest(authValidations.forgotPasswordSchema),
+    AuthController.forgotPassword,
+);
 
 // Refresh Token
-router.post("/refresh-token", AuthController.refreshToken);
+router.post(
+    "/refresh-token",
+    validateRequest(authValidations.refreshTokenSchema),
+    AuthController.refreshToken,
+);
 
 export const AuthRoutes = router;

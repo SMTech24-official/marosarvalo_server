@@ -8,6 +8,7 @@ import { ReminderRoutes } from "../modules/reminder/reminder.route";
 import { SettingsRoutes } from "../modules/settings/settings.route";
 import { ReportsRoutes } from "../modules/reports/reports.route";
 import auth from "../../../middlewares/auth";
+import { SpecialistRoutes } from "../../Specialist/specialist.route";
 
 const moduleRoutes = [
     {
@@ -35,7 +36,7 @@ const moduleRoutes = [
         handlers: [ReceiptRoutes],
     },
     {
-        path: "/reminder",
+        path: "/reminders",
         handlers: [ReminderRoutes],
     },
     {
@@ -45,6 +46,10 @@ const moduleRoutes = [
     {
         path: "/reports",
         handlers: [auth("CLINIC_ADMIN"), ReportsRoutes],
+    },
+    {
+        path: "/specialists",
+        handlers: [SpecialistRoutes],
     },
 ] satisfies {
     path: string;

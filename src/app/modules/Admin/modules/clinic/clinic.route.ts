@@ -27,3 +27,5 @@ router.patch(
 
 // Delete Clinic
 router.delete("/:id", ClinicControllers.deleteClinic);
+
+export const ClinicRoutes = router;

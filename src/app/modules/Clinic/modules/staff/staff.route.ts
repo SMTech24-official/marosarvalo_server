@@ -12,10 +12,13 @@ router.post(
     StaffControllers.createNewStaff,
 );
 
+// Get Staff Schedules
+router.get("/schedules", StaffControllers.getStaffSchedules);
+
 // Get All Staff
 router.get("/", StaffControllers.getAllStaff);
 
-// get By Id, update, delete
+// Get single Staff
 router.get("/:id", StaffControllers.getStaffById);
 
 // Update Staff data
@@ -41,8 +44,5 @@ router.post(
     validateRequest(staffValidations.insertHolidayInput),
     StaffControllers.insertHoliday,
 );
-
-// Get Staff Schedules
-router.get("/schedules", StaffControllers.getStaffSchedules);
 
 export const StaffRoutes = router;

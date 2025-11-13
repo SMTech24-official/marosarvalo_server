@@ -3,7 +3,7 @@ import z from "zod";
 
 const createReminderScheduleSchema = z.object({
     type: z.enum(ReminderScheduleType),
-    prior: z.number().optional(),
+    prior: z.number(),
     description: z.string().optional(),
     communicationMethods: z.array(z.enum(CommunicationMethod)),
     subject: z.string(),

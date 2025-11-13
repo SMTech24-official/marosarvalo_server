@@ -1,4 +1,4 @@
-import { ClinicRoutes } from "../../Clinic/clinic.route";
+import { ClinicRoutes } from "../modules/clinic/clinic.route";
 import { PackageRoutes } from "../modules/package/package.route";
 import { ReminderRoutes } from "../modules/reminder/reminder.route";
 

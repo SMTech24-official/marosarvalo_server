@@ -10,9 +10,15 @@ import emailSender from "../../../helpers/emailSender/emailSender";
 import { comparePassword } from "../../../helpers/passwordHelpers";
 import { JwtPayload, Secret } from "jsonwebtoken";
 import { GenerateForgetPasswordTemplate } from "./auth.template";
+import {
+    ChangePasswordSchemaInput,
+    ForgotPasswordSchemaInput,
+    LoginSchemaInput,
+    RefreshTokenSchemaInput,
+} from "./auth.validation";
 
 // Login User
-const loginUser = async (payload: { email: string; password: string }) => {
+const loginUser = async (payload: LoginSchemaInput) => {
     const userData = await prisma.user.findUniqueOrThrow({
         where: {
             email: payload.email,
@@ -76,15 +82,8 @@ const loginUser = async (payload: { email: string; password: string }) => {
 // Change Password
 const changePassword = async (
     user: JwtPayload,
-    payload: {
-        oldPassword: string;
-        newPassword: string;
-    },
+    payload: ChangePasswordSchemaInput,
 ) => {
-    if (!payload.oldPassword || !payload.newPassword) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Invalid Body Provided");
-    }
-
     const userInfo = await prisma.user.findUnique({
         where: { id: user?.id },
     });
@@ -119,7 +118,7 @@ const changePassword = async (
 };
 
 // Forgot Password
-const forgotPassword = async (payload: { email: string }) => {
+const forgotPassword = async (payload: ForgotPasswordSchemaInput) => {
     const userData = await prisma.user.findUnique({
         where: {
             email: payload.email,
@@ -151,11 +150,7 @@ const forgotPassword = async (payload: { email: string }) => {
 };
 
 // Refresh Token
-const refreshToken = async (payload: { refreshToken: string }) => {
-    if (!payload.refreshToken) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "refreshToken is required");
-    }
-
+const refreshToken = async (payload: RefreshTokenSchemaInput) => {
     let decrypted;
 
     try {

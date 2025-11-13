@@ -32,6 +32,9 @@ router.post(
 // Get Patients
 router.get("/", PatientControllers.getPatients);
 
+// Search Patient
+router.get("/search", PatientControllers.searchPatient);
+
 // Get Patient by Id
 router.get("/:id", PatientControllers.getPatientById);
 
@@ -40,8 +43,5 @@ router.get("/:id/appointments", PatientControllers.getPatientAppointments);
 
 // Get Patient Bonds
 router.get("/:id/bonds", PatientControllers.getPatientBonds);
-
-// Search Patient
-router.get("/search", PatientControllers.searchPatient);
 
 export const PatientRoutes = router;

@@ -21,7 +21,7 @@ const moduleRoutes = [
     },
     {
         path: "/me",
-        handlers: [MeRoutes],
+        handlers: [auth(), MeRoutes],
     },
     {
         path: "/specialist",
