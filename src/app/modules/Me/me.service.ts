@@ -12,22 +12,16 @@ const getUserInfo = async (user: JwtPayload) => {
         where: {
             id: user?.id,
         },
-        select: {
-            id: true,
-            email: true,
-            role: true,
-            address: true,
-            phone: true,
-            introduction: true,
-
+        include: {
             staff: {
                 select: {
                     profession: true,
                 },
             },
-
-            createdAt: true,
-            updatedAt: true,
+        },
+        omit: {
+            password: true,
+            clinicId: true,
         },
     });
 

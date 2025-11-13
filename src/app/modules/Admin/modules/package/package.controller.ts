@@ -60,7 +60,21 @@ const deletePackage = catchAsync(async (req: Request, res: Response) => {
         statusCode: StatusCodes.OK,
         success: true,
         message: result.message,
-        data: result.data,
+    });
+});
+
+// Update Package Status
+const updatePackageStatus = catchAsync(async (req: Request, res: Response) => {
+    const { status } = req.body;
+    const result = await PackageServices.updatePackageStatus(
+        req.params.id,
+        status,
+    );
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: result.message,
     });
 });
 
@@ -70,4 +84,5 @@ export default {
     getSinglePackage,
     updatePackage,
     deletePackage,
+    updatePackageStatus
 };

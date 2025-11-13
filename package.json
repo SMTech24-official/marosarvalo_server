@@ -4,7 +4,7 @@
     "main": "server.js",
     "scripts": {
         "start": "node ./dist/server.js",
-        "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+        "dev": "ts-node-dev --respawn --transpile-only --clear src/server.ts",
         "build": "tsc",
         "test": "echo \"Error: no test specified\" && exit 1",
         "cModule": "node scripts/generateModule.js",

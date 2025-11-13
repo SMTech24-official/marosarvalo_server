@@ -7,6 +7,7 @@ import { MeRoutes } from "../modules/Me/me.route";
 import { SpecialistRoutes } from "../modules/Specialist/specialist.route";
 import { StripeRoutes } from "../modules/Stripe/stripe.route";
 import { ClinicRoutes } from "../modules/Clinic/clinic.route";
+import { PublicRoutes } from "../modules/Public/public.route";
 
 const router = express.Router();
 
@@ -34,6 +35,11 @@ const moduleRoutes = [
     {
         path: "/stripe",
         handlers: [StripeRoutes],
+    },
+
+    {
+        path: "/public",
+        handlers: [PublicRoutes],
     },
 ] satisfies {
     path: string;

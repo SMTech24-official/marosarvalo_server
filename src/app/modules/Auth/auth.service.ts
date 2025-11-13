@@ -19,7 +19,7 @@ import {
 
 // Login User
 const loginUser = async (payload: LoginSchemaInput) => {
-    const userData = await prisma.user.findUniqueOrThrow({
+    const userData = await prisma.user.findUnique({
         where: {
             email: payload.email,
         },
@@ -27,14 +27,14 @@ const loginUser = async (payload: LoginSchemaInput) => {
     if (!userData) {
         throw new ApiError(
             StatusCodes.UNAUTHORIZED,
-            "Invalid Credentials Provided",
+            "Invalid Credentials",
         );
     }
 
     if (!payload.password || !userData?.password) {
         throw new ApiError(
             StatusCodes.UNAUTHORIZED,
-            "Invalid Credentials Provided",
+            "Invalid Credentials",
         );
     }
 
@@ -46,7 +46,7 @@ const loginUser = async (payload: LoginSchemaInput) => {
     if (!isCorrectPassword) {
         throw new ApiError(
             StatusCodes.UNAUTHORIZED,
-            "Invalid Credentials Provided",
+            "Invalid Credentials",
         );
     }
 
@@ -156,7 +156,7 @@ const refreshToken = async (payload: RefreshTokenSchemaInput) => {
     try {
         decrypted = jwtHelpers.verifyToken(
             payload.refreshToken,
-            config.jwt.jwt_secret as string,
+            config.jwt.refresh_token_secret as string,
         );
     } catch (err) {
         console.log(err);

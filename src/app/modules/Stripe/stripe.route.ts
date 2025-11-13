@@ -7,7 +7,7 @@ const router = Router();
 
 // Create Stripe Checkout Order
 router.post(
-    "/",
+    "/create-checkout-session",
     validateRequest(StripeValidations.createClinicSchema),
     StripeControllers.createCheckoutRequest,
 );

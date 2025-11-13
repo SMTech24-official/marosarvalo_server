@@ -151,7 +151,7 @@ model Clinic {
     reminderSchedule ReminderSchedule[]
 
     subscription Subscription?
-    status       ActivityStatus @default(INACTIVE)
+    status       ActivityStatus @default(ACTIVE)
 
     branding Branding?
 
@@ -172,7 +172,7 @@ model Branding {
     signature String?
 
     clinicId String  @unique @db.ObjectId
-    clinic   Clinic? @relation(fields: [clinicId], references: [id])
+    clinic   Clinic? @relation(fields: [clinicId], references: [id], onDelete: Cascade)
 
     note String?
 

@@ -24,15 +24,15 @@ if (!fs.existsSync(baseDir)) {
 const files = [
     {
         name: `${camel}.route.ts`,
-        content: routeTemplate({ pascal, camel, lower, subdir: !!baseDir }),
+        content: routeTemplate({ pascal, camel, lower, subdir: !!baseName }),
     },
     {
         name: `${camel}.controller.ts`,
-        content: controllerTemplate({ pascal, camel, subdir: !!baseDir }),
+        content: controllerTemplate({ pascal, camel, subdir: !!baseName }),
     },
     {
         name: `${camel}.service.ts`,
-        content: serviceTemplate({ pascal, camel, lower, subdir: !!baseDir }),
+        content: serviceTemplate({ pascal, camel, lower, subdir: !!baseName }),
     },
     {
         name: `${camel}.validation.ts`,
@@ -40,7 +40,7 @@ const files = [
             pascal,
             camel,
             lower,
-            subdir: !!baseDir,
+            subdir: !!baseName,
         }),
     },
 ];

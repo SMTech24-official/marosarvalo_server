@@ -16,6 +16,7 @@ import { toZonedTime } from "date-fns-tz";
 import { getMaxSequence } from "../../../../../utils";
 
 // Create new Staff
+// TODO: Check this - create clinic? why?
 const createNewStaff = async (payload: CreateStaffInput, user: JwtPayload) => {
     const { password, ...rest } = payload;
 

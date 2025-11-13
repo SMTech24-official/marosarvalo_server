@@ -1,5 +1,8 @@
+import { ActivityStatus } from "@prisma/client";
 import prisma from "../../../../../shared/prisma";
 import { CreatePackageInput, UpdatePackageInput } from "./package.validation";
+import ApiError from "../../../../../errors/ApiErrors";
+import { StatusCodes } from "http-status-codes";
 
 // Create Package
 const createPackage = async (payload: CreatePackageInput) => {
@@ -70,10 +73,52 @@ const deletePackage = async (id: string) => {
     };
 };
 
+// Update Package Status
+const updatePackageStatus = async (id: string, status: ActivityStatus) => {
+    if (!Object.values(ActivityStatus).includes(status)) {
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            `Invalid Status. Supported: ${Object.values(ActivityStatus).join(
+                ", ",
+            )}`,
+        );
+    }
+
+    const packageData = await prisma.package.findUnique({
+        where: { id },
+    });
+
+    if (!packageData) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Clinic not found");
+    }
+
+    if (packageData.status === status) {
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            `Package status is already ${status}`,
+        );
+    }
+
+    const response = await prisma.package.update({
+        where: {
+            id,
+        },
+        data: {
+            status: status,
+        },
+    });
+
+    return {
+        message: "Package Status Updated successfully",
+        data: response,
+    };
+};
+
 export default {
     createPackage,
     getAllPackages,
     getSinglePackage,
     updatePackage,
     deletePackage,
+    updatePackageStatus
 };

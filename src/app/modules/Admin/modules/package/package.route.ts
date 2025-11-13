@@ -28,4 +28,7 @@ router.patch(
 // Delete Package
 router.delete("/:id", PackageControllers.deletePackage);
 
+// Update Package Status
+router.patch("/:id/status", PackageControllers.updatePackageStatus);
+
 export const PackageRoutes = router;

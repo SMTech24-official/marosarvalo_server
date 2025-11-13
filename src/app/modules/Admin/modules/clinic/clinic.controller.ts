@@ -63,10 +63,26 @@ const deleteClinic = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// Update Clinic Status
+const updateClinicStatus = catchAsync(async (req: Request, res: Response) => {
+    const { status } = req.body;
+    const result = await ClinicServices.updateClinicStatus(
+        req.params.id,
+        status,
+    );
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: result.message,
+    });
+});
+
 export default {
     createNewClinic,
     getAllClinic,
     getSingleClinic,
     updateClinic,
     deleteClinic,
+    updateClinicStatus,
 };

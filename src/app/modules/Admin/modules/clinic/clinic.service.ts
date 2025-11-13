@@ -4,7 +4,7 @@ import prisma from "../../../../../shared/prisma";
 import { StatusCodes } from "http-status-codes";
 import { CreateClinicInput, UpdateClinicInput } from "./clinic.validation";
 import QueryBuilder from "../../../../../utils/queryBuilderV2";
-import { Prisma } from "@prisma/client";
+import { ActivityStatus, Prisma } from "@prisma/client";
 import { getCountdown } from "./clinic.utils";
 
 // Create new Clinic // TODO: Add Clinic to Subscription
@@ -221,10 +221,42 @@ const deleteClinic = async (id: string) => {
     };
 };
 
+// Update Clinic Status
+const updateClinicStatus = async (id: string, status: ActivityStatus) => {
+    if (!Object.values(ActivityStatus).includes(status)) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid Status. Supported: ${Object.values(ActivityStatus).join(", ")}`);
+    }
+
+    const clinic = await prisma.clinic.findUnique({
+        where: { id },
+    });
+
+    if (!clinic) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Clinic not found");
+    }
+
+    if (clinic.status === status) {
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            `Clinic status is already ${status}`,
+        );
+    }
+
+    await prisma.clinic.update({
+        where: { id },
+        data: { status },
+    });
+
+    return {
+        message: `Clinic status updated to ${status} successfully.`,
+    };
+};
+
 export default {
     createNewClinic,
     getAllClinic,
     getSingleClinic,
     updateClinic,
     deleteClinic,
+    updateClinicStatus,
 };

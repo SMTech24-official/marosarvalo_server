@@ -1,3 +1,4 @@
+import { PackageType, PlanType, UsageType } from "@prisma/client";
 import { z } from "zod";
 
 const createClinicSchema = z.object({
@@ -13,7 +14,7 @@ const createClinicSchema = z.object({
         phone: z.string(),
         address: z.string().min(5),
     }),
-    package: z.string(),
+    package: z.string()
 });
 export type CreateClinicInput = z.infer<typeof createClinicSchema>;
 
