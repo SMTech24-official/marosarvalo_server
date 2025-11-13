@@ -112,6 +112,7 @@ const getAllBookings = async (query: Record<string, unknown>) => {
                     id: true,
                 },
             },
+            order: true,
         })
         .execute();
 
@@ -123,6 +124,10 @@ const getAllBookings = async (query: Record<string, unknown>) => {
             name: subscription.name,
             email: subscription.email,
             phone: subscription.phone,
+            userName: subscription.order?.userName,
+            userEmail: subscription.order?.userEmail,
+            userPhone: subscription.order?.userPhone,
+            userAddress: subscription.order?.userAddress,
 
             status: subscription.clinic ? "COMPLETE" : "PENDING",
         };

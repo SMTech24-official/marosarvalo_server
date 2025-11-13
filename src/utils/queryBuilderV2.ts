@@ -48,7 +48,7 @@ type ExtractField<TArgs, K extends keyof any> = [
 
 class QueryBuilder<
     Model extends { findMany: (...args: any) => any },
-    TPayload extends OperationPayload = any,
+    TPayload,
     TFindManyArgs = Parameters<Model["findMany"]>[0],
     TInclude = undefined,
     TSelect = undefined,
@@ -468,13 +468,13 @@ class QueryBuilder<
             ? TFindManyArgs
             : Record<string, any> = {} as any,
     ): Promise<
-        TPayload extends any
-            ? Record<string, any>[]
-            : GetResult<
+        TPayload extends OperationPayload
+            ? GetResult<
                   TPayload,
                   CleanOptions<TInclude, TSelect, TOmit>,
                   "findMany"
               >
+            : Record<string, any>
     > {
         return this.model.findMany({
             ...this.prismaQuery,

@@ -94,6 +94,8 @@ model ClinicOrder {
     userPhone   String
     userAddress String
 
+    status CompletionStatus @default(PENDING)
+
     subscription Subscription?
 
     createdAt DateTime @default(now())
@@ -114,7 +116,7 @@ model Subscription {
     endDate   DateTime?
 
     orderId String?      @unique @db.ObjectId
-    order   ClinicOrder? @relation(fields: [orderId], references: [id])
+    order   ClinicOrder? @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
     clinicId String? @unique @db.ObjectId
     clinic   Clinic? @relation(fields: [clinicId], references: [id])
@@ -577,6 +579,12 @@ model ScheduledReminderHistory {
 enum ActivityStatus {
     ACTIVE
     INACTIVE
+}
+
+enum CompletionStatus {
+    PENDING
+    COMPLETED
+    CANCELLED
 }
 
 enum Gender {

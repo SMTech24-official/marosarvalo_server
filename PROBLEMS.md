@@ -15,7 +15,7 @@
 -   Will there not be any day off?
 -   Does Unavailability need any time?
 
-### Subscription
+### Subscription - Can't work with subscription without solution of this
 
 -   How will clinic re-subscribe?
 -   Is it a recurring subscription or one time and manual re-subscription?
@@ -32,3 +32,6 @@
 ### Clinics
 
 -   Should deleting clinic delete every data of that clinic?
+
+
+
