@@ -36,14 +36,14 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
         );
     }
 
-    req.body.guardianDocuments = guardianDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
+    req.body.guardianDocuments = guardianDocuments?.map(
+        (doc) => `${config.uploads_url}/${doc.filename}`,
     );
-    req.body.documents = documents.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
+    req.body.documents = documents?.map(
+        (doc) => `${config.uploads_url}/${doc.filename}`,
     );
-    req.body.otherDocuments = otherDocuments.map(
-        (doc) => `${config.backend_url}/uploads/${doc.filename}`,
+    req.body.otherDocuments = otherDocuments?.map(
+        (doc) => `${config.uploads_url}/${doc.filename}`,
     );
 
     const result = await PatientServices.createPatient(req.body, req.user);

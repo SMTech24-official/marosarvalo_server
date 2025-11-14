@@ -8,6 +8,7 @@ import { getValidatedIntId } from "../../../../../utils";
 // Create New Staff
 const createNewStaff = catchAsync(async (req: Request, res: Response) => {
     const result = await StaffServices.createNewStaff(req.body, req.user);
+
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.CREATED,
@@ -50,7 +51,6 @@ const updateStaffData = catchAsync(async (req: Request, res: Response) => {
         success: true,
         statusCode: StatusCodes.OK,
         message: result.message,
-        data: result.data,
     });
 });
 
@@ -84,11 +84,64 @@ const updateWorkingHours = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// Get Staff Working Hours
+const getWorkingHours = catchAsync(async (req: Request, res: Response) => {
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await StaffServices.getWorkingHours(id, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
 // Insert Staff Holiday
 const insertHoliday = catchAsync(async (req: Request, res: Response) => {
     const id = getValidatedIntId(req.params.id);
 
     const result = await StaffServices.insertHoliday(id, req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Get All Staff Holidays
+const getAllHolidays = catchAsync(async (req: Request, res: Response) => {
+    const id = getValidatedIntId(req.params.id);
+
+    const result = await StaffServices.getAllHolidays(id, req.query, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: result.message,
+        data: result.data,
+        pagination: result.pagination,
+    });
+});
+
+// Update Staff Holiday
+const updateHoliday = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id; // This is the holiday ID, not staff ID
+
+    const result = await StaffServices.updateHoliday(id, req.body, req.user);
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: result.message,
+        data: result.data,
+    });
+});
+
+// Delete Staff Holiday
+const deleteHoliday = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id; // This is the holiday ID, not staff ID
+
+    const result = await StaffServices.deleteHoliday(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,
@@ -121,6 +174,10 @@ export default {
     updateStaffData,
     deleteStaffData,
     updateWorkingHours,
+    getWorkingHours,
     insertHoliday,
+    getAllHolidays,
+    deleteHoliday,
+    updateHoliday,
     getStaffSchedules,
 };

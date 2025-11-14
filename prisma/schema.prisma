@@ -12,7 +12,7 @@ datasource db {
 }
 
 /**
- * @IdMod - Shows which models uses `dbId` as as the og id and use `id` as custom, but main id
+ * @IdMod - Shows which models uses `dbId` as the og id and use `id` as custom, but main (@unique) id
  */
 
 // ---------------- MODELS START HERE ----------------
@@ -225,7 +225,7 @@ model Staff {
 
     // Working Hours and Holiday
     workingHour StaffWorkingHour?
-    holiday     StaffHoliday?
+    holiday     StaffHoliday[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

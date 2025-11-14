@@ -54,7 +54,9 @@ const createPatient = async (
 
     return {
         message: "New Patient created",
-        data: response,
+        data: {
+            id: response.id,
+        },
     };
 };
 
@@ -189,6 +191,7 @@ const getPatientAppointments = async (
         },
         select: {
             id: true,
+            dbId: true
         },
     });
     if (!patient) {
@@ -220,7 +223,7 @@ const getPatientAppointments = async (
             },
         })
         .rawFilter({
-            patientId,
+            patientId: patient.dbId,
         })
         .execute();
     const pagination = await queryBuilder.countTotal();
@@ -262,6 +265,7 @@ const getPatientBonds = async (
         },
         select: {
             id: true,
+            dbId: true
         },
     });
     if (!patient) {
@@ -291,7 +295,7 @@ const getPatientBonds = async (
             },
         })
         .rawFilter({
-            patientId,
+            patientId: patient.dbId,
         })
         .execute();
     const pagination = await queryBuilder.countTotal();

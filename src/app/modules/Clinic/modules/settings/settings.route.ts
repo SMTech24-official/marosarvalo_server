@@ -2,6 +2,8 @@ import { Router } from "express";
 import SettingsControllers from "./settings.controller";
 import validateRequest from "../../../../middlewares/validateRequest";
 import settingsValidations from "./settings.validation";
+import { fileUploader } from "../../../../../helpers/fileUploader";
+import { parseBodyData } from "../../../../middlewares/parseBodyData";
 
 const router = Router();
 
@@ -21,6 +23,17 @@ router.get("/branding", SettingsControllers.getBrandingInfo);
 // Update Branding Info
 router.patch(
     "/branding",
+    fileUploader.upload.fields([
+        {
+            name: "logo",
+            maxCount: 1,
+        },
+        {
+            name: "signature",
+            maxCount: 1,
+        },
+    ]),
+    parseBodyData,
     validateRequest(settingsValidations.updateBrandingInfoSchema),
     SettingsControllers.updateBrandingInfo,
 );

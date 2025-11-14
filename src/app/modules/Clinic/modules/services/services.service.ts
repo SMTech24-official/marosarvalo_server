@@ -11,7 +11,7 @@ import { CreateServiceInput, UpdateServiceInput } from "./services.validation";
 const getServicesStatistics = async (user: JwtPayload) => {
     const disciplines = await prisma.discipline.findMany({
         where: {
-            clinicId: user.clinicId!,
+            clinicId: user.clinicId,
         },
         include: {
             services: {
@@ -106,11 +106,13 @@ const createService = async (payload: CreateServiceInput) => {
                 },
             },
         },
+        omit: {
+            disciplineId: true,
+        },
     });
 
     return {
         message: "New Service created",
-
         data: response,
     };
 };
@@ -125,16 +127,7 @@ const updateService = async (
         where: {
             id: serviceId,
             discipline: {
-                clinic: {
-                    specialists: {
-                        some: {
-                            id: user.id,
-                            role: {
-                                in: ["CLINIC_ADMIN", "RECEPTIONIST"],
-                            },
-                        },
-                    },
-                },
+                clinicId: user.clinicId,
             },
         },
         select: {
@@ -151,6 +144,7 @@ const updateService = async (
         data: { ...payload },
         select: {
             id: true,
+            name: true,
             discipline: {
                 select: {
                     id: true,
@@ -174,16 +168,7 @@ const deleteService = async (serviceId: string, user: JwtPayload) => {
         where: {
             id: serviceId,
             discipline: {
-                clinic: {
-                    specialists: {
-                        some: {
-                            id: user.id,
-                            role: {
-                                in: ["CLINIC_ADMIN", "RECEPTIONIST"],
-                            },
-                        },
-                    },
-                },
+                clinicId: user.clinicId,
             },
         },
         select: {

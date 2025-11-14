@@ -97,38 +97,22 @@ const updateBrandingInfo = async (
     payload: UpdateBrandingInfoInput,
     user: JwtPayload,
 ) => {
-    const response = await prisma.user.update({
+    const response = await prisma.branding.upsert({
         where: {
-            id: user.id,
+            clinicId: user.clinicId,
         },
-        data: {
-            clinic: {
-                update: {
-                    branding: {
-                        upsert: {
-                            create: {
-                                ...payload,
-                            },
-                            update: {
-                                ...payload,
-                            },
-                        },
-                    },
-                },
-            },
+
+        create: {
+            ...payload,
         },
-        select: {
-            clinic: {
-                select: {
-                    branding: true,
-                },
-            },
+        update: {
+            ...payload,
         },
     });
 
     return {
         message: "Branding Info updated",
-        data: response.clinic?.branding,
+        data: response,
     };
 };
 

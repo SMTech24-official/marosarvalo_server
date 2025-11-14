@@ -474,10 +474,12 @@ class QueryBuilder<
                   CleanOptions<TInclude, TSelect, TOmit>,
                   "findMany"
               >
-            : Record<string, any>
+            : any[]
     > {
+        const query = this.cleanQuery(this.prismaQuery);
+
         return this.model.findMany({
-            ...this.prismaQuery,
+            ...query,
             ...extraOptions,
         });
     }
@@ -491,7 +493,9 @@ class QueryBuilder<
         total: any;
         totalPage: number;
     }> {
-        const total = await this.model.count({ where: this.prismaQuery.where });
+        const query = this.cleanQuery(this.prismaQuery);
+
+        const total = await this.model.count({ where: query.where });
         const page = Number(this.query.page) || 1;
         const limit = Number(this.query.limit) || 10;
         const totalPage = Math.ceil(total / limit);
@@ -501,6 +505,26 @@ class QueryBuilder<
             limit,
             total,
             totalPage,
+        };
+    }
+
+    // Utility Functions
+    private cleanQuery(query: Record<string, any>) {
+        if (!query.where) return query;
+
+        const cleanedWhere = { ...query.where };
+
+        if (Array.isArray(cleanedWhere.AND) && cleanedWhere.AND.length === 0) {
+            delete cleanedWhere.AND;
+        }
+
+        if (Array.isArray(cleanedWhere.OR) && cleanedWhere.OR.length === 0) {
+            delete cleanedWhere.OR;
+        }
+
+        return {
+            ...query,
+            where: cleanedWhere,
         };
     }
 }

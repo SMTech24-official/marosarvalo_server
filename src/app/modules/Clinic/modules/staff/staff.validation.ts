@@ -74,14 +74,21 @@ const updateWorkingHoursSchema = z.object({
 export type UpdateWorkingHourInput = z.infer<typeof updateWorkingHoursSchema>;
 
 const insertHolidayInput = z.object({
-    date: z.date(),
+    date: z.iso.datetime(),
     reason: z.string(),
 });
 export type InsertHolidayInput = z.infer<typeof insertHolidayInput>;
+
+const updateHolidayInput = z.object({
+    date: z.iso.datetime().optional(),
+    reason: z.string().optional(),
+});
+export type UpdateHolidayInput = z.infer<typeof updateHolidayInput>;
 
 export default {
     createStaffSchema,
     updateStaffSchema,
     updateWorkingHoursSchema,
     insertHolidayInput,
+    updateHolidayInput
 };

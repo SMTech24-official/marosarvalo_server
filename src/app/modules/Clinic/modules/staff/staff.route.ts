@@ -38,11 +38,27 @@ router.patch(
     StaffControllers.updateWorkingHours,
 );
 
+// Get Staff Working Hours
+router.get("/:id/working-hours", StaffControllers.getWorkingHours);
+
 // Insert Staff Holiday
 router.post(
     "/:id/holiday",
     validateRequest(staffValidations.insertHolidayInput),
     StaffControllers.insertHoliday,
 );
+
+// Get All Staff Holidays
+router.get("/:id/holiday", StaffControllers.getAllHolidays);
+
+// Update Staff Holiday
+router.patch(
+    "/holiday/:id",
+    validateRequest(staffValidations.updateHolidayInput),
+    StaffControllers.updateHoliday,
+);
+
+// Delete Staff Holiday
+router.delete("/holiday/:id", StaffControllers.deleteHoliday);
 
 export const StaffRoutes = router;

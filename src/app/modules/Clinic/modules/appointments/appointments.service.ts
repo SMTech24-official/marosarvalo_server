@@ -10,25 +10,59 @@ import ApiError from "../../../../../errors/ApiErrors";
 import { getMaxSequence } from "../../../../../utils";
 import { FilterBy } from "../../../Admin/admin.service";
 
-import { endOfDay, isSameDay, startOfDay } from "date-fns";
+import { endOfDay, getTime, isSameDay, set, startOfDay } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
 import config from "../../../../../config";
 
 // Create new Appointment
+// TODO: Check Conflict of Time
 const createAppointment = async (
     payload: CreateAppointmentInput & { documents: string[] },
     timezone: string,
     user: JwtPayload,
 ) => {
+    const [specialist, patient] = await Promise.all([
+        prisma.staff.findUnique({
+            where: {
+                id_clinicId: {
+                    id: payload.specialistId as number,
+                    clinicId: user.clinicId,
+                },
+            },
+            select: {
+                id: true,
+                dbId: true,
+            },
+        }),
+        prisma.patient.findUnique({
+            where: {
+                id_clinicId: {
+                    id: payload.patientId as number,
+                    clinicId: user.clinicId,
+                },
+            },
+            select: {
+                id: true,
+                dbId: true,
+            },
+        }),
+    ]);
+    if (!specialist) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Specialist not found");
+    }
+    if (!patient) {
+        throw new ApiError(StatusCodes.NOT_FOUND, "Patient not found");
+    }
+
     const appointmentExists = await prisma.appointment.findFirst({
         where: {
             OR: [
                 {
-                    specialistId: payload.specialistId,
+                    specialistId: specialist.dbId,
                 },
                 {
-                    patientId: payload.patientId,
+                    patientId: specialist.dbId,
                 },
             ],
             startTime: { lt: fromZonedTime(payload.endTime, timezone) },
@@ -46,7 +80,7 @@ const createAppointment = async (
     if (appointmentExists) {
         throw new ApiError(
             StatusCodes.CONFLICT,
-            appointmentExists.specialistId === payload.specialistId
+            appointmentExists.specialistId === specialist.dbId
                 ? "Specialist is not available in this time slot"
                 : "Patient already has Appointment in this time slot",
         );
@@ -54,7 +88,7 @@ const createAppointment = async (
 
     const holiday = await prisma.staffHoliday.findMany({
         where: {
-            staffId: payload.specialistId,
+            staffId: specialist.dbId,
         },
     });
 
@@ -73,6 +107,8 @@ const createAppointment = async (
     const response = await prisma.appointment.create({
         data: {
             ...payload,
+            specialistId: specialist.dbId,
+            patientId: patient.dbId,
             clinicId: user.clinicId,
             id:
                 (await getMaxSequence({
@@ -85,7 +121,9 @@ const createAppointment = async (
 
     return {
         message: "New Appointment Created!",
-        data: response,
+        data: {
+            id: response.id,
+        },
     };
 };
 
@@ -99,8 +137,7 @@ const getAppointments = async (
         Prisma.$AppointmentPayload
     >(prisma.appointment, query);
 
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+    const startOfToday = startOfDay(new Date());
 
     const appointments = await queryBuilder
         .search(["patient.firstName", "patient.lastName"])
@@ -108,7 +145,7 @@ const getAppointments = async (
         .paginate()
         .filter(["status"])
         .rawFilter({
-            specialistId: user.id,
+            clinicId: user.clinicId,
             date: {
                 gte: startOfToday,
             },
@@ -143,6 +180,7 @@ const getAppointments = async (
             service: appointment.service.name,
             specialist: appointment.specialist,
             date: appointment.date,
+            status: appointment.status,
             startTime: appointment.startTime,
             endTime: appointment.endTime,
         };
@@ -367,7 +405,6 @@ const getAppointmentsCalender = async (
         .range()
         .rawFilter({
             clinicId: user.clinicId,
-            specialistId: user.id,
             status: {
                 not: "CANCELLED",
             },
@@ -443,6 +480,7 @@ const getAvailableAppointmentSchedules = async (
                 id: parseInt(payload.specialistId),
                 clinicId: user.clinicId,
             },
+            role: "SPECIALIST",
         },
         select: {
             id: true,
@@ -463,7 +501,17 @@ const getAvailableAppointmentSchedules = async (
         throw new ApiError(StatusCodes.NOT_FOUND, "Specialist not found");
     }
 
-    if (specialist.holiday && isSameDay(specialist.holiday.date, zoned)) {
+    if (!specialist.workingHour) {
+        throw new ApiError(
+            StatusCodes.NOT_ACCEPTABLE,
+            "Specialist's working hours not found",
+        );
+    }
+
+    if (
+        specialist.holiday &&
+        specialist.holiday.some((holiday) => isSameDay(holiday.date, zoned))
+    ) {
         throw new ApiError(StatusCodes.NO_CONTENT, "Specialist is in Holiday");
     }
 
@@ -480,14 +528,20 @@ const getAvailableAppointmentSchedules = async (
         return [];
     }
 
+    console.log(startTime, endTime);
+
     // Unavailable appointments for this day
     const appointments = await prisma.appointment.findMany({
         where: {
             status: {
                 notIn: ["CANCELLED"],
             },
-            startTime: { lte: endTime },
-            endTime: { gte: startTime },
+            date: {
+                gte: startTime,
+                lte: endTime,
+            },
+            // startTime: { lte: endTime },
+            // endTime: { gte: startTime },
             specialistId: specialist.dbId,
         },
         select: {
@@ -496,6 +550,8 @@ const getAvailableAppointmentSchedules = async (
             endTime: true,
         },
     });
+
+    console.log(appointments);
 
     const dayAppointmentStart = fromZonedTime(
         new Date(specialistWorkTime["from"]),
@@ -510,22 +566,10 @@ const getAvailableAppointmentSchedules = async (
         dayAppointmentStart,
         dayAppointmentEnd,
         Number(config.appointment_length),
+        appointments,
     );
 
-    const modifiedSlots = slots.map((slot) => {
-        const booked = appointments.some(
-            (appointment) =>
-                appointment.startTime < slot.end &&
-                appointment.endTime > slot.start,
-        );
-
-        return {
-            ...slot,
-            available: !booked,
-        };
-    });
-
-    return modifiedSlots;
+    return slots;
 };
 
 // Export all in default
