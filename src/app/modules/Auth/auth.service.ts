@@ -25,17 +25,11 @@ const loginUser = async (payload: LoginSchemaInput) => {
         },
     });
     if (!userData) {
-        throw new ApiError(
-            StatusCodes.UNAUTHORIZED,
-            "Invalid Credentials",
-        );
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid Credentials");
     }
 
     if (!payload.password || !userData?.password) {
-        throw new ApiError(
-            StatusCodes.UNAUTHORIZED,
-            "Invalid Credentials",
-        );
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid Credentials");
     }
 
     const isCorrectPassword = await comparePassword(
@@ -44,10 +38,7 @@ const loginUser = async (payload: LoginSchemaInput) => {
     );
 
     if (!isCorrectPassword) {
-        throw new ApiError(
-            StatusCodes.UNAUTHORIZED,
-            "Invalid Credentials",
-        );
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "Invalid Credentials");
     }
 
     if (userData.status === "INACTIVE")

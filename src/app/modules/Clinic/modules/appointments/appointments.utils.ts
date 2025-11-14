@@ -1,12 +1,4 @@
-import {
-    format,
-    getHours,
-    getMinutes,
-    getSeconds,
-    getWeek,
-    getYear,
-    parse,
-} from "date-fns";
+import { format, getWeek, getYear } from "date-fns";
 
 type FilterBy = "day" | "week" | "month" | "year" | undefined;
 

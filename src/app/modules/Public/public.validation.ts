@@ -1,19 +1,12 @@
-
 import { z } from "zod";
 
-const createPublicSchema = z.object({
-	
-});
-export type CreatePublicInput = z.infer<typeof createPublicSchema>
+const createPublicSchema = z.object({});
+export type CreatePublicInput = z.infer<typeof createPublicSchema>;
 
-const updatePublicSchema = z.object({
-	
-});
-export type UpdatePublicInput = z.infer<typeof updatePublicSchema>
-
+const updatePublicSchema = z.object({});
+export type UpdatePublicInput = z.infer<typeof updatePublicSchema>;
 
 export default {
-	createPublicSchema,
+    createPublicSchema,
     updatePublicSchema,
 };
-

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-unused-vars */
 
 import { Prisma } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
@@ -11,7 +12,12 @@ import handleZodError from "../../errors/handleZodError";
 import { IGenericErrorMessage } from "../../interfaces/error";
 import config from "../../config";
 
-const GlobalErrorHandler = (error: any, req: Request, res: Response, next: NextFunction) => {
+const GlobalErrorHandler = (
+    error: any,
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
     let statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR;
     let message = error.message || "Something went wrong!";
     let errorMessages: IGenericErrorMessage[] = [];

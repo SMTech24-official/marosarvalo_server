@@ -30,7 +30,7 @@ const getSingleBookings = catchAsync(async (req: Request, res: Response) => {
 
 const deleteBookings = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const result = await BookingsServices.deleteBookings(id);
+    await BookingsServices.deleteBookings(id);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

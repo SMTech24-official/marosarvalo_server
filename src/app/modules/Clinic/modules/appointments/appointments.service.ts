@@ -10,7 +10,7 @@ import ApiError from "../../../../../errors/ApiErrors";
 import { getMaxSequence } from "../../../../../utils";
 import { FilterBy } from "../../../Admin/admin.service";
 
-import { endOfDay, getTime, isSameDay, set, startOfDay } from "date-fns";
+import { endOfDay, isSameDay, startOfDay } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
 import config from "../../../../../config";

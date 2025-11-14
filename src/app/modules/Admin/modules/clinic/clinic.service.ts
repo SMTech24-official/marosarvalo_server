@@ -224,7 +224,10 @@ const deleteClinic = async (id: string) => {
 // Update Clinic Status
 const updateClinicStatus = async (id: string, status: ActivityStatus) => {
     if (!Object.values(ActivityStatus).includes(status)) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid Status. Supported: ${Object.values(ActivityStatus).join(", ")}`);
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            `Invalid Status. Supported: ${Object.values(ActivityStatus).join(", ")}`,
+        );
     }
 
     const clinic = await prisma.clinic.findUnique({

@@ -90,5 +90,5 @@ export default {
     updateStaffSchema,
     updateWorkingHoursSchema,
     insertHolidayInput,
-    updateHolidayInput
+    updateHolidayInput,
 };

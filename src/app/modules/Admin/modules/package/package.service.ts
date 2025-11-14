@@ -120,5 +120,5 @@ export default {
     getSinglePackage,
     updatePackage,
     deletePackage,
-    updatePackageStatus
+    updatePackageStatus,
 };

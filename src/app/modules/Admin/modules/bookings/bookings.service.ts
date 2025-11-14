@@ -1,8 +1,6 @@
 import prisma from "../../../../../shared/prisma";
 import QueryBuilder from "../../../../../utils/queryBuilderV2";
-import httpStatus from "http-status";
-import config from "../../../../../config";
-import { ActivityStatus, CompletionStatus } from "@prisma/client";
+import { CompletionStatus } from "@prisma/client";
 
 // CRUD
 
@@ -14,7 +12,7 @@ import { ActivityStatus, CompletionStatus } from "@prisma/client";
 // };
 
 // Get All Bookings
-const getAllBookings = async (query: Record<string, any>) => {
+const getAllBookings = async (query: Record<string, unknown>) => {
     const BookingsQuery = new QueryBuilder(prisma.clinicOrder, query)
         .search([
             "name",

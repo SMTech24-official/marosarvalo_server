@@ -191,7 +191,7 @@ const getPatientAppointments = async (
         },
         select: {
             id: true,
-            dbId: true
+            dbId: true,
         },
     });
     if (!patient) {
@@ -265,7 +265,7 @@ const getPatientBonds = async (
         },
         select: {
             id: true,
-            dbId: true
+            dbId: true,
         },
     });
     if (!patient) {

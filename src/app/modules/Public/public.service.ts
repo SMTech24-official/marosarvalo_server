@@ -1,7 +1,4 @@
 import prisma from "../../../shared/prisma";
-import QueryBuilder from "../../../utils/queryBuilder";
-import httpStatus from "http-status";
-import config from "../../../config";
 
 // Get Active Packages
 const getActivePackages = async () => {

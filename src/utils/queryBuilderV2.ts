@@ -20,8 +20,8 @@ type IsEnum<T> = T extends string | number
     ? string extends T
         ? false
         : number extends T
-        ? false
-        : true
+          ? false
+          : true
     : false;
 
 type EnumKeys<T> = {
@@ -363,8 +363,8 @@ class QueryBuilder<
         const existing = Array.isArray(this.prismaQuery.orderBy)
             ? this.prismaQuery.orderBy
             : this.prismaQuery.orderBy
-            ? [this.prismaQuery.orderBy]
-            : [];
+              ? [this.prismaQuery.orderBy]
+              : [];
         const newFields = Array.isArray(fields) ? fields : [fields];
         this.prismaQuery.orderBy = [...existing, ...newFields];
         return this;
